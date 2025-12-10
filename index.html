@@ -13,32 +13,32 @@
     }
     *{box-sizing:border-box}
     html,body,#app{height:100%}
-    body{margin:0;font-family:var(--font-sans);background:radial-gradient(800px 400px at 10% 10%, rgba(212,175,55,0.02), transparent), var(--bg);color:#eee;overflow:hidden}
+    body{margin:0;font-family:var(--font-sans);background:#ffffff;color:#eee;overflow:hidden}
 
     /* Layout */
     .wrap{display:grid;grid-template-columns:320px 1fr 340px;gap:18px;padding:20px;height:100%;align-items:stretch}
     @media (max-width:1100px){.wrap{grid-template-columns:1fr;grid-template-rows:auto 1fr auto;padding:12px}}
 
-    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:var(--radius);padding:14px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 36px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:12px;min-height:0}
+    .panel{background:#ffffff;border-radius:var(--radius);padding:14px;backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.04);box-shadow:0 8px 36px rgba(0,0,0,0.6);display:flex;flex-direction:column;gap:12px;min-height:0}
 
     h1{font-size:18px;margin:0}
     .lead{color:var(--muted);font-size:13px;margin:0}
 
     /* canvas area */
     .stage{position:relative;border-radius:var(--radius);overflow:hidden;padding:12px;display:flex;flex-direction:column}
-    .canvas-shell{flex:1;position:relative;border-radius:10px;overflow:hidden;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.015));border:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
+    .canvas-shell{flex:1;position:relative;border-radius:10px;overflow:hidden;background:#ffffff;border:1px solid rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
     canvas{width:100%;height:100%;display:block;touch-action:none}
 
     /* hud */
-    .hud{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:rgba(0,0,0,0.3);padding:8px 14px;border-radius:30px;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px);z-index:20}
+    .hud{position:absolute;left:50%;top:14px;transform:translateX(-50%);background:#ffffff;padding:8px 14px;border-radius:30px;border:1px solid rgba(255,255,255,0.03);backdrop-filter:blur(6px);z-index:20}
 
     /* toolbar */
     .tools{display:flex;flex-wrap:wrap;gap:8px}
-    .btn{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:10px;color:#fff;cursor:pointer;transition:all .14s}
-    .btn.primary{background:linear-gradient(90deg, rgba(212,175,55,0.12), rgba(243,215,217,0.02));border:1px solid rgba(212,175,55,0.22)}
+    .btn{background:#ffffff;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:10px;color:#fff;cursor:pointer;transition:all .14s}
+    .btn.primary{background:#ffffff;border:1px solid rgba(212,175,55,0.22)}
     .row{display:flex;align-items:center;gap:10px}
     .label{font-size:13px;color:var(--muted);min-width:90px}
-    input[type=range]{-webkit-appearance:none;height:8px;background:linear-gradient(90deg, rgba(212,175,55,0.16), rgba(243,215,217,0.03));border-radius:999px;outline:none}
+    input[type=range]{-webkit-appearance:none;height:8px;background:#ffffff;border-radius:999px;outline:none}
 
     /* color picker */
     .color-tools{display:flex;gap:8px;align-items:center}
@@ -50,13 +50,13 @@
 
     /* mobile bottom toolbar */\    
     .mobile-bottom{display:none}
-    @media (max-width:1100px){.mobile-bottom{display:flex;position:fixed;left:0;right:0;bottom:10px;margin:0 12px;padding:10px;background:linear-gradient(180deg, rgba(0,0,0,0.45), rgba(0,0,0,0.25));border-radius:14px;gap:8px;z-index:60;justify-content:center}}
+    @media (max-width:1100px){.mobile-bottom{display:flex;position:fixed;left:0;right:0;bottom:10px;margin:0 12px;padding:10px;background:#ffffff;border-radius:14px;gap:8px;z-index:60;justify-content:center}}
 
     /* small text */
     .small{font-size:13px;color:var(--muted)}
 
     /* helper */
-    .badge{background:rgba(255,255,255,0.02);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.03)}
+    .badge{background:#ffffff;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.03)}
   </style>
 </head>
 <body>
@@ -158,8 +158,8 @@
     </div>
 
     <!-- Advanced color modal -->
-    <div id="colorModal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);z-index:90">
-      <div style="width:420px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)">
+    <div id="colorModal" style="display:none;position:fixed;inset:0;align-items:center;justify-content:center;background:#ffffff;z-index:90">
+      <div style="width:420px;background:#ffffff;padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.04)">
         <h3 style="margin:0 0 8px 0">Advanced Color Picker</h3>
         <div style="display:flex;gap:10px">
           <input id="hue" type="range" min="0" max="360" value="45" style="flex:1">
