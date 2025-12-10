@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Created with love by Priyanshu for Ria</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
     <style>
@@ -15,454 +15,65 @@
             --accent: #C9A961;
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        html,body { height:100%; background:linear-gradient(135deg,var(--darker-bg) 0%,var(--dark-bg) 100%); color:var(--light-text); font-family:'Poppins',sans-serif; }
+        body { display:flex; flex-direction:column; min-height:100vh; }
 
-        html, body {
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background: linear-gradient(135deg, var(--darker-bg) 0%, var(--dark-bg) 100%);
-            color: var(--light-text);
-            font-family: 'Poppins', sans-serif;
-        }
+        #particlesContainer { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        #particlesContainer {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .particle {
-            position: absolute;
-            pointer-events: none;
-        }
-
-        /* Header */
         .header {
-            background: linear-gradient(to bottom, rgba(212, 175, 55, 0.08), transparent);
-            padding: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
-            z-index: 100;
-            position: relative;
+            background: linear-gradient(to bottom, rgba(212,175,55,0.08), transparent);
+            padding:18px; text-align:center; backdrop-filter: blur(10px);
+            border-bottom:1px solid rgba(212,175,55,0.15); z-index:100; position:relative;
         }
+        .header h1 { font-family:'Playfair Display',serif; font-size:28px; background:linear-gradient(135deg,var(--gold),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:4px; }
+        .header p { font-size:12px; color:var(--soft-gray); letter-spacing:1px; }
 
-        .header h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 28px;
-            background: linear-gradient(135deg, var(--gold), var(--accent));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
-        }
+        .main-container { display:flex; flex:1; gap:20px; padding:18px; position:relative; z-index:2; overflow:hidden; }
 
-        .header p {
-            font-size: 12px;
-            color: var(--soft-gray);
-            letter-spacing: 2px;
-        }
-
-        /* Main Container */
-        .main-container {
-            display: flex;
-            flex: 1;
-            position: relative;
-            z-index: 2;
-            gap: 20px;
-            padding: 20px;
-            overflow: hidden;
-        }
-
-        /* Canvas Container */
         #canvasContainer {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.98);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            overflow: hidden;
+            flex:1; display:flex; justify-content:center; align-items:center; position:relative;
+            border-radius:12px; background:rgba(255,255,255,0.98); box-shadow:0 8px 32px rgba(0,0,0,0.3); overflow:hidden;
+            border:1px solid rgba(212,175,55,0.2);
         }
 
-        #drawingCanvas {
-            display: block;
-            cursor: crosshair;
-            touch-action: none;
-        }
+        #drawingCanvas { display:block; touch-action:none; cursor:crosshair; background:transparent; }
 
-        /* Toolbar */
-        .toolbar {
-            width: 320px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-height: 100%;
-            overflow-y: auto;
-        }
+        .toolbar { width:320px; display:flex; flex-direction:column; gap:12px; max-height:calc(100vh - 160px); overflow:auto; }
+        .panel { background:rgba(15,23,42,0.85); border-radius:12px; padding:14px; border:1px solid rgba(212,175,55,0.12); backdrop-filter:blur(8px); box-shadow:0 8px 32px rgba(0,0,0,0.28); }
+        .panel-title { font-size:13px; font-weight:600; color:var(--gold); text-transform:uppercase; margin-bottom:10px; display:flex; gap:8px; align-items:center; }
 
-        .panel {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 12px;
-            padding: 16px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            animation: slideIn 0.4s ease-out;
-        }
+        .brush-selector { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+        .brush-btn { padding:10px; border-radius:8px; border:1px solid rgba(212,175,55,0.18); background:rgba(212,175,55,0.06); color:var(--light-text); cursor:pointer; font-size:12px; }
+        .brush-btn.active { background:var(--gold); color:var(--darker-bg); box-shadow:0 0 12px rgba(212,175,55,0.28); }
 
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
+        input[type="range"] { width:100%; -webkit-appearance:none; height:6px; background:linear-gradient(to right, rgba(212,175,55,0.15), rgba(212,175,55,0.3)); border-radius:6px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--accent)); box-shadow:0 0 8px rgba(212,175,55,0.2); cursor:pointer; border:none; }
 
-        .panel-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--gold);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+        .color-display { height:60px; border-radius:8px; border:2px solid rgba(212,175,55,0.12); box-shadow:inset 0 2px 8px rgba(0,0,0,0.2); }
+        .color-inputs { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px; }
+        input[type="color"] { height:40px; border-radius:6px; border:1px solid rgba(212,175,55,0.12); cursor:pointer; }
+        .hex-input { padding:8px; border-radius:6px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.08); color:var(--light-text); font-family:monospace; }
 
-        /* Brush Type */
-        .brush-selector {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
+        .btn-group { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+        button { padding:10px 14px; border-radius:8px; border:1px solid rgba(212,175,55,0.12); background:rgba(212,175,55,0.06); color:var(--light-text); cursor:pointer; font-weight:500; }
+        button.primary { background:linear-gradient(135deg,var(--gold),var(--accent)); color:var(--darker-bg); border-color:var(--gold); font-weight:600; }
 
-        .brush-btn {
-            padding: 10px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--light-text);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            text-align: center;
-        }
+        .palette-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
+        .palette-color { width:100%; aspect-ratio:1; border-radius:6px; border:2px solid rgba(212,175,55,0.08); cursor:pointer; }
 
-        .brush-btn:hover {
-            background: rgba(212, 175, 55, 0.2);
-            border-color: var(--gold);
-        }
+        .footer { text-align:center; padding:14px 12px; background:linear-gradient(to top, rgba(212,175,55,0.06), transparent); border-top:1px solid rgba(212,175,55,0.12); color:var(--soft-gray); }
 
-        .brush-btn.active {
-            background: var(--gold);
-            color: var(--darker-bg);
-            border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
-        }
+        @media (max-width:1024px) { .main-container { flex-direction:column; } .toolbar { width:100%; max-height:220px; flex-direction:row; overflow-x:auto; } .panel { min-width:240px; flex-shrink:0; } }
 
-        /* Sliders */
-        .slider-group {
-            margin-bottom: 12px;
-        }
+        .sparkle { position:absolute; pointer-events:none; border-radius:50%; width:6px; height:6px; animation:sparkle 0.6s ease-out forwards; }
+        @keyframes sparkle { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:scale(0.2); } }
 
-        .slider-label {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: var(--soft-gray);
-            margin-bottom: 6px;
-        }
-
-        input[type="range"] {
-            width: 100%;
-            height: 6px;
-            border-radius: 3px;
-            background: linear-gradient(to right, rgba(212, 175, 55, 0.2), rgba(212, 175, 55, 0.4));
-            outline: none;
-            -webkit-appearance: none;
-            appearance: none;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold), var(--accent));
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--gold), var(--accent));
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
-        }
-
-        /* Color Picker */
-        .color-section {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .color-display {
-            width: 100%;
-            height: 60px;
-            border-radius: 8px;
-            border: 2px solid rgba(212, 175, 55, 0.3);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .color-display:hover {
-            border-color: var(--gold);
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 2px 8px rgba(0, 0, 0, 0.3);
-        }
-
-        .color-inputs {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        input[type="color"] {
-            width: 100%;
-            height: 40px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .hex-input {
-            width: 100%;
-            padding: 8px;
-            background: rgba(212, 175, 55, 0.1);
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            color: var(--light-text);
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-        }
-
-        /* Buttons */
-        .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        button {
-            padding: 10px 16px;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(212, 175, 55, 0.1);
-            color: var(--light-text);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-family: 'Poppins', sans-serif;
-        }
-
-        button:hover {
-            background: rgba(212, 175, 55, 0.2);
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-        }
-
-        button.primary {
-            background: linear-gradient(135deg, var(--gold), var(--accent));
-            color: var(--darker-bg);
-            border-color: var(--gold);
-            font-weight: 600;
-        }
-
-        button.primary:hover {
-            box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-        }
-
-        /* Palette */
-        .palette-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
-
-        .palette-color {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 6px;
-            border: 2px solid rgba(212, 175, 55, 0.2);
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .palette-color:hover {
-            border-color: var(--gold);
-            transform: scale(1.05);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-        }
-
-        /* Layers */
-        .layer-item {
-            padding: 10px;
-            background: rgba(212, 175, 55, 0.05);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            border-radius: 6px;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .layer-item:hover {
-            background: rgba(212, 175, 55, 0.1);
-            border-color: var(--gold);
-        }
-
-        .layer-item.active {
-            background: rgba(212, 175, 55, 0.15);
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.2);
-        }
-
-        .layer-name {
-            font-size: 12px;
-            flex: 1;
-        }
-
-        .layer-buttons {
-            display: flex;
-            gap: 4px;
-        }
-
-        .layer-btn {
-            padding: 4px 8px;
-            font-size: 10px;
-            min-width: auto;
-            background: rgba(212, 175, 55, 0.1);
-        }
-
-        /* Scrollbar */
-        .toolbar::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .toolbar::-webkit-scrollbar-track {
-            background: rgba(212, 175, 55, 0.05);
-            border-radius: 3px;
-        }
-
-        .toolbar::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.3);
-            border-radius: 3px;
-        }
-
-        .toolbar::-webkit-scrollbar-thumb:hover {
-            background: rgba(212, 175, 55, 0.5);
-        }
-
-        /* Footer */
-        .footer {
-            background: linear-gradient(to top, rgba(212, 175, 55, 0.08), transparent);
-            padding: 15px 20px;
-            text-align: center;
-            border-top: 1px solid rgba(212, 175, 55, 0.15);
-            font-size: 12px;
-            color: var(--soft-gray);
-            letter-spacing: 1px;
-            z-index: 100;
-            position: relative;
-        }
-
-        /* Mobile */
-        @media (max-width: 1024px) {
-            .main-container {
-                flex-direction: column;
-            }
-
-            .toolbar {
-                width: 100%;
-                max-height: 200px;
-                flex-direction: row;
-                overflow-x: auto;
-                overflow-y: hidden;
-            }
-
-            .panel {
-                flex-shrink: 0;
-                min-width: 250px;
-            }
-        }
-
-        /* Animations */
-        @keyframes sparkle {
-            0% {
-                opacity: 1;
-                transform: scale(1);
-            }
-            100% {
-                opacity: 0;
-                transform: scale(0);
-            }
-        }
-
-        .sparkle {
-            animation: sparkle 0.6s ease-out forwards;
-        }
-
-        /* Toast Notifications */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: rgba(212, 175, 55, 0.9);
-            color: var(--darker-bg);
-            padding: 12px 20px;
-            border-radius: 6px;
-            font-size: 12px;
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-        }
+        .toast { position:fixed; bottom:30px; right:30px; background:rgba(212,175,55,0.95); color:var(--darker-bg); padding:10px 14px; border-radius:8px; z-index:2000; }
     </style>
 </head>
 <body>
-    <div id="particlesContainer"></div>
+    <div id="particlesContainer" aria-hidden="true"></div>
 
     <div class="header">
         <h1>✨ Drawing Canvas</h1>
@@ -474,8 +85,7 @@
             <canvas id="drawingCanvas"></canvas>
         </div>
 
-        <div class="toolbar">
-            <!-- Brush Type -->
+        <div class="toolbar" aria-hidden="false">
             <div class="panel">
                 <div class="panel-title">🎨 Brush Type</div>
                 <div class="brush-selector">
@@ -488,75 +98,55 @@
                 </div>
             </div>
 
-            <!-- Brush Settings -->
             <div class="panel">
                 <div class="panel-title">⚙️ Brush Settings</div>
-                
                 <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Size</span>
-                        <span id="sizeValue">10</span>
-                    </div>
-                    <input type="range" id="brushSize" min="1" max="300" value="10">
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Size</span><span id="sizeValue">10</span></div>
+                    <input type="range" id="brushSize" min="1" max="200" value="10">
                 </div>
-
                 <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Opacity</span>
-                        <span id="opacityValue">100%</span>
-                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Opacity</span><span id="opacityValue">100%</span></div>
                     <input type="range" id="brushOpacity" min="0" max="100" value="100">
                 </div>
-
                 <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Hardness</span>
-                        <span id="hardnessValue">100%</span>
-                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Hardness</span><span id="hardnessValue">100%</span></div>
                     <input type="range" id="brushHardness" min="0" max="100" value="100">
                 </div>
-
                 <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Flow</span>
-                        <span id="flowValue">100%</span>
-                    </div>
+                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Flow</span><span id="flowValue">100%</span></div>
                     <input type="range" id="brushFlow" min="0" max="100" value="100">
                 </div>
             </div>
 
-            <!-- Color Picker -->
             <div class="panel">
                 <div class="panel-title">🎯 Color</div>
                 <div class="color-section">
-                    <div class="color-display" id="colorDisplay"></div>
+                    <div id="colorDisplay" class="color-display"></div>
                     <div class="color-inputs">
                         <input type="color" id="colorPicker" value="#000000">
-                        <input type="text" class="hex-input" id="hexInput" placeholder="#000000" maxlength="7">
+                        <input type="text" id="hexInput" class="hex-input" maxlength="7" placeholder="#000000" value="#000000">
                     </div>
                 </div>
-
-                <div style="margin-top: 12px;">
-                    <div class="slider-label">Alpha</div>
+                <div style="margin-top:12px;">
+                    <div style="font-size:12px;color:var(--soft-gray);margin-bottom:6px;">Alpha (Color)</div>
                     <input type="range" id="colorAlpha" min="0" max="255" value="255">
                 </div>
 
-                <div style="margin-top: 12px;">
+                <div style="margin-top:12px;">
                     <div class="panel-title">Quick Colors</div>
                     <div class="palette-grid">
-                        <div class="palette-color" style="background: #000000;"></div>
-                        <div class="palette-color" style="background: #FFFFFF;"></div>
-                        <div class="palette-color" style="background: #FF6B6B;"></div>
-                        <div class="palette-color" style="background: #FFD93D;"></div>
-                        <div class="palette-color" style="background: #6BCB77;"></div>
-                        <div class="palette-color" style="background: #4D96FF;"></div>
-                        <div class="palette-color" style="background: #D4AF37;"></div>
-                        <div class="palette-color" style="background: #FF6B9D;"></div>
+                        <div class="palette-color" style="background:#000000;"></div>
+                        <div class="palette-color" style="background:#FFFFFF;"></div>
+                        <div class="palette-color" style="background:#FF6B6B;"></div>
+                        <div class="palette-color" style="background:#FFD93D;"></div>
+                        <div class="palette-color" style="background:#6BCB77;"></div>
+                        <div class="palette-color" style="background:#4D96FF;"></div>
+                        <div class="palette-color" style="background:#D4AF37;"></div>
+                        <div class="palette-color" style="background:#FF6B9D;"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Tools -->
             <div class="panel">
                 <div class="panel-title">🛠️ Tools</div>
                 <div class="btn-group">
@@ -567,7 +157,6 @@
                 </div>
             </div>
 
-            <!-- Symmetry -->
             <div class="panel">
                 <div class="panel-title">↔️ Symmetry</div>
                 <div class="btn-group">
@@ -576,7 +165,6 @@
                 </div>
             </div>
 
-            <!-- Canvas -->
             <div class="panel">
                 <div class="panel-title">📋 Canvas</div>
                 <div class="btn-group">
@@ -587,375 +175,494 @@
         </div>
     </div>
 
-    <div class="footer">
-        Forever — Priyanshu × Ria
-    </div>
+    <div class="footer">Forever — Priyanshu × Ria</div>
 
     <script>
-        const canvas = document.getElementById('drawingCanvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const container = document.getElementById('canvasContainer');
+    // --- Elements & context
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const container = document.getElementById('canvasContainer');
+    const particles = document.getElementById('particlesContainer');
 
-        // Set canvas size
-        function resizeCanvas() {
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-            redrawLayers();
+    // State
+    let DPR = Math.max(1, window.devicePixelRatio || 1);
+    let isDrawing = false;
+    let currentBrush = 'pencil';
+    let currentColorHex = '#000000';
+    let colorAlpha = 1; // 0..1 (from colorAlpha slider)
+    let brushSize = 10;
+    let brushOpacity = 1; // 0..1 (from opacity slider)
+    let brushHardness = 1;
+    let brushFlow = 1;
+    let isErasing = false;
+    let isSmudging = false;
+    let enableMirror = false;
+    let enableRadial = false;
+    let points = [];
+    let layers = [];
+    let currentLayerIndex = 0;
+    let history = [];
+    let historyStep = -1;
+    const MAX_HISTORY = 50;
+
+    // --- Utility: convert hex + alpha to rgba string
+    function hexToRgba(hex, alpha = 1) {
+        if (!hex) return `rgba(0,0,0,${alpha})`;
+        const h = hex.replace('#','');
+        const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+        return `rgba(${r},${g},${b},${alpha})`;
+    }
+
+    // --- Layers creation & management
+    function createLayer(w = canvas.width, h = canvas.height) {
+        const layerCanvas = document.createElement('canvas');
+        layerCanvas.width = Math.max(1, w);
+        layerCanvas.height = Math.max(1, h);
+        const lctx = layerCanvas.getContext('2d');
+        lctx.clearRect(0,0,layerCanvas.width,layerCanvas.height);
+        return {
+            canvas: layerCanvas,
+            ctx: lctx,
+            name: `Layer ${layers.length + 1}`,
+            visible: true,
+            opacity: 1,
+            blendMode: 'source-over'
+        };
+    }
+
+    function initLayers() {
+        layers = [];
+        layers.push(createLayer(canvas.width, canvas.height));
+        currentLayerIndex = 0;
+        history = [];
+        historyStep = -1;
+        saveToHistory(); // save the blank initial state
+    }
+
+    // Resize all layer canvases while preserving content
+    function resizeLayers(newW, newH) {
+        for (let layer of layers) {
+            if (layer.canvas.width === newW && layer.canvas.height === newH) continue;
+            const temp = document.createElement('canvas');
+            temp.width = newW;
+            temp.height = newH;
+            const tctx = temp.getContext('2d');
+            // draw existing content onto temp (no scaling - keep same pixel dimensions by copying at top-left)
+            tctx.drawImage(layer.canvas, 0, 0, layer.canvas.width, layer.canvas.height, 0, 0, newW, newH);
+            layer.canvas.width = newW;
+            layer.canvas.height = newH;
+            layer.ctx = layer.canvas.getContext('2d');
+            layer.ctx.clearRect(0,0,newW,newH);
+            layer.ctx.drawImage(temp, 0, 0);
         }
+    }
 
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+    // --- Canvas resize with DPR handling
+    function resizeCanvas() {
+        DPR = Math.max(1, window.devicePixelRatio || 1);
+        const rect = container.getBoundingClientRect();
+        const cssW = Math.max(100, Math.floor(rect.width));
+        const cssH = Math.max(100, Math.floor(rect.height));
+        canvas.style.width = cssW + 'px';
+        canvas.style.height = cssH + 'px';
+        const newW = Math.floor(cssW * DPR);
+        const newH = Math.floor(cssH * DPR);
 
-        // State
-        let isDrawing = false;
-        let currentBrush = 'pencil';
-        let currentColor = '#000000';
-        let brushSize = 10;
-        let brushOpacity = 1;
-        let brushHardness = 1;
-        let brushFlow = 1;
-        let isErasing = false;
-        let isSmudging = false;
-        let enableMirror = false;
-        let enableRadial = false;
-        let points = [];
-        let layers = [];
-        let currentLayerIndex = 0;
-        let history = [];
-        let historyStep = -1;
+        // store previous layer images and resize
+        resizeLayers(newW, newH);
 
-        // Initialize layers
-        function initLayers() {
-            layers = [createLayer()];
-            currentLayerIndex = 0;
-            history = [];
-            historyStep = -1;
+        // set main canvas size (pixel size)
+        canvas.width = newW;
+        canvas.height = newH;
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0); // scale drawing operations to CSS pixels
+
+        redrawLayers();
+    }
+
+    window.addEventListener('resize', () => {
+        // small debounce
+        clearTimeout(window.___resizeTimeout);
+        window.___resizeTimeout = setTimeout(resizeCanvas, 80);
+    });
+
+    // --- Redraw combined layers onto main canvas
+    function redrawLayers() {
+        // Fill background white (or keep transparent by commenting out)
+        ctx.save();
+        ctx.setTransform(1,0,0,1,0,0); // reset transform to fill full pixel grid
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.restore();
+
+        // draw each layer
+        for (let layer of layers) {
+            if (!layer.visible) continue;
+            ctx.globalAlpha = layer.opacity;
+            ctx.globalCompositeOperation = layer.blendMode || 'source-over';
+            // drawImage expects pixel canvas sizes, but because we set ctx transform with DPR, we draw image scaled by 1/DPR automatically
+            ctx.drawImage(layer.canvas, 0, 0, layer.canvas.width / DPR, layer.canvas.height / DPR);
         }
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+    }
 
-        function createLayer() {
-            const layerCanvas = document.createElement('canvas');
-            layerCanvas.width = canvas.width;
-            layerCanvas.height = canvas.height;
-            return {
-                canvas: layerCanvas,
-                ctx: layerCanvas.getContext('2d'),
-                name: `Layer ${layers.length + 1}`,
-                visible: true,
-                opacity: 1,
-                blendMode: 'source-over'
+    // --- History (undo/redo)
+    function saveToHistory() {
+        // cap history
+        if (historyStep < history.length - 1) {
+            history = history.slice(0, historyStep + 1);
+        }
+        // save each layer as dataURL (may be memory heavy; cap length)
+        const snapshot = layers.map(layer => layer.canvas.toDataURL('image/png'));
+        history.push(snapshot);
+        historyStep = history.length - 1;
+        if (history.length > MAX_HISTORY) {
+            history.shift();
+            historyStep = history.length - 1;
+        }
+    }
+
+    function restoreFromHistory() {
+        if (historyStep < 0 || historyStep >= history.length) return;
+        const snapshot = history[historyStep];
+        let loaded = 0;
+        for (let i = 0; i < snapshot.length; i++) {
+            const data = snapshot[i];
+            if (!data) { loaded++; continue; }
+            const img = new Image();
+            img.onload = () => {
+                // adjust layer canvas to match current size just in case
+                layers[i].ctx.clearRect(0,0,layers[i].canvas.width, layers[i].canvas.height);
+                // draw onto layer ctx scaled to layer canvas pixel size
+                layers[i].ctx.drawImage(img, 0, 0, layers[i].canvas.width, layers[i].canvas.height);
+                loaded++;
+                if (loaded === snapshot.length) {
+                    redrawLayers();
+                }
             };
+            img.src = data;
         }
+    }
 
-        function redrawLayers() {
-            ctx.fillStyle = '#FFFFFF';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            for (let layer of layers) {
-                if (layer.visible) {
-                    ctx.globalAlpha = layer.opacity;
-                    ctx.globalCompositeOperation = layer.blendMode;
-                    ctx.drawImage(layer.canvas, 0, 0);
-                }
-            }
-            ctx.globalAlpha = 1;
-            ctx.globalCompositeOperation = 'source-over';
+    function undo() {
+        if (historyStep > 0) {
+            historyStep--;
+            restoreFromHistory();
+        } else {
+            showToast('No more undo');
         }
-
-        function saveToHistory() {
+    }
+    function redo() {
+        if (historyStep < history.length - 1) {
             historyStep++;
-            if (historyStep < history.length) {
-                history.length = historyStep;
-            }
-            
-            const layerData = [];
-            for (let layer of layers) {
-                layerData.push(layer.canvas.toDataURL());
-            }
-            history.push(layerData);
+            restoreFromHistory();
+        } else {
+            showToast('No more redo');
+        }
+    }
+
+    // --- Brush textures & draw
+    function getBrushTexture() {
+        switch (currentBrush) {
+            case 'pencil': return { alpha: 0.85, blur: 0 };
+            case 'charcoal': return { alpha: 0.5 + Math.random() * 0.25, blur: 0.5 };
+            case 'marker': return { alpha: 0.9, blur: 0.2 };
+            case 'oil': return { alpha: 0.6 + Math.random() * 0.12, blur: 1 };
+            case 'watercolor': return { alpha: 0.25 + Math.random() * 0.25, blur: 2 };
+            case 'airbrush': return { alpha: 0.18, blur: 3 };
+            default: return { alpha: 0.8, blur: 0 };
+        }
+    }
+
+    function drawCurve(fromX, fromY, toX, toY) {
+        const layer = layers[currentLayerIndex];
+        const lctx = layer.ctx;
+
+        lctx.save();
+        lctx.lineCap = 'round';
+        lctx.lineJoin = 'round';
+
+        // brush dynamics
+        const texture = getBrushTexture();
+        let effectiveAlpha = texture.alpha * brushOpacity * brushFlow;
+        const finalAlpha = isErasing ? 1 : effectiveAlpha;
+        const strokeW = brushSize * (brushHardness * 0.9 + 0.1);
+
+        lctx.globalAlpha = finalAlpha;
+        lctx.lineWidth = strokeW;
+        lctx.filter = isSmudging ? `blur(${Math.max(1, brushSize * 0.06)}px)` : 'none';
+
+        if (isErasing) {
+            lctx.globalCompositeOperation = 'destination-out';
+            lctx.strokeStyle = `rgba(0,0,0,${finalAlpha})`;
+        } else {
+            lctx.globalCompositeOperation = 'source-over';
+            // combine color alpha slider with brushOpacity/flow
+            const colorA = colorAlpha * brushOpacity * brushFlow;
+            lctx.strokeStyle = hexToRgba(currentColorHex, Math.max(0.01, colorA));
         }
 
-        function undo() {
-            if (historyStep > 0) {
-                historyStep--;
-                restoreFromHistory();
-            }
+        // simple smooth line
+        lctx.beginPath();
+        lctx.moveTo(fromX, fromY);
+        lctx.lineTo(toX, toY);
+        lctx.stroke();
+
+        lctx.restore();
+
+        // Add sparkle occasionally (positioning relative to container)
+        if (!isErasing && Math.random() < 0.06) {
+            createSparkleAtCanvasPos(toX, toY);
         }
+    }
 
-        function redo() {
-            if (historyStep < history.length - 1) {
-                historyStep++;
-                restoreFromHistory();
-            }
-        }
+    // Sparkle placed relative to container (so CSS coords match)
+    function createSparkleAtCanvasPos(canvasX, canvasY) {
+        const rect = canvas.getBoundingClientRect();
+        // convert canvas coords (CSS px) to page coords using container rect (we used DPR scaling earlier)
+        // canvasX, canvasY are in CSS pixels (because we set ctx transform to DPR), so map directly
+        const pageX = rect.left + canvasX;
+        const pageY = rect.top + canvasY;
+        const sparkle = document.createElement('div');
+        sparkle.className = 'sparkle';
+        sparkle.style.left = (pageX - 3) + 'px'; // center
+        sparkle.style.top = (pageY - 3) + 'px';
+        sparkle.style.background = currentColorHex;
+        sparkle.style.boxShadow = `0 0 8px ${currentColorHex}`;
+        particles.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 650);
+    }
 
-        function restoreFromHistory() {
-            const layerData = history[historyStep];
-            layers.forEach((layer, i) => {
-                if (layerData[i]) {
-                    const img = new Image();
-                    img.onload = () => {
-                        layer.ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
-                        layer.ctx.drawImage(img, 0, 0);
-                        redrawLayers();
-                    };
-                    img.src = layerData[i];
-                }
-            });
-        }
+    // --- Pointer handling (with pointer capture)
+    canvas.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
+        isDrawing = true;
+        const rect = canvas.getBoundingClientRect();
+        // convert to CSS pixels (our drawing uses CSS pixel coords because ctx scaled by DPR)
+        const x = (e.clientX - rect.left);
+        const y = (e.clientY - rect.top);
+        points = [{x,y}];
 
-        // Brush textures
-        function getBrushTexture(x, y, size) {
-            switch(currentBrush) {
-                case 'pencil':
-                    return { alpha: 0.7, blur: 0 };
-                case 'charcoal':
-                    return { alpha: 0.5 + Math.random() * 0.2, blur: 1 };
-                case 'marker':
-                    return { alpha: 0.9, blur: 0.5 };
-                case 'oil':
-                    return { alpha: 0.6 + Math.random() * 0.1, blur: 1.5 };
-                case 'watercolor':
-                    return { alpha: 0.3 + Math.random() * 0.2, blur: 2 };
-                case 'airbrush':
-                    return { alpha: 0.2, blur: 3 };
-                default:
-                    return { alpha: 0.7, blur: 0 };
-            }
-        }
+        // save state to history (start of a stroke)
+        saveToHistory();
+    });
 
-        // Smooth curve drawing
-        function drawCurve(fromX, fromY, toX, toY) {
-            const layer = layers[currentLayerIndex];
-            const lctx = layer.ctx;
+    canvas.addEventListener('pointermove', (e) => {
+        if (!isDrawing) return;
+        const rect = canvas.getBoundingClientRect();
+        const x = (e.clientX - rect.left);
+        const y = (e.clientY - rect.top);
 
-            lctx.lineCap = 'round';
-            lctx.lineJoin = 'round';
-            lctx.globalAlpha = brushOpacity * brushFlow;
+        if (points.length > 0) {
+            const last = points[points.length - 1];
+            drawCurve(last.x, last.y, x, y);
 
-            if (isErasing) {
-                lctx.globalCompositeOperation = 'destination-out';
-                lctx.strokeStyle = `rgba(0,0,0,${brushOpacity})`;
-            } else {
-                lctx.globalCompositeOperation = 'source-over';
-                lctx.strokeStyle = currentColor;
+            if (enableMirror) {
+                const mirrorX = (canvas.width / DPR) - x;
+                const mirrorLastX = (canvas.width / DPR) - last.x;
+                drawCurve(mirrorLastX, last.y, mirrorX, y);
             }
 
-            lctx.lineWidth = brushSize;
-            
-            lctx.beginPath();
-            lctx.moveTo(fromX, fromY);
-            lctx.lineTo(toX, toY);
-            lctx.stroke();
-
-            // Add sparkles
-            if (!isErasing && Math.random() < 0.1) {
-                createSparkle(toX, toY);
-            }
-        }
-
-        function createSparkle(x, y) {
-            const sparkle = document.createElement('div');
-            sparkle.className = 'sparkle particle';
-            sparkle.style.left = x + 'px';
-            sparkle.style.top = y + 'px';
-            sparkle.style.width = '4px';
-            sparkle.style.height = '4px';
-            sparkle.style.background = 'radial-gradient(' + currentColor + ', transparent)';
-            sparkle.style.borderRadius = '50%';
-            sparkle.style.boxShadow = `0 0 8px ${currentColor}`;
-            document.getElementById('particlesContainer').appendChild(sparkle);
-            
-            setTimeout(() => sparkle.remove(), 600);
-        }
-
-        // Event listeners
-        canvas.addEventListener('pointerdown', (e) => {
-            isDrawing = true;
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            points = [{x, y}];
-            saveToHistory();
-        });
-
-        canvas.addEventListener('pointermove', (e) => {
-            if (!isDrawing) return;
-
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            if (points.length > 0) {
-                const lastPoint = points[points.length - 1];
-                drawCurve(lastPoint.x, lastPoint.y, x, y);
-
-                if (enableMirror) {
-                    const mirrorX = canvas.width - x;
-                    drawCurve(canvas.width - lastPoint.x, lastPoint.y, mirrorX, y);
-                }
-
-                if (enableRadial) {
-                    const centerX = canvas.width / 2;
-                    const centerY = canvas.height / 2;
-                    const angle = Math.atan2(y - centerY, x - centerX);
-                    for (let i = 1; i < 6; i++) {
-                        const a = angle + (i * Math.PI * 2 / 6);
-                        const radX = centerX + Math.cos(a) * Math.hypot(x - centerX, y - centerY);
-                        const radY = centerY + Math.sin(a) * Math.hypot(x - centerX, y - centerY);
-                        drawCurve(
-                            centerX + Math.cos(a) * Math.hypot(lastPoint.x - centerX, lastPoint.y - centerY),
-                            centerY + Math.sin(a) * Math.hypot(lastPoint.x - centerX, lastPoint.y - centerY),
-                            radX, radY
-                        );
-                    }
+            if (enableRadial) {
+                const centerX = (canvas.width / DPR) / 2;
+                const centerY = (canvas.height / DPR) / 2;
+                const angle = Math.atan2(y - centerY, x - centerX);
+                const dist = Math.hypot(x - centerX, y - centerY);
+                const segments = 6;
+                for (let i = 1; i < segments; i++) {
+                    const a = angle + (i * Math.PI * 2 / segments);
+                    const radX = centerX + Math.cos(a) * dist;
+                    const radY = centerY + Math.sin(a) * dist;
+                    const lastDist = Math.hypot(last.x - centerX, last.y - centerY);
+                    drawCurve(
+                        centerX + Math.cos(a) * lastDist,
+                        centerY + Math.sin(a) * lastDist,
+                        radX, radY
+                    );
                 }
             }
+        }
+        points.push({x,y});
+        redrawLayers();
+    });
 
-            points.push({x, y});
-            redrawLayers();
+    canvas.addEventListener('pointerup', (e) => {
+        isDrawing = false;
+        canvas.releasePointerCapture && canvas.releasePointerCapture(e.pointerId);
+        points = [];
+        // after finishing stroke, save snapshot for redo/undo (already saved at start, but good to push final)
+        saveToHistory();
+    });
+
+    canvas.addEventListener('pointerleave', () => { isDrawing = false; points = []; });
+
+    // --- UI bindings
+    document.querySelectorAll('.brush-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentBrush = btn.dataset.brush;
+            isErasing = false;
+            document.getElementById('eraserBtn').style.background = '';
         });
+    });
 
-        canvas.addEventListener('pointerup', () => {
-            isDrawing = false;
-            points = [];
-        });
+    document.getElementById('brushSize').addEventListener('input', (e) => {
+        brushSize = Number(e.target.value);
+        document.getElementById('sizeValue').textContent = brushSize;
+    });
 
-        canvas.addEventListener('pointerleave', () => {
-            isDrawing = false;
-        });
+    document.getElementById('brushOpacity').addEventListener('input', (e) => {
+        brushOpacity = Number(e.target.value) / 100;
+        document.getElementById('opacityValue').textContent = `${e.target.value}%`;
+    });
 
-        // Brush buttons
-        document.querySelectorAll('.brush-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentBrush = btn.dataset.brush;
-                isErasing = false;
-            });
-        });
+    document.getElementById('brushHardness').addEventListener('input', (e) => {
+        brushHardness = Number(e.target.value) / 100;
+        document.getElementById('hardnessValue').textContent = `${e.target.value}%`;
+    });
 
-        // Size slider
-        document.getElementById('brushSize').addEventListener('input', (e) => {
-            brushSize = e.target.value;
-            document.getElementById('sizeValue').textContent = brushSize;
-        });
+    document.getElementById('brushFlow').addEventListener('input', (e) => {
+        brushFlow = Number(e.target.value) / 100;
+        document.getElementById('flowValue').textContent = `${e.target.value}%`;
+    });
 
-        // Opacity slider
-        document.getElementById('brushOpacity').addEventListener('input', (e) => {
-            brushOpacity = e.target.value / 100;
-            document.getElementById('opacityValue').textContent = e.target.value + '%';
-        });
+    const colorPicker = document.getElementById('colorPicker');
+    const hexInput = document.getElementById('hexInput');
+    const colorDisplay = document.getElementById('colorDisplay');
+    const colorAlphaInput = document.getElementById('colorAlpha');
 
-        // Hardness slider
-        document.getElementById('brushHardness').addEventListener('input', (e) => {
-            brushHardness = e.target.value / 100;
-            document.getElementById('hardnessValue').textContent = e.target.value + '%';
-        });
+    colorPicker.addEventListener('input', (e) => {
+        currentColorHex = e.target.value;
+        hexInput.value = e.target.value;
+        updateColorDisplay();
+    });
 
-        // Flow slider
-        document.getElementById('brushFlow').addEventListener('input', (e) => {
-            brushFlow = e.target.value / 100;
-            document.getElementById('flowValue').textContent = e.target.value + '%';
-        });
+    hexInput.addEventListener('input', (e) => {
+        const v = e.target.value;
+        if (/^#([0-9A-Fa-f]{6})$/.test(v)) {
+            currentColorHex = v;
+            colorPicker.value = v;
+            updateColorDisplay();
+        }
+    });
 
-        // Color picker
-        const colorPicker = document.getElementById('colorPicker');
-        const hexInput = document.getElementById('hexInput');
-        const colorDisplay = document.getElementById('colorDisplay');
-        const colorAlpha = document.getElementById('colorAlpha');
+    colorAlphaInput.addEventListener('input', (e) => {
+        colorAlpha = Number(e.target.value) / 255;
+        updateColorDisplay();
+    });
 
-        colorPicker.addEventListener('change', (e) => {
-            currentColor = e.target.value;
-            hexInput.value = e.target.value;
+    function updateColorDisplay() {
+        colorDisplay.style.background = currentColorHex;
+        colorDisplay.style.opacity = colorAlpha;
+    }
+
+    document.querySelectorAll('.palette-color').forEach(elem => {
+        elem.addEventListener('click', () => {
+            const bg = window.getComputedStyle(elem).backgroundColor;
+            // convert rgb(...) to hex
+            const hex = rgbToHex(bg);
+            currentColorHex = hex;
+            colorPicker.value = hex;
+            hexInput.value = hex;
             updateColorDisplay();
         });
+    });
 
-        hexInput.addEventListener('input', (e) => {
-            if (e.target.value.length === 7) {
-                currentColor = e.target.value;
-                colorPicker.value = e.target.value;
-                updateColorDisplay();
-            }
-        });
+    function rgbToHex(rgb) {
+        const m = rgb.match(/\d+/g);
+        if (!m) return '#000000';
+        const r = parseInt(m[0]).toString(16).padStart(2,'0');
+        const g = parseInt(m[1]).toString(16).padStart(2,'0');
+        const b = parseInt(m[2]).toString(16).padStart(2,'0');
+        return `#${r}${g}${b}`;
+    }
 
-        colorAlpha.addEventListener('input', (e) => {
-            brushOpacity = e.target.value / 255;
-        });
+    // Eraser toggle
+    document.getElementById('eraserBtn').addEventListener('click', () => {
+        isErasing = !isErasing;
+        isSmudging = false;
+        document.getElementById('smudgeBtn').style.background = '';
+        document.getElementById('eraserBtn').style.background = isErasing ? 'rgba(212,175,55,0.3)' : '';
+    });
 
-        function updateColorDisplay() {
-            const alpha = colorAlpha.value / 255;
-            colorDisplay.style.background = currentColor;
-            colorDisplay.style.opacity = alpha;
+    // Smudge (basic)
+    document.getElementById('smudgeBtn').addEventListener('click', () => {
+        isSmudging = !isSmudging;
+        isErasing = false;
+        document.getElementById('eraserBtn').style.background = '';
+        document.getElementById('smudgeBtn').style.background = isSmudging ? 'rgba(212,175,55,0.3)' : '';
+    });
+
+    // Undo/Redo
+    document.getElementById('undoBtn').addEventListener('click', undo);
+    document.getElementById('redoBtn').addEventListener('click', redo);
+
+    // Symmetry
+    document.getElementById('mirrorBtn').addEventListener('click', () => {
+        enableMirror = !enableMirror;
+        document.getElementById('mirrorBtn').style.background = enableMirror ? 'rgba(212,175,55,0.3)' : '';
+    });
+    document.getElementById('radialBtn').addEventListener('click', () => {
+        enableRadial = !enableRadial;
+        document.getElementById('radialBtn').style.background = enableRadial ? 'rgba(212,175,55,0.3)' : '';
+    });
+
+    // Clear canvas
+    document.getElementById('clearBtn').addEventListener('click', () => {
+        if (!confirm('Clear entire canvas? This cannot be undone.')) return;
+        for (let layer of layers) {
+            layer.ctx.clearRect(0,0,layer.canvas.width, layer.canvas.height);
         }
+        redrawLayers();
+        saveToHistory();
+    });
 
-        // Palette colors
-        document.querySelectorAll('.palette-color').forEach(color => {
-            color.addEventListener('click', () => {
-                currentColor = window.getComputedStyle(color).backgroundColor;
-                colorPicker.value = rgbToHex(currentColor);
-                updateColorDisplay();
-            });
-        });
-
-        function rgbToHex(rgb) {
-            const match = rgb.match(/\d+/g);
-            if (!match) return '#000000';
-            const r = parseInt(match[0]).toString(16).padStart(2, '0');
-            const g = parseInt(match[1]).toString(16).padStart(2, '0');
-            const b = parseInt(match[2]).toString(16).padStart(2, '0');
-            return '#' + r + g + b;
+    // Download: merge layers at CSS-size resolution and download PNG
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        // create temp canvas at pixel resolution (scaled by DPR)
+        const out = document.createElement('canvas');
+        out.width = canvas.width;
+        out.height = canvas.height;
+        const octx = out.getContext('2d');
+        // white bg
+        octx.fillStyle = '#ffffff';
+        octx.fillRect(0,0,out.width,out.height);
+        // draw each layer (they are stored at pixel resolution)
+        for (let layer of layers) {
+            if (!layer.visible) continue;
+            octx.globalAlpha = layer.opacity;
+            octx.globalCompositeOperation = layer.blendMode || 'source-over';
+            octx.drawImage(layer.canvas, 0, 0);
         }
+        const link = document.createElement('a');
+        link.href = out.toDataURL('image/png');
+        link.download = 'drawing-priyanshu-ria.png';
+        link.click();
+    });
 
-        // Eraser
-        document.getElementById('eraserBtn').addEventListener('click', () => {
-            isErasing = !isErasing;
-            document.getElementById('eraserBtn').style.background = isErasing ? 'rgba(212, 175, 55, 0.3)' : '';
-        });
+    // --- Small toast utility
+    function showToast(text, ms = 1400) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = text;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), ms);
+    }
 
-        // Smudge (not fully implemented but toggled)
-        document.getElementById('smudgeBtn').addEventListener('click', () => {
-            isSmudging = !isSmudging;
-            document.getElementById('smudgeBtn').style.background = isSmudging ? 'rgba(212, 175, 55, 0.3)' : '';
-        });
-
-        // Undo/Redo
-        document.getElementById('undoBtn').addEventListener('click', undo);
-        document.getElementById('redoBtn').addEventListener('click', redo);
-
-        // Symmetry
-        document.getElementById('mirrorBtn').addEventListener('click', () => {
-            enableMirror = !enableMirror;
-            document.getElementById('mirrorBtn').style.background = enableMirror ? 'rgba(212, 175, 55, 0.3)' : '';
-        });
-
-        document.getElementById('radialBtn').addEventListener('click', () => {
-            enableRadial = !enableRadial;
-            document.getElementById('radialBtn').style.background = enableRadial ? 'rgba(212, 175, 55, 0.3)' : '';
-        });
-
-        // Clear canvas
-        document.getElementById('clearBtn').addEventListener('click', () => {
-            if (confirm('Clear entire canvas? This cannot be undone.')) {
-                layers.forEach(layer => {
-                    layer.ctx.clearRect(0, 0, layer.canvas.width, layer.canvas.height);
-                });
-                redrawLayers();
-                saveToHistory();
-            }
-        });
-
-        // Download
-        document.getElementById('downloadBtn').addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.href = canvas.toDataURL('image/png');
-            link.download = 'drawing-priyanshu-ria.png';
-            link.click();
-        });
-
-        // Initialize
-        updateColorDisplay();
+    // --- Init
+    updateColorDisplay();
+    // set initial canvas size after DOM paints
+    setTimeout(() => {
+        resizeCanvas();
         initLayers();
         redrawLayers();
+    }, 30);
     </script>
 </body>
 </html>
