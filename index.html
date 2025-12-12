@@ -5046,44 +5046,116 @@
             }
         }
 
-        // ========== INIT ==========
-        window.app = new DiaryApp();
-        window.audio = new AudioEngine();
-
-        document.addEventListener('DOMContentLoaded', () => {
+        // ========== STARFIELD ==========
+        function initStarfield() {
             try {
-                initStarfield();
-                const enterBtn = document.getElementById('enterBtn');
-                if (enterBtn) {
-                    enterBtn.addEventListener('click', () => {
-                        if (window.audio) window.audio.playClick();
-                        const landing = document.getElementById('landing');
-                        if (landing && window.gsap) {
-                            gsap.to(landing, {
-                                duration: 0.8,
-                                opacity: 0,
-                                ease: 'power2.inOut',
-                                onComplete: () => {
-                                    if (window.app) window.app.startApp();
-                                }
-                            });
-                        } else {
-                            if (window.app) window.app.startApp();
-                        }
+                const canvas = document.getElementById('starfield');
+                if (!canvas) return;
+
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
+
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+
+                const stars = [];
+                for (let i = 0; i < 250; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 1.5,
+                        opacity: Math.random() * 0.6 + 0.3,
                     });
                 }
-            } catch (err) {
-                console.error('DOMContentLoaded error:', err);
-            }
-        });
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', () => {
-                initStarfield();
-            });
-        } else {
-            setTimeout(() => initStarfield(), 100);
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'rgba(244, 228, 193, 0.9)';
+
+                    for (const star of stars) {
+                        ctx.globalAlpha = star.opacity;
+                        ctx.beginPath();
+                        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        star.opacity += (Math.random() - 0.5) * 0.08;
+                        star.opacity = Math.max(0.2, Math.min(0.8, star.opacity));
+                    }
+
+                    requestAnimationFrame(animate);
+                }
+
+                animate();
+
+                window.addEventListener('resize', () => {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                });
+            } catch (err) {
+                console.error('Starfield error:', err);
+            }
         }
+
+        // ========== INIT - CORRECT SEQUENCE ==========
+        
+        // Wait for DOM to be ready
+        function initializeApp() {
+            console.log('🎉 Initializing Luxury Diary...');
+            
+            // Create global instances
+            window.audio = new AudioEngine();
+            window.app = new DiaryApp();
+
+            // Initialize starfield animation
+            initStarfield();
+
+            // Setup enter button
+            const enterBtn = document.getElementById('enterBtn');
+            if (enterBtn) {
+                enterBtn.addEventListener('click', () => {
+                    console.log('👆 Enter button clicked');
+                    if (window.audio) window.audio.playClick();
+                    
+                    const landing = document.getElementById('landing');
+                    const app = document.getElementById('app');
+                    
+                    if (landing && window.gsap) {
+                        gsap.to(landing, {
+                            duration: 0.8,
+                            opacity: 0,
+                            ease: 'power2.inOut',
+                            onComplete: () => {
+                                landing.classList.add('hidden');
+                                if (app) app.style.display = 'flex';
+                                if (window.app) {
+                                    console.log('📖 Starting diary app...');
+                                    window.app.init();
+                                }
+                            }
+                        });
+                    } else {
+                        landing.classList.add('hidden');
+                        if (app) app.style.display = 'flex';
+                        if (window.app) window.app.init();
+                    }
+                });
+            } else {
+                console.error('❌ Enter button not found!');
+            }
+        }
+
+        // Execute when DOM is completely loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            // DOM already loaded (script at end of body)
+            initializeApp();
+        }
+
+        // Also ensure initialization on window load for safety
+        window.addEventListener('load', () => {
+            console.log('✓ Window loaded, app ready');
+        });
     </script>
 </body>
 </html>
