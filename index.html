@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hyper-realistic diary with handwriting and offline storage">
-    <title>Diary - Production Edition</title>
+    <meta name="description" content="Interactive 3D diary with realistic page flips and animations">
+    <title>Diary - Interactive Edition</title>
     
-    <!-- CDN LIBRARIES (with fallbacks) -->
+    <!-- CDN LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -38,9 +38,10 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: var(--color-text-primary);
             -webkit-font-smoothing: antialiased;
+            perspective: 1000px;
         }
 
-        /* LANDING SCREEN */
+        /* ========== LANDING SCREEN ========== */
         #landing {
             position: fixed;
             top: 0;
@@ -109,15 +110,19 @@
             background: linear-gradient(135deg, var(--color-accent) 0%, #d4a574 100%);
             color: white;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 10px 30px rgba(184, 149, 106, 0.3);
             opacity: 0;
             animation: fadeInUp 0.8s ease-out 0.6s forwards;
         }
 
         .landing-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(184, 149, 106, 0.4);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(184, 149, 106, 0.5);
+        }
+
+        .landing-btn:active {
+            transform: translateY(-2px) scale(1.02);
         }
 
         @keyframes fadeInUp {
@@ -125,22 +130,223 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* MAIN APP */
+        /* ========== MAIN APP ========== */
         #app {
             width: 100%;
             height: 100%;
             display: none;
-            background: var(--color-bg-primary);
+            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+            position: relative;
+            overflow: hidden;
         }
 
-        .app-layout {
-            display: flex;
+        /* ========== BOOK VIEW ========== */
+        .book-viewer {
             width: 100%;
             height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+            position: relative;
         }
 
-        /* SIDEBAR */
+        .book-spine {
+            perspective: 1500px;
+            transform-style: preserve-3d;
+            position: relative;
+            width: 600px;
+            height: 750px;
+            max-width: 90%;
+            max-height: 90vh;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #8b7355 0%, #5c4033 50%, #3e2723 100%);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset -1px -1px 3px rgba(255, 255, 255, 0.1);
+            transform-style: preserve-3d;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            opacity: 1;
+            z-index: 10;
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .book-cover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            border-radius: 8px;
+            pointer-events: none;
+        }
+
+        .book-cover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset -1px -1px 3px rgba(255, 255, 255, 0.15);
+        }
+
+        .book-cover.open {
+            opacity: 0;
+            pointer-events: none;
+            transform: rotateY(-180deg) translateZ(-300px);
+        }
+
+        .book-pages {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .book-pages.show {
+            opacity: 1;
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        .pages-container {
+            width: 100%;
+            height: 100%;
+            perspective: 1500px;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .page-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--color-paper);
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            z-index: -1;
+        }
+
+        .page-canvas-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 8px;
+            perspective: 1500px;
+        }
+
+        #pageCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            border-radius: 4px;
+        }
+
+        .page-text-layer {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--color-text-primary);
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            z-index: 5;
+        }
+
+        .page-text-layer:focus {
+            outline: none;
+        }
+
+        /* Page number indicator */
+        .page-number {
+            position: absolute;
+            bottom: 20px;
+            right: 30px;
+            font-size: 0.9rem;
+            color: var(--color-text-secondary);
+            font-weight: 600;
+            opacity: 0;
+            animation: slideInUp 0.5s ease-out 0.3s forwards;
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Page flip corner */
+        .page-flip-zone {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            cursor: grab;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .page-flip-zone:hover {
+            opacity: 0.3;
+            background: radial-gradient(circle at top-left, rgba(184, 149, 106, 0.2), transparent);
+        }
+
+        .page-flip-zone:active {
+            cursor: grabbing;
+        }
+
+        /* Page flip indicator */
+        .page-flip-corner {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, transparent 50%, var(--color-accent) 50%);
+            border-radius: 4px 0 0 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .page-flip-zone:hover .page-flip-corner {
+            opacity: 0.6;
+        }
+
+        /* ========== SIDEBAR ========== */
         .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
             width: 280px;
             height: 100%;
             background: var(--color-bg-secondary);
@@ -149,6 +355,41 @@
             flex-direction: column;
             overflow-y: auto;
             box-shadow: 2px 0 8px var(--color-shadow);
+            transform: translateX(-100%);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .sidebar-toggle:active {
+            transform: scale(0.95);
         }
 
         .sidebar-header {
@@ -165,17 +406,18 @@
             color: var(--color-text-primary);
         }
 
-        .sidebar-btn {
+        .sidebar-close {
             background: none;
             border: none;
-            color: var(--color-accent);
+            font-size: 1.5rem;
             cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0.5rem;
+            color: var(--color-accent);
+            padding: 0;
+            transition: all 0.2s ease;
         }
 
-        .sidebar-btn:hover {
-            opacity: 0.8;
+        .sidebar-close:hover {
+            transform: rotate(90deg) scale(1.2);
         }
 
         .sidebar-content {
@@ -185,25 +427,45 @@
         }
 
         .page-item {
-            padding: 0.75rem;
+            padding: 1rem;
             margin-bottom: 0.75rem;
             background: var(--color-paper);
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             user-select: none;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .page-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .page-item:hover::before {
+            left: 100%;
         }
 
         .page-item:hover {
             background: white;
-            box-shadow: 0 2px 8px var(--color-shadow);
+            box-shadow: 0 4px 12px var(--color-shadow);
+            transform: translateX(8px);
+            border-color: var(--color-accent);
         }
 
         .page-item.active {
             background: var(--color-accent);
             color: white;
             border-color: var(--color-accent);
+            box-shadow: 0 4px 16px rgba(184, 149, 106, 0.3);
         }
 
         .page-item-title {
@@ -227,65 +489,116 @@
 
         .action-btn {
             padding: 0.75rem;
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             background: var(--color-paper);
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: var(--color-text-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--color-accent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .action-btn:hover {
-            background: var(--color-accent);
             color: white;
             border-color: var(--color-accent);
         }
 
-        /* MAIN CONTENT */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
-        }
-
+        /* ========== TOOLBAR ========== */
         .toolbar {
-            height: 60px;
-            background: var(--color-paper);
-            border-bottom: 1px solid var(--color-border);
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: auto;
+            background: white;
+            border: 2px solid var(--color-border);
+            border-radius: 50px;
             display: flex;
             align-items: center;
-            padding: 0 1.5rem;
-            gap: 1.5rem;
-            box-shadow: 0 2px 4px var(--color-shadow);
-            flex-wrap: wrap;
+            padding: 0.75rem 1.5rem;
+            gap: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(30px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         .toolbar-group {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.5rem;
             align-items: center;
+            padding: 0 0.5rem;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 30px;
+            background: var(--color-border);
+            margin: 0 0.5rem;
         }
 
         .toolbar-btn {
             padding: 0.5rem 1rem;
-            border: 1px solid var(--color-border);
-            background: var(--color-bg-secondary);
+            border: 2px solid var(--color-border);
+            background: white;
             border-radius: 6px;
             cursor: pointer;
             font-size: 0.9rem;
-            transition: all 0.2s ease;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             color: var(--color-text-primary);
             white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toolbar-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--color-accent);
+            z-index: -1;
+            transition: left 0.4s ease;
+        }
+
+        .toolbar-btn:hover::before {
+            left: 0;
         }
 
         .toolbar-btn:hover {
-            background: var(--color-accent);
             color: white;
-            border-color: var(--color-accent);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .toolbar-btn.active {
@@ -294,122 +607,121 @@
             border-color: var(--color-accent);
         }
 
-        .toolbar-separator {
-            width: 1px;
-            height: 30px;
-            background: var(--color-border);
-        }
-
-        /* CONTROLS */
-        .control-group {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .control-label {
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-            font-weight: 500;
-        }
-
+        /* Controls */
         input[type="color"] {
             width: 35px;
             height: 35px;
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             border-radius: 4px;
             cursor: pointer;
             padding: 2px;
+            transition: all 0.2s ease;
+        }
+
+        input[type="color"]:hover {
+            transform: scale(1.1);
         }
 
         input[type="range"] {
             width: 100px;
             cursor: pointer;
+            accent-color: var(--color-accent);
         }
 
         select {
             padding: 0.4rem 0.75rem;
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             border-radius: 4px;
-            background: var(--color-bg-secondary);
+            background: white;
             color: var(--color-text-primary);
             cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
         }
 
-        /* CANVAS CONTAINER */
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+        select:hover {
+            border-color: var(--color-accent);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        #pageCanvas {
-            box-shadow: 0 10px 40px var(--color-shadow-dark);
-            border-radius: 4px;
-            cursor: crosshair;
-            background: var(--color-paper);
-            touch-action: none;
-            display: block;
-        }
-
-        .page-text-layer {
-            position: absolute;
-            top: 40px;
-            left: 40px;
-            right: 40px;
-            bottom: 40px;
-            font-size: 1rem;
-            line-height: 1.8;
-            color: var(--color-text-primary);
-            overflow-y: auto;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            font-family: 'Segoe UI', sans-serif;
-            padding: 0;
-            margin: 0;
-            background: transparent;
-        }
-
-        .page-text-layer:focus {
-            outline: none;
-        }
-
-        /* LIBRARY VIEW */
+        /* ========== LIBRARY VIEW ========== */
         #libraryView {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
             display: none;
+            flex-direction: column;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #libraryView.active {
+            display: flex;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .library-header {
+            padding: 2rem;
+            border-bottom: 2px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .library-title {
+            font-size: 2rem;
+            font-weight: 700;
+        }
+
+        .library-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--color-accent);
+            padding: 0;
+            transition: all 0.2s ease;
+        }
+
+        .library-close:hover {
+            transform: rotate(90deg) scale(1.2);
+        }
+
+        .library-content {
             flex: 1;
             overflow-y: auto;
             padding: 2rem;
         }
 
-        #libraryView.active {
-            display: block;
-        }
-
         .library-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1.5rem;
+            gap: 2rem;
         }
 
         .page-thumbnail {
             aspect-ratio: 3/4;
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             border-radius: 8px;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             background: var(--color-paper);
-            box-shadow: 0 2px 8px var(--color-shadow);
+            box-shadow: 0 4px 12px var(--color-shadow);
+            position: relative;
+            transform-style: preserve-3d;
         }
 
         .page-thumbnail:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px var(--color-shadow-dark);
+            transform: translateY(-12px) rotateX(5deg);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+            border-color: var(--color-accent);
         }
 
         .page-thumbnail img {
@@ -418,11 +730,24 @@
             object-fit: cover;
         }
 
-        /* STATUS INDICATOR */
+        .page-thumbnail-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+            padding: 1rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        /* ========== STATUS INDICATOR ========== */
         .status-indicator {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
             padding: 0.75rem 1.5rem;
             background: var(--color-accent);
             color: white;
@@ -431,17 +756,23 @@
             font-weight: 600;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
-            z-index: 999;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 24px rgba(184, 149, 106, 0.4);
+            z-index: 45;
         }
 
         .status-indicator.visible {
             opacity: 1;
             pointer-events: auto;
+            animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
-        /* MODAL */
+        @keyframes popIn {
+            0% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        /* ========== MODAL ========== */
         .modal {
             display: none;
             position: fixed;
@@ -450,13 +781,20 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
+            z-index: 300;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(5px);
         }
 
         .modal.active {
             display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         .modal-content {
@@ -466,6 +804,12 @@
             max-width: 500px;
             width: 90%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideInDown 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-title {
@@ -478,17 +822,19 @@
         .modal-input {
             width: 100%;
             padding: 0.75rem;
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
             border-radius: 6px;
             font-size: 1rem;
             margin-bottom: 1.5rem;
             color: var(--color-text-primary);
+            transition: all 0.3s ease;
         }
 
         .modal-input:focus {
             outline: none;
             border-color: var(--color-accent);
-            box-shadow: 0 0 0 3px rgba(184, 149, 106, 0.1);
+            box-shadow: 0 0 0 4px rgba(184, 149, 106, 0.1);
+            transform: scale(1.01);
         }
 
         .modal-actions {
@@ -499,51 +845,47 @@
 
         .modal-btn {
             padding: 0.75rem 1.5rem;
-            border: none;
+            border: 2px solid var(--color-border);
             border-radius: 6px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .modal-btn-primary {
             background: var(--color-accent);
             color: white;
+            border-color: var(--color-accent);
         }
 
         .modal-btn-primary:hover {
-            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(184, 149, 106, 0.3);
         }
 
         .modal-btn-secondary {
-            background: var(--color-bg-secondary);
+            background: white;
             color: var(--color-text-primary);
-            border: 1px solid var(--color-border);
         }
 
         .modal-btn-secondary:hover {
-            background: var(--color-border);
+            background: var(--color-bg-secondary);
+            transform: translateY(-2px);
         }
 
-        /* RESPONSIVE */
+        /* ========== RESPONSIVE ========== */
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
+            .book-spine {
+                width: 95%;
                 height: auto;
-                max-height: 150px;
-                border-right: none;
-                border-bottom: 1px solid var(--color-border);
-            }
-
-            .app-layout {
-                flex-direction: column;
+                aspect-ratio: 3/4;
             }
 
             .toolbar {
-                flex-wrap: wrap;
-                height: auto;
-                padding: 0.5rem;
+                width: 95%;
+                bottom: 10px;
+                padding: 0.5rem 1rem;
                 gap: 0.5rem;
             }
 
@@ -552,13 +894,13 @@
                 font-size: 0.8rem;
             }
 
+            .landing-title {
+                font-size: 2rem;
+            }
+
             .library-grid {
                 grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
                 gap: 1rem;
-            }
-
-            .landing-title {
-                font-size: 2rem;
             }
         }
     </style>
@@ -570,76 +912,98 @@
             <canvas id="starfield"></canvas>
         </div>
         <div class="landing-content">
-            <h1 class="landing-title">Your Diary</h1>
-            <p class="landing-subtitle">Hyper-realistic journaling</p>
-            <button class="landing-btn" id="enterBtn">ENTER</button>
+            <h1 class="landing-title">✦ Your Diary ✦</h1>
+            <p class="landing-subtitle">Hyper-interactive journaling experience</p>
+            <button class="landing-btn" id="enterBtn">ENTER ➜</button>
         </div>
     </div>
 
     <!-- MAIN APP -->
     <div id="app">
-        <div class="app-layout">
-            <!-- SIDEBAR -->
-            <div class="sidebar">
-                <div class="sidebar-header">
-                    <div class="sidebar-title">Diary</div>
-                    <button class="sidebar-btn" id="libraryBtn" title="View all pages">📚</button>
+        <!-- SIDEBAR -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">📖 Pages</div>
+                <button class="sidebar-close" id="sidebarClose">✕</button>
+            </div>
+            <div class="sidebar-content" id="pageList"></div>
+            <div class="sidebar-actions">
+                <button class="action-btn" id="newPageBtn">✨ New Page</button>
+                <button class="action-btn" id="exportPdfBtn">📄 Export PDF</button>
+                <button class="action-btn" id="exportJsonBtn">💾 Backup</button>
+                <button class="action-btn" id="importJsonBtn">📂 Import</button>
+            </div>
+        </div>
+
+        <!-- SIDEBAR TOGGLE -->
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+        <!-- BOOK VIEWER -->
+        <div class="book-viewer">
+            <!-- COVER -->
+            <div class="book-spine">
+                <div class="book-cover" id="bookCover">
+                    📔
+                    <div style="font-size: 1.2rem; margin-top: 1rem; letter-spacing: 1px;">MY DIARY</div>
                 </div>
-                <div class="sidebar-content" id="pageList"></div>
-                <div class="sidebar-actions">
-                    <button class="action-btn" id="newPageBtn">+ New Page</button>
-                    <button class="action-btn" id="exportPdfBtn">Export PDF</button>
-                    <button class="action-btn" id="exportJsonBtn">Backup</button>
-                    <button class="action-btn" id="importJsonBtn">Import</button>
+
+                <!-- PAGES -->
+                <div class="book-pages" id="bookPages">
+                    <div class="pages-container">
+                        <div class="page-background"></div>
+                        <div class="page-canvas-wrapper">
+                            <canvas id="pageCanvas" width="600" height="750"></canvas>
+                            <div class="page-text-layer"></div>
+                            <div class="page-number" id="pageNumber"></div>
+                            <div class="page-flip-zone" id="pageFlipZone">
+                                <div class="page-flip-corner"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- MAIN CONTENT -->
-            <div class="main-content">
-                <!-- TOOLBAR -->
-                <div class="toolbar">
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn active" data-mode="text" id="modeText">📝 Type</button>
-                        <button class="toolbar-btn" data-mode="draw" id="modeDraw">✏️ Draw</button>
-                    </div>
-                    <div class="toolbar-separator"></div>
-                    <div class="toolbar-group" id="drawTools" style="display: none;">
-                        <select id="brushType">
-                            <option value="pen">Pen</option>
-                            <option value="pencil">Pencil</option>
-                            <option value="marker">Marker</option>
-                            <option value="eraser">Eraser</option>
-                        </select>
-                    </div>
-                    <div class="toolbar-group" id="colorControl" style="display: none;">
-                        <label class="control-label">Color:</label>
-                        <input type="color" id="brushColor" value="#000000">
-                    </div>
-                    <div class="toolbar-group" id="sizeControl" style="display: none;">
-                        <label class="control-label">Size:</label>
-                        <input type="range" id="brushSize" min="1" max="50" value="3">
-                    </div>
-                    <div class="toolbar-separator"></div>
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn" id="undoBtn" title="Undo">↶</button>
-                        <button class="toolbar-btn" id="redoBtn" title="Redo">↷</button>
-                    </div>
-                    <div class="toolbar-separator"></div>
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn" id="exportPngBtn">💾 PNG</button>
-                        <button class="toolbar-btn" id="saveBtn">Save</button>
-                    </div>
-                </div>
-
-                <!-- CANVAS AREA -->
-                <div class="canvas-container">
-                    <canvas id="pageCanvas" width="800" height="1000"></canvas>
-                </div>
+        <!-- TOOLBAR -->
+        <div class="toolbar" id="toolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn active" data-mode="text" id="modeText">📝</button>
+                <button class="toolbar-btn" data-mode="draw" id="modeDraw">✏️</button>
             </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group" id="drawTools" style="display: none;">
+                <select id="brushType">
+                    <option value="pen">Pen</option>
+                    <option value="pencil">Pencil</option>
+                    <option value="marker">Marker</option>
+                    <option value="eraser">Eraser</option>
+                </select>
+            </div>
+            <div class="toolbar-group" id="colorControl" style="display: none;">
+                <input type="color" id="brushColor" value="#000000" title="Brush color">
+            </div>
+            <div class="toolbar-group" id="sizeControl" style="display: none;">
+                <input type="range" id="brushSize" min="1" max="50" value="3" title="Brush size">
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="undoBtn" title="Undo">↶</button>
+                <button class="toolbar-btn" id="redoBtn" title="Redo">↷</button>
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="exportPngBtn">🖼️</button>
+                <button class="toolbar-btn" id="saveBtn">💾</button>
+            </div>
+        </div>
 
-            <!-- LIBRARY VIEW -->
-            <div id="libraryView">
-                <h2 style="margin-bottom: 2rem; font-size: 1.8rem;">Your Pages</h2>
+        <!-- LIBRARY VIEW -->
+        <div id="libraryView">
+            <div class="library-header">
+                <h2 class="library-title">📚 Your Pages</h2>
+                <button class="library-close" id="libraryClose">✕</button>
+            </div>
+            <div class="library-content">
                 <div class="library-grid" id="libraryGrid"></div>
             </div>
         </div>
@@ -648,7 +1012,7 @@
     <!-- IMPORT MODAL -->
     <div id="importModal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">Import Backup</h2>
+            <h2 class="modal-title">📂 Import Backup</h2>
             <input type="file" id="importFile" accept=".json" class="modal-input" placeholder="Choose file">
             <div class="modal-actions">
                 <button class="modal-btn modal-btn-secondary" id="importCancelBtn">Cancel</button>
@@ -662,19 +1026,43 @@
 
     <script>
         // ============================================================================
-        // DIARY APP - PRODUCTION VERSION WITH FULL ERROR HANDLING
+        // INTERACTIVE DIARY APP WITH PAGE FLIP PHYSICS & ANIMATIONS
         // ============================================================================
 
         const CONFIG = {
-            CANVAS_WIDTH: 800,
-            CANVAS_HEIGHT: 1000,
+            CANVAS_WIDTH: 600,
+            CANVAS_HEIGHT: 750,
             PAGE_MARGIN: 40,
             DB_NAME: 'DiaryApp',
-            DB_VERSION: 1,
             AUTOSAVE_DELAY: 5000,
         };
 
-        // STORAGE HELPER - IndexedDB with localStorage fallback
+        // PHYSICS ENGINE FOR PAGE FLIP
+        class PageFlipPhysics {
+            constructor() {
+                this.x = 0;
+                this.y = 0;
+                this.vx = 0;
+                this.vy = 0;
+                this.rotation = 0;
+                this.friction = 0.92;
+            }
+
+            update(targetX, targetY) {
+                const dx = targetX - this.x;
+                const dy = targetY - this.y;
+                this.vx = dx * 0.1 + this.vx * this.friction;
+                this.vy = dy * 0.1 + this.vy * this.friction;
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+
+            getEase() {
+                return Math.sqrt(this.vx * this.vx + this.vy * this.vy) / 100;
+            }
+        }
+
+        // STORAGE MANAGER
         class StorageManager {
             constructor() {
                 this.db = null;
@@ -683,8 +1071,8 @@
 
             async init() {
                 try {
-                    return new Promise((resolve, reject) => {
-                        const req = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+                    return new Promise((resolve) => {
+                        const req = indexedDB.open(CONFIG.DB_NAME, 1);
                         const timeout = setTimeout(() => {
                             this.useIndexedDB = false;
                             resolve(false);
@@ -703,18 +1091,13 @@
                         };
 
                         req.onupgradeneeded = (e) => {
-                            try {
-                                const db = e.target.result;
-                                if (!db.objectStoreNames.contains('pages')) {
-                                    db.createObjectStore('pages', { keyPath: 'id' });
-                                }
-                            } catch (err) {
-                                console.error('DB upgrade error:', err);
+                            const db = e.target.result;
+                            if (!db.objectStoreNames.contains('pages')) {
+                                db.createObjectStore('pages', { keyPath: 'id' });
                             }
                         };
                     });
                 } catch (err) {
-                    console.error('IndexedDB init failed:', err);
                     this.useIndexedDB = false;
                     return false;
                 }
@@ -723,17 +1106,16 @@
             async savePage(page) {
                 if (this.useIndexedDB && this.db) {
                     try {
-                        return new Promise((resolve, reject) => {
+                        return new Promise((resolve) => {
                             const tx = this.db.transaction('pages', 'readwrite');
                             const req = tx.objectStore('pages').put(page);
-                            req.onerror = () => reject(req.error);
+                            req.onerror = () => resolve();
                             req.onsuccess = () => resolve();
                         });
                     } catch (err) {
                         console.error('Save error:', err);
                     }
                 } else {
-                    // Fallback to localStorage
                     try {
                         localStorage.setItem(`page_${page.id}`, JSON.stringify(page));
                     } catch (err) {
@@ -752,7 +1134,6 @@
                             req.onsuccess = () => resolve(req.result || null);
                         });
                     } catch (err) {
-                        console.error('Get error:', err);
                         return null;
                     }
                 } else {
@@ -782,7 +1163,7 @@
                         const pages = [];
                         for (let i = 0; i < localStorage.length; i++) {
                             const key = localStorage.key(i);
-                            if (key.startsWith('page_')) {
+                            if (key && key.startsWith('page_')) {
                                 const data = localStorage.getItem(key);
                                 pages.push(JSON.parse(data));
                             }
@@ -799,9 +1180,8 @@
                     try {
                         return new Promise((resolve) => {
                             const tx = this.db.transaction('pages', 'readwrite');
-                            const req = tx.objectStore('pages').delete(id);
-                            req.onerror = () => resolve();
-                            req.onsuccess = () => resolve();
+                            tx.objectStore('pages').delete(id);
+                            resolve();
                         });
                     } catch (err) {
                         console.error('Delete error:', err);
@@ -860,16 +1240,12 @@
                 this.color = '#000000';
                 this.size = 3;
 
-                this.lastX = 0;
-                this.lastY = 0;
-
                 this.setupEventListeners();
                 this.renderPaperTexture();
             }
 
             setupEventListeners() {
                 if (!this.canvas) return;
-
                 this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e), false);
                 this.canvas.addEventListener('pointermove', (e) => this.onPointerMove(e), false);
                 this.canvas.addEventListener('pointerup', (e) => this.onPointerUp(e), false);
@@ -891,23 +1267,21 @@
 
             onPointerDown(e) {
                 if (window.app && window.app.mode !== 'draw') return;
-                
                 e.preventDefault();
                 this.isDrawing = true;
                 const rect = this.canvas.getBoundingClientRect();
-                this.lastX = e.clientX - rect.left;
-                this.lastY = e.clientY - rect.top;
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const pressure = e.pressure || 1.0;
 
                 this.currentStroke = new Stroke(this.brush, this.color, this.size);
-                this.currentStroke.addPoint(this.lastX, this.lastY, e.pressure || 1.0);
-
+                this.currentStroke.addPoint(x, y, pressure);
                 this.undoStack.push(this.strokes.length);
                 this.redoStack = [];
             }
 
             onPointerMove(e) {
                 if (!this.isDrawing || !this.currentStroke) return;
-
                 e.preventDefault();
                 const rect = this.canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
@@ -920,7 +1294,6 @@
 
             onPointerUp(e) {
                 if (!this.isDrawing) return;
-
                 e.preventDefault();
                 this.isDrawing = false;
                 if (this.currentStroke) {
@@ -931,11 +1304,9 @@
 
             redraw() {
                 this.renderPaperTexture();
-
                 for (const stroke of this.strokes) {
                     this.drawStroke(stroke);
                 }
-
                 if (this.currentStroke) {
                     this.drawStroke(this.currentStroke);
                 }
@@ -946,7 +1317,6 @@
 
                 const ctx = this.ctx;
                 ctx.save();
-
                 ctx.strokeStyle = stroke.color;
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
@@ -980,7 +1350,6 @@
                     ctx.lineTo(p2.x, p2.y);
                     ctx.stroke();
                 }
-
                 ctx.restore();
             }
 
@@ -988,12 +1357,14 @@
                 if (this.strokes.length === 0) return;
                 this.redoStack.push(this.strokes.pop());
                 this.redraw();
+                window.app.showStatus('↶ Undone', 1000);
             }
 
             redo() {
                 if (this.redoStack.length === 0) return;
                 this.strokes.push(this.redoStack.pop());
                 this.redraw();
+                window.app.showStatus('↷ Redone', 1000);
             }
 
             clear() {
@@ -1012,7 +1383,6 @@
                 const scaledCtx = scaledCanvas.getContext('2d');
                 scaledCtx.scale(scale, scale);
 
-                // Draw paper texture
                 const imgData = this.ctx.createImageData(w, h);
                 const data = imgData.data;
                 for (let i = 0; i < data.length; i += 4) {
@@ -1024,7 +1394,6 @@
                 }
                 scaledCtx.putImageData(imgData, 0, 0);
 
-                // Draw strokes
                 for (const stroke of this.strokes) {
                     this.drawStrokeOnContext(scaledCtx, stroke);
                 }
@@ -1069,12 +1438,11 @@
                     ctx.lineTo(p2.x, p2.y);
                     ctx.stroke();
                 }
-
                 ctx.restore();
             }
         }
 
-        // MAIN APP CLASS
+        // MAIN APP
         class DiaryApp {
             constructor() {
                 this.storage = new StorageManager();
@@ -1084,20 +1452,14 @@
                 this.drawingEngine = null;
                 this.autosaveTimer = null;
                 this.initialized = false;
+                this.pageFlipPhysics = new PageFlipPhysics();
+                this.isFlipping = false;
+                this.currentPageIndex = 0;
             }
 
             async init() {
                 try {
-                    if (this.initialized) return;
-                    this.initialized = true;
-
-                    console.log('Initializing app...');
-
-                    // Wait for storage
                     await this.storage.init();
-                    console.log('Storage ready');
-
-                    // Wait for canvas
                     await new Promise(r => setTimeout(r, 100));
 
                     const canvas = document.getElementById('pageCanvas');
@@ -1107,12 +1469,8 @@
                     }
 
                     this.drawingEngine = new DrawingEngine(canvas);
-                    console.log('Drawing engine ready');
-
-                    // Load pages
                     this.pages = await this.storage.getAllPages();
                     this.pages.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-                    console.log('Pages loaded:', this.pages.length);
 
                     if (this.pages.length === 0) {
                         await this.newPage();
@@ -1124,15 +1482,127 @@
                     this.setupKeyboardShortcuts();
                     this.setupAutosave();
                     this.setupEventListeners();
-                    this.resizeCanvas();
+                    this.setupPageFlipInteraction();
+                    this.setupBookCoverInteraction();
 
-                    console.log('App fully initialized');
+                    this.initialized = true;
+                    console.log('✓ App ready');
                 } catch (err) {
                     console.error('Init error:', err);
                 }
             }
 
+            setupBookCoverInteraction() {
+                const cover = document.getElementById('bookCover');
+                const pages = document.getElementById('bookPages');
+
+                if (!cover || !pages) return;
+
+                cover.addEventListener('click', () => {
+                    cover.classList.add('open');
+                    pages.classList.add('show');
+                    gsap.to(cover, { duration: 0.6, opacity: 0, pointerEvents: 'none' });
+                    gsap.to(pages, { duration: 0.6, opacity: 1 });
+                    this.showStatus('Welcome to your diary!');
+                });
+            }
+
+            setupPageFlipInteraction() {
+                const flipZone = document.getElementById('pageFlipZone');
+                let isFlipping = false;
+                let startX, startY;
+
+                if (!flipZone) return;
+
+                flipZone.addEventListener('pointerdown', (e) => {
+                    if (this.mode !== 'draw' && this.mode !== 'text') return;
+                    isFlipping = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    flipZone.style.opacity = '0.5';
+                });
+
+                document.addEventListener('pointermove', (e) => {
+                    if (!isFlipping || !flipZone) return;
+
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                    if (distance > 20) {
+                        const flipProgress = Math.max(0, Math.min(1, -deltaX / 200));
+                        this.animatePageFlip(flipProgress);
+                    }
+                });
+
+                document.addEventListener('pointerup', () => {
+                    if (!isFlipping) return;
+                    isFlipping = false;
+                    flipZone.style.opacity = '0';
+                    this.completePageFlip();
+                });
+
+                // Swipe detection for turning pages
+                let touchStartX = 0;
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                }, false);
+
+                document.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const diff = touchStartX - touchEndX;
+
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            this.nextPage();
+                        } else {
+                            this.previousPage();
+                        }
+                    }
+                }, false);
+            }
+
+            animatePageFlip(progress) {
+                const canvas = document.getElementById('pageCanvas');
+                const wrapper = document.querySelector('.page-canvas-wrapper');
+                if (!canvas || !wrapper) return;
+
+                const skew = progress * 15;
+                const rotateX = progress * 20;
+                const opacity = 1 - progress * 0.3;
+
+                wrapper.style.transform = `skewY(${skew}deg) rotateX(${rotateX}deg)`;
+                wrapper.style.opacity = opacity;
+            }
+
+            completePageFlip() {
+                const wrapper = document.querySelector('.page-canvas-wrapper');
+                if (!wrapper) return;
+
+                gsap.to(wrapper, {
+                    duration: 0.6,
+                    skewY: 0,
+                    rotateX: 0,
+                    opacity: 1,
+                    ease: 'back.out'
+                });
+            }
+
             setupEventListeners() {
+                // Sidebar
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                const sidebarClose = document.getElementById('sidebarClose');
+                const sidebar = document.getElementById('sidebar');
+
+                if (sidebarToggle) sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    gsap.to(sidebarToggle, { duration: 0.3, rotate: sidebar.classList.contains('open') ? 90 : 0 });
+                });
+
+                if (sidebarClose) sidebarClose.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                });
+
                 // Mode buttons
                 const modeText = document.getElementById('modeText');
                 const modeDraw = document.getElementById('modeDraw');
@@ -1141,7 +1611,15 @@
 
                 // Sidebar buttons
                 const newPageBtn = document.getElementById('newPageBtn');
-                const libraryBtn = document.getElementById('libraryBtn');
+                const libraryBtn = document.getElementById('libraryToggle') || (() => {
+                    const btn = document.createElement('button');
+                    btn.id = 'libraryToggle';
+                    btn.className = 'action-btn';
+                    btn.textContent = '📚 Library';
+                    document.querySelector('.sidebar-actions').insertBefore(btn, document.querySelector('.sidebar-actions').firstChild);
+                    return btn;
+                })();
+
                 const exportPdfBtn = document.getElementById('exportPdfBtn');
                 const exportJsonBtn = document.getElementById('exportJsonBtn');
                 const importJsonBtn = document.getElementById('importJsonBtn');
@@ -1183,23 +1661,27 @@
                 });
                 if (importConfirmBtn) importConfirmBtn.addEventListener('click', () => this.importJSON());
 
-                // Resize
+                // Library
+                const libraryClose = document.getElementById('libraryClose');
+                if (libraryClose) libraryClose.addEventListener('click', () => this.toggleLibrary());
+
                 window.addEventListener('resize', () => this.resizeCanvas());
             }
 
             resizeCanvas() {
-                const container = document.querySelector('.canvas-container');
-                const canvas = document.getElementById('pageCanvas');
-                if (!container || !canvas) return;
+                const spine = document.querySelector('.book-spine');
+                if (!spine) return;
+
+                const container = document.querySelector('.book-viewer');
+                if (!container) return;
 
                 const scale = Math.min(
-                    (container.clientWidth - 40) / CONFIG.CANVAS_WIDTH,
-                    (container.clientHeight - 40) / CONFIG.CANVAS_HEIGHT,
+                    (container.clientWidth - 40) / 600,
+                    (container.clientHeight - 40) / 750,
                     1
                 );
 
-                canvas.style.width = (CONFIG.CANVAS_WIDTH * scale) + 'px';
-                canvas.style.height = (CONFIG.CANVAS_HEIGHT * scale) + 'px';
+                spine.style.transform = `scale(${scale})`;
             }
 
             setupKeyboardShortcuts() {
@@ -1250,7 +1732,7 @@
                 this.pages.unshift(page);
                 await this.openPage(page.id);
                 this.renderPageList();
-                this.showStatus('New page created');
+                this.showStatus('✨ New page created');
             }
 
             async openPage(id) {
@@ -1263,16 +1745,13 @@
                     if (!page) return;
 
                     this.currentPageId = id;
+                    this.currentPageIndex = this.pages.findIndex(p => p.id === id);
 
-                    // Clear text layer
                     const oldTextLayer = document.querySelector('.page-text-layer');
                     if (oldTextLayer) oldTextLayer.remove();
 
-                    // Clear drawing
                     if (this.drawingEngine) {
                         this.drawingEngine.clear();
-
-                        // Restore strokes
                         if (page.strokes && Array.isArray(page.strokes)) {
                             this.drawingEngine.strokes = page.strokes.map(s => {
                                 try {
@@ -1285,7 +1764,6 @@
                         }
                     }
 
-                    // Create new text layer
                     const canvas = document.getElementById('pageCanvas');
                     if (canvas && canvas.parentElement) {
                         const textLayer = document.createElement('div');
@@ -1296,7 +1774,21 @@
                         canvas.parentElement.appendChild(textLayer);
                     }
 
+                    // Update page number
+                    const pageNumber = document.getElementById('pageNumber');
+                    if (pageNumber) {
+                        pageNumber.textContent = `Page ${this.currentPageIndex + 1} of ${this.pages.length}`;
+                    }
+
                     this.renderPageList();
+                    this.showStatus(`📖 Page ${this.currentPageIndex + 1}`);
+                    this.resizeCanvas();
+
+                    // Animate page transition
+                    const wrapper = document.querySelector('.page-canvas-wrapper');
+                    if (wrapper) {
+                        gsap.from(wrapper, { duration: 0.4, opacity: 0, y: 20, ease: 'back.out' });
+                    }
                 } catch (err) {
                     console.error('Open page error:', err);
                 }
@@ -1316,7 +1808,7 @@
                     page.thumbnail = this.drawingEngine ? this.drawingEngine.getImageData(0.25) : '';
 
                     await this.storage.savePage(page);
-                    this.showStatus('Saved');
+                    this.showStatus('💾 Saved', 800);
                 } catch (err) {
                     console.error('Save error:', err);
                 }
@@ -1338,11 +1830,13 @@
                     if (colorControl) colorControl.style.display = 'flex';
                     if (sizeControl) sizeControl.style.display = 'flex';
                     if (canvas) canvas.style.cursor = 'crosshair';
+                    this.showStatus('✏️ Drawing mode');
                 } else {
                     if (drawTools) drawTools.style.display = 'none';
                     if (colorControl) colorControl.style.display = 'none';
                     if (sizeControl) sizeControl.style.display = 'none';
                     if (canvas) canvas.style.cursor = 'default';
+                    this.showStatus('📝 Typing mode');
                 }
             }
 
@@ -1373,7 +1867,7 @@
                     link.href = this.drawingEngine.getImageData(2);
                     link.download = `page-${this.currentPageId}.png`;
                     link.click();
-                    this.showStatus('PNG exported');
+                    this.showStatus('🖼️ PNG exported');
                 } catch (err) {
                     console.error('PNG export error:', err);
                 }
@@ -1389,7 +1883,7 @@
                     this.showStatus('Generating PDF...');
 
                     if (!window.jspdf) {
-                        this.showStatus('PDF library loading...');
+                        this.showStatus('Loading PDF library...');
                         return;
                     }
 
@@ -1409,7 +1903,7 @@
                     }
 
                     pdf.save('diary.pdf');
-                    this.showStatus('PDF exported');
+                    this.showStatus('📄 PDF exported');
                 } catch (err) {
                     console.error('PDF export error:', err);
                     this.showStatus('PDF export failed');
@@ -1425,7 +1919,7 @@
                     link.href = URL.createObjectURL(blob);
                     link.download = `diary-backup-${Date.now()}.json`;
                     link.click();
-                    this.showStatus('Backup exported');
+                    this.showStatus('💾 Backup exported');
                 } catch (err) {
                     console.error('JSON export error:', err);
                 }
@@ -1455,7 +1949,7 @@
                             this.renderPageList();
                             document.getElementById('importModal').classList.remove('active');
                             fileInput.value = '';
-                            this.showStatus('Backup imported');
+                            this.showStatus('✓ Backup imported');
                         } catch (err) {
                             this.showStatus('Import failed: ' + err.message);
                         }
@@ -1469,6 +1963,8 @@
             async nextPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx < this.pages.length - 1) {
+                    gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: -50 });
+                    await new Promise(r => setTimeout(r, 300));
                     await this.openPage(this.pages[idx + 1].id);
                 }
             }
@@ -1476,20 +1972,22 @@
             async previousPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx > 0) {
+                    gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: 50 });
+                    await new Promise(r => setTimeout(r, 300));
                     await this.openPage(this.pages[idx - 1].id);
                 }
             }
 
             toggleLibrary() {
                 const lib = document.getElementById('libraryView');
-                const main = document.querySelector('.main-content');
-                if (!lib || !main) return;
+                if (!lib) return;
 
                 lib.classList.toggle('active');
-                main.style.display = lib.classList.contains('active') ? 'none' : 'flex';
+                gsap.to(lib, { duration: 0.5, opacity: lib.classList.contains('active') ? 1 : 0 });
 
                 if (lib.classList.contains('active')) {
                     this.renderLibrary();
+                    document.getElementById('sidebar').classList.remove('open');
                 }
             }
 
@@ -1506,7 +2004,10 @@
                         <div class="page-item-title">${page.title || 'Untitled'}</div>
                         <div class="page-item-date">${new Date(page.updatedAt || page.createdAt).toLocaleDateString()}</div>
                     `;
-                    item.addEventListener('click', () => this.openPage(page.id));
+                    item.addEventListener('click', () => {
+                        this.openPage(page.id);
+                        document.getElementById('sidebar').classList.remove('open');
+                    });
                     pageList.appendChild(item);
                 }
             }
@@ -1525,6 +2026,10 @@
                         img.src = page.thumbnail;
                         img.alt = page.title || 'Page';
                         thumb.appendChild(img);
+                        const overlay = document.createElement('div');
+                        overlay.className = 'page-thumbnail-overlay';
+                        overlay.textContent = page.title || 'Untitled';
+                        thumb.appendChild(overlay);
                     } else {
                         thumb.style.background = 'var(--color-bg-secondary)';
                         thumb.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem;">${(page.title || 'P')[0]}</div>`;
@@ -1537,7 +2042,7 @@
                 }
             }
 
-            showStatus(msg) {
+            showStatus(msg, duration = 1500) {
                 const indicator = document.getElementById('statusIndicator');
                 if (!indicator) return;
 
@@ -1545,7 +2050,7 @@
                 indicator.classList.add('visible');
                 setTimeout(() => {
                     indicator.classList.remove('visible');
-                }, 2000);
+                }, duration);
             }
 
             startApp() {
@@ -1557,7 +2062,7 @@
             }
         }
 
-        // STARFIELD INITIALIZATION
+        // STARFIELD
         function initStarfield() {
             try {
                 const canvas = document.getElementById('starfield');
@@ -1607,27 +2112,22 @@
             }
         }
 
-        // GLOBAL APP INSTANCE
+        // INIT
         window.app = new DiaryApp();
 
-        // INITIALIZATION
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM ready');
             initStarfield();
-
             const enterBtn = document.getElementById('enterBtn');
             if (enterBtn) {
                 enterBtn.addEventListener('click', () => window.app.startApp());
             }
         });
 
-        // Fallback init
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                console.log('DOMContentLoaded fired');
+                console.log('DOMContentLoaded');
             });
         } else {
-            console.log('Document already loaded');
             initStarfield();
             const enterBtn = document.getElementById('enterBtn');
             if (enterBtn) {
