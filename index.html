@@ -1847,6 +1847,207 @@
             border-color: var(--gold-dark);
         }
 
+        /* ========== THEME SWITCHER ========== */
+        .theme-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 400;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .theme-panel.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        .theme-grid {
+            background: linear-gradient(135deg, #3d3530 0%, #2d2620 100%);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 900px;
+            width: 95%;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1.5rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .theme-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.5rem;
+            border: 2px solid rgba(212, 165, 116, 0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: rgba(212, 165, 116, 0.05);
+        }
+
+        .theme-item:hover {
+            border-color: var(--gold-dark);
+            background: rgba(212, 165, 116, 0.12);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.2);
+        }
+
+        .theme-item.active {
+            border-color: var(--gold-dark);
+            background: rgba(212, 165, 116, 0.25);
+            box-shadow: 0 0 20px rgba(212, 165, 116, 0.4);
+        }
+
+        .theme-preview {
+            width: 80px;
+            height: 110px;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-name {
+            font-family: var(--font-serif);
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--gold-light);
+            text-align: center;
+        }
+
+        .theme-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 401;
+            transition: all 0.3s ease;
+            color: var(--black-luxe);
+            font-weight: 700;
+        }
+
+        .theme-close:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+        }
+
+        /* ========== DELETE CONFIRMATION MODAL ========== */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .delete-modal.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .delete-modal-content {
+            background: linear-gradient(135deg, #3d3530 0%, #2d2620 100%);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        .delete-modal-title {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #e05555 0%, #c74c4c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .delete-modal-text {
+            color: var(--gold-light);
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .delete-modal-warning {
+            background: rgba(224, 85, 85, 0.1);
+            border: 1px solid rgba(224, 85, 85, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            color: #e05555;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .delete-modal-actions {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+        }
+
+        .delete-btn-cancel {
+            padding: 0.9rem 2rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            background: rgba(212, 165, 116, 0.08);
+            color: var(--gold-light);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: var(--font-serif);
+        }
+
+        .delete-btn-cancel:hover {
+            background: rgba(212, 165, 116, 0.15);
+            transform: translateY(-3px);
+        }
+
+        .delete-btn-confirm {
+            padding: 0.9rem 2rem;
+            background: linear-gradient(135deg, #e05555 0%, #c74c4c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: var(--font-serif);
+        }
+
+        .delete-btn-confirm:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(224, 85, 85, 0.3);
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 1024px) {
             .customizer-panel {
@@ -1952,6 +2153,8 @@
                 <button class="action-btn" id="exportPdfBtn">📄 PDF</button>
                 <button class="action-btn" id="exportJsonBtn">💾 Backup</button>
                 <button class="action-btn" id="importJsonBtn">📂 Import</button>
+                <button class="action-btn" id="themeBtn">🎨 Themes</button>
+                <button class="action-btn" id="deleteAllBtn">🗑️ Clear All</button>
             </div>
         </div>
 
@@ -2524,6 +2727,25 @@
     <!-- STATUS INDICATOR -->
     <div id="statusIndicator" class="status-indicator"></div>
 
+    <!-- THEME SWITCHER PANEL -->
+    <div class="theme-panel" id="themePanel">
+        <button class="theme-close" id="themeClose">✕</button>
+        <div class="theme-grid" id="themeGrid"></div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div class="delete-modal" id="deleteModal">
+        <div class="delete-modal-content">
+            <h2 class="delete-modal-title">⚠️ Delete Everything?</h2>
+            <p class="delete-modal-text">This will permanently delete all your diary pages and cannot be undone.</p>
+            <div class="delete-modal-warning">💾 Backup your work first using Export JSON!</div>
+            <div class="delete-modal-actions">
+                <button class="delete-btn-cancel" id="deleteCancel">Cancel</button>
+                <button class="delete-btn-confirm" id="deleteConfirm">Delete All Pages</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // ============================================================================
         // EXTREME REALISM LUXURY DIARY WITH UNLIMITED CUSTOMIZATION
@@ -2653,157 +2875,39 @@
             }
         }
 
-        // ========== STORAGE MANAGER ==========
+        // ========== STORAGE MANAGER (IN-MEMORY ONLY) ==========
         class StorageManager {
             constructor() {
-                this.db = null;
-                this.useIndexedDB = true;
+                this.pagesMap = new Map();
+                this.settingsMap = new Map();
             }
 
             async init() {
-                try {
-                    return new Promise((resolve) => {
-                        const req = indexedDB.open(CONFIG.DB_NAME, 1);
-                        const timeout = setTimeout(() => {
-                            this.useIndexedDB = false;
-                            resolve(false);
-                        }, 3000);
-
-                        req.onerror = () => {
-                            clearTimeout(timeout);
-                            this.useIndexedDB = false;
-                            resolve(false);
-                        };
-
-                        req.onsuccess = () => {
-                            clearTimeout(timeout);
-                            this.db = req.result;
-                            resolve(true);
-                        };
-
-                        req.onupgradeneeded = (e) => {
-                            const db = e.target.result;
-                            if (!db.objectStoreNames.contains('pages')) {
-                                db.createObjectStore('pages', { keyPath: 'id' });
-                            }
-                            if (!db.objectStoreNames.contains('settings')) {
-                                db.createObjectStore('settings', { keyPath: 'key' });
-                            }
-                        };
-                    });
-                } catch (err) {
-                    this.useIndexedDB = false;
-                    return false;
-                }
+                return true;
             }
 
             async savePage(page) {
-                if (this.useIndexedDB && this.db) {
-                    try {
-                        return new Promise((resolve) => {
-                            const tx = this.db.transaction('pages', 'readwrite');
-                            tx.objectStore('pages').put(page);
-                            resolve();
-                        });
-                    } catch (err) {
-                        console.error('Save error:', err);
-                    }
-                } else {
-                    localStorage.setItem(`page_${page.id}`, JSON.stringify(page));
-                }
+                this.pagesMap.set(page.id, { ...page });
             }
 
             async getPage(id) {
-                if (this.useIndexedDB && this.db) {
-                    try {
-                        return new Promise((resolve) => {
-                            const tx = this.db.transaction('pages', 'readonly');
-                            const req = tx.objectStore('pages').get(id);
-                            req.onerror = () => resolve(null);
-                            req.onsuccess = () => resolve(req.result || null);
-                        });
-                    } catch (err) {
-                        return null;
-                    }
-                } else {
-                    const data = localStorage.getItem(`page_${id}`);
-                    return data ? JSON.parse(data) : null;
-                }
+                return this.pagesMap.get(id) || null;
             }
 
             async getAllPages() {
-                if (this.useIndexedDB && this.db) {
-                    try {
-                        return new Promise((resolve) => {
-                            const tx = this.db.transaction('pages', 'readonly');
-                            const req = tx.objectStore('pages').getAll();
-                            req.onerror = () => resolve([]);
-                            req.onsuccess = () => resolve(req.result || []);
-                        });
-                    } catch (err) {
-                        return [];
-                    }
-                } else {
-                    const pages = [];
-                    for (let i = 0; i < localStorage.length; i++) {
-                        const key = localStorage.key(i);
-                        if (key && key.startsWith('page_')) {
-                            pages.push(JSON.parse(localStorage.getItem(key)));
-                        }
-                    }
-                    return pages;
-                }
+                return Array.from(this.pagesMap.values());
             }
 
             async saveSettings(key, value) {
-                const data = { key, value };
-                if (this.useIndexedDB && this.db) {
-                    try {
-                        return new Promise((resolve) => {
-                            const tx = this.db.transaction('settings', 'readwrite');
-                            tx.objectStore('settings').put(data);
-                            resolve();
-                        });
-                    } catch (err) {
-                        console.error('Settings save error:', err);
-                    }
-                } else {
-                    localStorage.setItem(`setting_${key}`, JSON.stringify(value));
-                }
+                this.settingsMap.set(key, value);
             }
 
             async getSettings(key) {
-                if (this.useIndexedDB && this.db) {
-                    try {
-                        return new Promise((resolve) => {
-                            const tx = this.db.transaction('settings', 'readonly');
-                            const req = tx.objectStore('settings').get(key);
-                            req.onerror = () => resolve(null);
-                            req.onsuccess = () => resolve(req.result?.value || null);
-                        });
-                    } catch (err) {
-                        return null;
-                    }
-                } else {
-                    const data = localStorage.getItem(`setting_${key}`);
-                    return data ? JSON.parse(data) : null;
-                }
+                return this.settingsMap.get(key) || null;
             }
 
             async deletePage(id) {
-                if (this.useIndexedDB && this.db) {
-                    try {
-                        return new Promise((resolve) => {
-                            const tx = this.db.transaction('pages', 'readwrite');
-                            tx.objectStore('pages').delete(id);
-                            resolve();
-                        });
-                    } catch (err) {
-                        console.error('Delete error:', err);
-                    }
-                } else {
-                    localStorage.removeItem(`page_${id}`);
-                }
+                this.pagesMap.delete(id);
             }
         }
 
@@ -3184,7 +3288,7 @@
 
             async init() {
                 try {
-                    await this.storage.init();
+                    this.storage.init();
                     await new Promise(r => setTimeout(r, 100));
 
                     const canvas = document.getElementById('pageCanvas');
@@ -3194,13 +3298,13 @@
                     }
 
                     this.drawingEngine = new DrawingEngine(canvas);
-                    this.pages = await this.storage.getAllPages();
+                    this.pages = this.storage.getAllPages();
                     this.pages.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
                     if (this.pages.length === 0) {
-                        await this.newPage();
+                        this.newPage();
                     } else {
-                        await this.openPage(this.pages[0].id);
+                        this.openPage(this.pages[0].id);
                     }
 
                     // Load ALL customization settings
@@ -3212,7 +3316,7 @@
                     ];
 
                     for (const setting of coverSettings) {
-                        const saved = await this.storage.getSettings(setting);
+                        const saved = this.storage.getSettings(setting);
                         if (saved) {
                             this[setting] = saved;
                         }
@@ -3220,13 +3324,13 @@
 
                     const pageSettings = ['pageTemplate', 'pageColor', 'pageMargin', 'pageBorder', 'pageTexture', 'pageNumberStyle'];
                     for (const setting of pageSettings) {
-                        const saved = await this.storage.getSettings(setting);
+                        const saved = this.storage.getSettings(setting);
                         if (saved) {
                             this[setting] = saved;
                         }
                     }
 
-                    this.bookmarks = await this.storage.getSettings('bookmarks') || [];
+                    this.bookmarks = this.storage.getSettings('bookmarks') || [];
                     this.updateCoverDisplay();
                     this.renderPageList();
                     this.setupKeyboardShortcuts();
@@ -3570,6 +3674,43 @@
                         };
                     })
                     .catch(err => console.log('Microphone access denied:', err));
+
+                // Setup theme switcher
+                const themeBtn = document.getElementById('themeBtn');
+                const themeClose = document.getElementById('themeClose');
+                const themePanel = document.getElementById('themePanel');
+
+                if (themeBtn) themeBtn.addEventListener('click', () => this.openThemeSwitcher());
+                if (themeClose) themeClose.addEventListener('click', () => {
+                    themePanel.classList.remove('active');
+                });
+
+                // Setup delete all functionality
+                const deleteAllBtn = document.getElementById('deleteAllBtn');
+                const deleteModal = document.getElementById('deleteModal');
+                const deleteCancel = document.getElementById('deleteCancel');
+                const deleteConfirm = document.getElementById('deleteConfirm');
+
+                if (deleteAllBtn) deleteAllBtn.addEventListener('click', () => {
+                    deleteModal.classList.add('active');
+                });
+                if (deleteCancel) deleteCancel.addEventListener('click', () => {
+                    deleteModal.classList.remove('active');
+                });
+                if (deleteConfirm) deleteConfirm.addEventListener('click', () => this.deleteAllPages());
+
+                // Close theme panel on outside click
+                themePanel.addEventListener('click', (e) => {
+                    if (e.target === themePanel) {
+                        themePanel.classList.remove('active');
+                    }
+                });
+
+                deleteModal.addEventListener('click', (e) => {
+                    if (e.target === deleteModal) {
+                        deleteModal.classList.remove('active');
+                    }
+                });
             }
 
             setupEventListeners() {
@@ -3666,7 +3807,7 @@
                     document.getElementById('coverCustomizer').classList.remove('active');
                 });
 
-                if (customizeApply) customizeApply.addEventListener('click', async () => {
+                if (customizeApply) customizeApply.addEventListener('click', () => {
                     this.coverText = coverText.value || 'MEMENTO';
                     this.coverSubtext = coverSubtextInput.value || 'My Diary';
                     this.updateCoverDisplay();
@@ -3683,12 +3824,8 @@
                         'pageTemplate', 'pageColor', 'pageMargin', 'pageBorder', 'pageTexture', 'pageNumberStyle'
                     ];
 
-                    const savePromises = [
-                        ...coverSettings.map(key => this.storage.saveSettings(key, this[key])),
-                        ...pageSettings.map(key => this.storage.saveSettings(key, this[key]))
-                    ];
-
-                    await Promise.all(savePromises);
+                    coverSettings.forEach(key => this.storage.saveSettings(key, this[key]));
+                    pageSettings.forEach(key => this.storage.saveSettings(key, this[key]));
                     
                     gsap.to(document.getElementById('coverCustomizer'), {
                         duration: 0.4,
@@ -3758,12 +3895,16 @@
             setupAutosave() {
                 this.autosaveTimer = setInterval(() => {
                     if (this.currentPageId && this.isCoverOpen) {
-                        this.savePage();
+                        try {
+                            this.savePage();
+                        } catch (err) {
+                            console.error('Autosave error:', err);
+                        }
                     }
                 }, CONFIG.AUTOSAVE_DELAY);
             }
 
-            async newPage() {
+            newPage() {
                 const page = {
                     id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
                     title: `Page ${this.pages.length + 1}`,
@@ -3774,23 +3915,23 @@
                     thumbnail: '',
                 };
 
-                await this.storage.savePage(page);
+                this.storage.savePage(page);
                 this.pages.unshift(page);
                 if (this.isCoverOpen) {
-                    await this.openPage(page.id);
+                    this.openPage(page.id);
                 }
                 this.renderPageList();
                 this.showStatus('✨ New page', 1200);
                 window.audio.playSave();
             }
 
-            async openPage(id) {
+            openPage(id) {
                 try {
                     if (this.currentPageId) {
-                        await this.savePage();
+                        this.savePage();
                     }
 
-                    const page = await this.storage.getPage(id);
+                    const page = this.storage.getPage(id);
                     if (!page) return;
 
                     this.currentPageId = id;
@@ -3841,12 +3982,12 @@
                 }
             }
 
-            async savePage() {
+            savePage() {
                 try {
                     if (!this.currentPageId) return;
 
                     const textLayer = document.querySelector('.page-text-layer');
-                    const page = await this.storage.getPage(this.currentPageId);
+                    const page = this.storage.getPage(this.currentPageId);
                     if (!page) return;
 
                     page.textContent = textLayer ? textLayer.textContent : '';
@@ -3854,7 +3995,7 @@
                     page.updatedAt = Date.now();
                     page.thumbnail = this.drawingEngine ? this.drawingEngine.getImageData(0.2) : '';
 
-                    await this.storage.savePage(page);
+                    this.storage.savePage(page);
                     this.showStatus('💾 Saved', 800);
                 } catch (err) {
                     console.error('Save error:', err);
@@ -3961,9 +4102,9 @@
                 }
             }
 
-            async exportJSON() {
+            exportJSON() {
                 try {
-                    const allPages = await this.storage.getAllPages();
+                    const allPages = this.storage.getAllPages();
                     const data = JSON.stringify(allPages, null, 2);
                     const blob = new Blob([data], { type: 'application/json' });
                     const link = document.createElement('a');
@@ -3977,14 +4118,14 @@
                 }
             }
 
-            async importJSON() {
+            importJSON() {
                 try {
                     const fileInput = document.getElementById('importFile');
                     const file = fileInput.files[0];
                     if (!file) return;
 
                     const reader = new FileReader();
-                    reader.onload = async (e) => {
+                    reader.onload = (e) => {
                         try {
                             const imported = JSON.parse(e.target.result);
                             if (!Array.isArray(imported)) {
@@ -3994,10 +4135,10 @@
 
                             for (const page of imported) {
                                 page.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-                                await this.storage.savePage(page);
+                                this.storage.savePage(page);
                             }
 
-                            this.pages = await this.storage.getAllPages();
+                            this.pages = this.storage.getAllPages();
                             this.renderPageList();
                             document.getElementById('importModal').classList.remove('active');
                             fileInput.value = '';
@@ -4013,23 +4154,21 @@
                 }
             }
 
-            async nextPage() {
+            nextPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx < this.pages.length - 1) {
                     window.audio.playPageTurn();
                     gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: -50 });
-                    await new Promise(r => setTimeout(r, 300));
-                    await this.openPage(this.pages[idx + 1].id);
+                    setTimeout(() => this.openPage(this.pages[idx + 1].id), 300);
                 }
             }
 
-            async previousPage() {
+            previousPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx > 0) {
                     window.audio.playPageTurn();
                     gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: 50 });
-                    await new Promise(r => setTimeout(r, 300));
-                    await this.openPage(this.pages[idx - 1].id);
+                    setTimeout(() => this.openPage(this.pages[idx - 1].id), 300);
                 }
             }
 
@@ -4411,6 +4550,175 @@
                 setTimeout(() => {
                     indicator.classList.remove('visible');
                 }, duration);
+            }
+
+            // THEME DEFINITIONS (10+ UNIQUE COLOR SCHEMES)
+            getThemes() {
+                return [
+                    {
+                        name: 'Classic Gold',
+                        id: 'classic-gold',
+                        coverColor: 'burgundy',
+                        primaryColor: '#d4a574',
+                        secondaryColor: '#f4e4c1',
+                        bgGradient: 'linear-gradient(135deg, #5c2e3a 0%, #4a3f35 50%, #3d3530 100%)',
+                        preview: 'linear-gradient(135deg, #5c2e3a 0%, #4a3f35 50%, #3d3530 100%)'
+                    },
+                    {
+                        name: 'Midnight Blue',
+                        id: 'midnight-blue',
+                        coverColor: 'navy',
+                        primaryColor: '#4a9fd8',
+                        secondaryColor: '#7bc4e8',
+                        bgGradient: 'linear-gradient(135deg, #1f2a3a 0%, #192230 50%, #0f1620 100%)',
+                        preview: 'linear-gradient(135deg, #1f2a3a 0%, #192230 50%, #0f1620 100%)'
+                    },
+                    {
+                        name: 'Forest Green',
+                        id: 'forest-green',
+                        coverColor: 'forest',
+                        primaryColor: '#6ba99a',
+                        secondaryColor: '#a8d5ce',
+                        bgGradient: 'linear-gradient(135deg, #1f3a2a 0%, #183020 50%, #0f2415 100%)',
+                        preview: 'linear-gradient(135deg, #1f3a2a 0%, #183020 50%, #0f2415 100%)'
+                    },
+                    {
+                        name: 'Rose Gold',
+                        id: 'rose-gold',
+                        coverColor: 'copper',
+                        primaryColor: '#d4845c',
+                        secondaryColor: '#e8b5a0',
+                        bgGradient: 'linear-gradient(135deg, #8b4513 0%, #7a3d10 50%, #6b360d 100%)',
+                        preview: 'linear-gradient(135deg, #8b4513 0%, #7a3d10 50%, #6b360d 100%)'
+                    },
+                    {
+                        name: 'Deep Plum',
+                        id: 'deep-plum',
+                        coverColor: 'plum',
+                        primaryColor: '#b894d3',
+                        secondaryColor: '#d4b8e8',
+                        bgGradient: 'linear-gradient(135deg, #4a2a4a 0%, #3f2540 50%, #342050 100%)',
+                        preview: 'linear-gradient(135deg, #4a2a4a 0%, #3f2540 50%, #342050 100%)'
+                    },
+                    {
+                        name: 'Wine Red',
+                        id: 'wine-red',
+                        coverColor: 'wine',
+                        primaryColor: '#d96b7f',
+                        secondaryColor: '#e8a0b0',
+                        bgGradient: 'linear-gradient(135deg, #5a1a2a 0%, #501520 50%, #451015 100%)',
+                        preview: 'linear-gradient(135deg, #5a1a2a 0%, #501520 50%, #451015 100%)'
+                    },
+                    {
+                        name: 'Charcoal Black',
+                        id: 'charcoal-black',
+                        coverColor: 'charcoal',
+                        primaryColor: '#c0c0c0',
+                        secondaryColor: '#e0e0e0',
+                        bgGradient: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 50%, #151515 100%)',
+                        preview: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 50%, #151515 100%)'
+                    },
+                    {
+                        name: 'Emerald Dream',
+                        id: 'emerald-dream',
+                        coverColor: 'emerald',
+                        primaryColor: '#7db3a0',
+                        secondaryColor: '#b8e0d0',
+                        bgGradient: 'linear-gradient(135deg, #2a4a3a 0%, #234035 50%, #1a3028 100%)',
+                        preview: 'linear-gradient(135deg, #2a4a3a 0%, #234035 50%, #1a3028 100%)'
+                    },
+                    {
+                        name: 'Cream & Gold',
+                        id: 'cream-gold',
+                        coverColor: 'cream',
+                        primaryColor: '#8b7355',
+                        secondaryColor: '#d4c5a0',
+                        bgGradient: 'linear-gradient(135deg, #d4c5a0 0%, #c8b890 50%, #b8a878 100%)',
+                        preview: 'linear-gradient(135deg, #d4c5a0 0%, #c8b890 50%, #b8a878 100%)'
+                    },
+                    {
+                        name: 'Deep Red',
+                        id: 'deep-red',
+                        coverColor: 'deep-red',
+                        primaryColor: '#d46b6b',
+                        secondaryColor: '#e8a0a0',
+                        bgGradient: 'linear-gradient(135deg, #8b1a1a 0%, #6b1515 50%, #5a1010 100%)',
+                        preview: 'linear-gradient(135deg, #8b1a1a 0%, #6b1515 50%, #5a1010 100%)'
+                    },
+                    {
+                        name: 'Sapphire Blue',
+                        id: 'sapphire-blue',
+                        coverColor: 'deep-blue',
+                        primaryColor: '#6ba8d4',
+                        secondaryColor: '#a8d0e8',
+                        bgGradient: 'linear-gradient(135deg, #2c3a4d 0%, #253340 50%, #1a2630 100%)',
+                        preview: 'linear-gradient(135deg, #2c3a4d 0%, #253340 50%, #1a2630 100%)'
+                    }
+                ];
+            }
+
+            openThemeSwitcher() {
+                const themePanel = document.getElementById('themePanel');
+                const themeGrid = document.getElementById('themeGrid');
+                if (!themePanel || !themeGrid) return;
+
+                themeGrid.innerHTML = '';
+                const themes = this.getThemes();
+
+                for (const theme of themes) {
+                    const item = document.createElement('div');
+                    item.className = 'theme-item';
+                    item.innerHTML = `
+                        <div class="theme-preview" style="background: ${theme.preview};"></div>
+                        <div class="theme-name">${theme.name}</div>
+                    `;
+                    item.addEventListener('click', () => this.applyTheme(theme));
+                    themeGrid.appendChild(item);
+                }
+
+                themePanel.classList.add('active');
+            }
+
+            applyTheme(theme) {
+                this.coverColor = theme.coverColor;
+                this.updateCoverDisplay();
+                
+                // Update CSS variables for accent colors
+                document.documentElement.style.setProperty('--accent-primary', theme.primaryColor);
+                document.documentElement.style.setProperty('--accent-secondary', theme.secondaryColor);
+
+                this.storage.saveSettings('currentTheme', theme.id);
+                this.showStatus(`✨ ${theme.name} theme applied!`, 1500);
+                window.audio.playSave();
+
+                // Close theme panel
+                document.getElementById('themePanel').classList.remove('active');
+            }
+
+            deleteAllPages() {
+                try {
+                    // Delete all pages from storage
+                    for (const page of this.pages) {
+                        await this.storage.deletePage(page.id);
+                    }
+
+                    this.pages = [];
+                    this.currentPageId = null;
+
+                    // Create a new blank page
+                    await this.newPage();
+
+                    // Update UI
+                    this.renderPageList();
+                    this.closeCover();
+
+                    document.getElementById('deleteModal').classList.remove('active');
+                    this.showStatus('🗑️ All pages deleted. Fresh start!', 1500);
+                    window.audio.playSave();
+                } catch (err) {
+                    console.error('Delete all error:', err);
+                    this.showStatus('Error deleting pages', 1500);
+                }
             }
 
             startApp() {
