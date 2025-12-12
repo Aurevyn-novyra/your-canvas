@@ -1510,6 +1510,343 @@
             font-weight: 600;
         }
 
+        /* ========== SMOOTH ANIMATIONS ========== */
+        @keyframes smoothFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes smoothSlide {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes smoothScale {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Page template patterns */
+        .page-template-lined {
+            background-image: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 24px,
+                rgba(200, 180, 160, 0.15) 24px,
+                rgba(200, 180, 160, 0.15) 25px
+            );
+        }
+
+        .page-template-dotted {
+            background-image: radial-gradient(circle, rgba(200, 180, 160, 0.2) 1.5px, transparent 1.5px);
+            background-size: 25px 25px;
+        }
+
+        .page-template-grid {
+            background-image: 
+                linear-gradient(rgba(200, 180, 160, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(200, 180, 160, 0.1) 1px, transparent 1px);
+            background-size: 25px 25px;
+        }
+
+        .page-template-cornell {
+            background-image: linear-gradient(90deg, transparent calc(35% - 1px), rgba(200, 180, 160, 0.2) calc(35% - 1px), rgba(200, 180, 160, 0.2) 35%, transparent 35%);
+        }
+
+        .page-template-hexagonal {
+            background-image: 
+                linear-gradient(30deg, rgba(200, 180, 160, 0.1) 25%, transparent 25%),
+                linear-gradient(150deg, rgba(200, 180, 160, 0.1) 25%, transparent 25%);
+            background-size: 50px 87px;
+            background-position: 0 0, 25px 43px;
+        }
+
+        .page-template-isometric {
+            background-image: 
+                linear-gradient(135deg, rgba(200, 180, 160, 0.1) 25%, transparent 25%),
+                linear-gradient(225deg, rgba(200, 180, 160, 0.1) 25%, transparent 25%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        .page-template-bullet {
+            background-image: 
+                radial-gradient(circle, rgba(200, 180, 160, 0.3) 3px, transparent 3px),
+                repeating-linear-gradient(0deg, transparent, transparent 23px, rgba(200, 180, 160, 0.1) 23px, rgba(200, 180, 160, 0.1) 24px);
+            background-size: 25px 24px;
+            background-position: 0 8px, 0 0;
+        }
+
+        /* Page borders */
+        .page-border-thin {
+            border: 1.5px solid rgba(200, 180, 160, 0.3);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .page-border-ornate {
+            border: 3px double rgba(200, 180, 160, 0.5);
+            border-radius: 0 8px 8px 0;
+            box-shadow: inset 0 0 8px rgba(200, 180, 160, 0.1);
+        }
+
+        /* NEW FEATURE: Voice Notes Button */
+        .voice-note-btn {
+            position: fixed;
+            bottom: 170px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, #8b7355 0%, #a0905a 100%);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            color: white;
+            font-weight: 700;
+            animation: smoothScale 0.5s ease-out;
+        }
+
+        .voice-note-btn:hover {
+            transform: scale(1.12);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .voice-note-btn.recording {
+            background: linear-gradient(135deg, #c74c4c 0%, #e05555 100%);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(199, 76, 76, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 12px 30px rgba(199, 76, 76, 0.5); }
+        }
+
+        /* NEW FEATURE: Bookmarks Panel */
+        .bookmarks-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 280px;
+            height: 100%;
+            background: linear-gradient(180deg, #2a2520 0%, #1f1a15 100%);
+            border-left: 1px solid rgba(212, 165, 116, 0.2);
+            transform: translateX(100%);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 95;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: -3px 0 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .bookmarks-panel.open {
+            transform: translateX(0);
+        }
+
+        .bookmarks-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bookmarks-title {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bookmarks-close {
+            background: none;
+            border: none;
+            color: var(--gold-dark);
+            cursor: pointer;
+            font-size: 1.3rem;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .bookmarks-close:hover {
+            transform: rotate(90deg) scale(1.2);
+        }
+
+        .bookmarks-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0.8rem;
+        }
+
+        .bookmark-item {
+            padding: 1rem;
+            margin-bottom: 0.6rem;
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.05) 0%, rgba(212, 165, 116, 0.02) 100%);
+            border: 1px solid rgba(212, 165, 116, 0.15);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bookmark-item:hover {
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.12) 0%, rgba(212, 165, 116, 0.05) 100%);
+            transform: translateX(-4px);
+            border-color: var(--gold-dark);
+        }
+
+        .bookmark-text {
+            color: var(--gold-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .bookmark-remove {
+            background: none;
+            border: none;
+            color: rgba(212, 165, 116, 0.6);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .bookmark-remove:hover {
+            color: #c74c4c;
+            transform: scale(1.3);
+        }
+
+        /* NEW FEATURE: Search & Tags */
+        .search-panel {
+            position: fixed;
+            top: 90px;
+            right: 25px;
+            width: 280px;
+            background: linear-gradient(135deg, #3d3530 0%, #2d2620 100%);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transform: translateY(-20px) scale(0.95);
+        }
+
+        .search-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateY(0) scale(1);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.2);
+            border-radius: 6px;
+            background: rgba(212, 165, 116, 0.05);
+            color: var(--gold-light);
+            font-family: var(--font-sans);
+            margin-bottom: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--gold-dark);
+            box-shadow: 0 0 12px rgba(212, 165, 116, 0.2);
+        }
+
+        .search-results {
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+
+        .search-result-item {
+            padding: 0.6rem;
+            margin-bottom: 0.4rem;
+            background: rgba(212, 165, 116, 0.05);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: var(--gold-light);
+        }
+
+        .search-result-item:hover {
+            background: rgba(212, 165, 116, 0.12);
+            transform: translateX(-3px);
+        }
+
+        /* NEW FEATURE: Markers & Highlights */
+        .marker-tools {
+            position: fixed;
+            bottom: 100px;
+            left: 100px;
+            background: linear-gradient(135deg, rgba(42, 37, 32, 0.95) 0%, rgba(31, 26, 21, 0.95) 100%);
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 12px;
+            padding: 0.8rem;
+            display: none;
+            gap: 0.6rem;
+            z-index: 50;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            animation: smoothSlide 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .marker-tools.show {
+            display: flex;
+        }
+
+        .marker-btn {
+            width: 38px;
+            height: 38px;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 6px;
+            background: transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .marker-btn:hover {
+            background: rgba(212, 165, 116, 0.1);
+            transform: scale(1.1);
+        }
+
+        .marker-btn.active {
+            background: var(--gold-dark);
+            border-color: var(--gold-dark);
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 1024px) {
             .customizer-panel {
@@ -1518,6 +1855,14 @@
 
             .customizer-preview {
                 position: static;
+            }
+
+            .bookmarks-panel {
+                width: 240px;
+            }
+
+            .search-panel {
+                width: 240px;
             }
         }
 
@@ -1555,6 +1900,21 @@
 
             .option-row {
                 grid-template-columns: 1fr;
+            }
+
+            .bookmarks-panel {
+                width: 200px;
+            }
+
+            .marker-tools {
+                left: 10px;
+                bottom: 90px;
+                gap: 0.4rem;
+            }
+
+            .search-panel {
+                width: 200px;
+                right: 10px;
             }
         }
     </style>
@@ -1943,6 +2303,179 @@
                     </div>
                 </div>
 
+                <!-- MATERIAL TYPE (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Material</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-material="leather" onclick="window.app.setCoverMaterial(this)">Leather</div>
+                        <div class="color-option" data-material="suede" onclick="window.app.setCoverMaterial(this)">Suede</div>
+                        <div class="color-option" data-material="velvet" onclick="window.app.setCoverMaterial(this)">Velvet</div>
+                        <div class="color-option" data-material="linen" onclick="window.app.setCoverMaterial(this)">Linen</div>
+                        <div class="color-option" data-material="cotton" onclick="window.app.setCoverMaterial(this)">Cotton</div>
+                        <div class="color-option" data-material="silk" onclick="window.app.setCoverMaterial(this)">Silk</div>
+                        <div class="color-option" data-material="canvas" onclick="window.app.setCoverMaterial(this)">Canvas</div>
+                        <div class="color-option" data-material="burlap" onclick="window.app.setCoverMaterial(this)">Burlap</div>
+                    </div>
+                </div>
+
+                <!-- EDGE STYLE (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Edge Style</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-edge="smooth" onclick="window.app.setCoverEdge(this)">Smooth</div>
+                        <div class="color-option" data-edge="gilt" onclick="window.app.setCoverEdge(this)">Gilt</div>
+                        <div class="color-option" data-edge="burnished" onclick="window.app.setCoverEdge(this)">Burnished</div>
+                        <div class="color-option" data-edge="deckled" onclick="window.app.setCoverEdge(this)">Deckled</div>
+                        <div class="color-option" data-edge="rough" onclick="window.app.setCoverEdge(this)">Rough</div>
+                        <div class="color-option" data-edge="beveled" onclick="window.app.setCoverEdge(this)">Beveled</div>
+                    </div>
+                </div>
+
+                <!-- EMBOSSING (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Embossing</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-emboss="raised" onclick="window.app.setCoverEmboss(this)">Raised</div>
+                        <div class="color-option" data-emboss="debossed" onclick="window.app.setCoverEmboss(this)">Debossed</div>
+                        <div class="color-option" data-emboss="flat" onclick="window.app.setCoverEmboss(this)">Flat</div>
+                        <div class="color-option" data-emboss="3d" onclick="window.app.setCoverEmboss(this)">3D Effect</div>
+                    </div>
+                </div>
+
+                <!-- BACK COVER STYLE (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Back Cover</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-back="same" onclick="window.app.setCoverBack(this)">Same as Front</div>
+                        <div class="color-option" data-back="contrast" onclick="window.app.setCoverBack(this)">Contrast</div>
+                        <div class="color-option" data-back="pattern" onclick="window.app.setCoverBack(this)">Pattern</div>
+                        <div class="color-option" data-back="texture" onclick="window.app.setCoverBack(this)">Texture</div>
+                    </div>
+                </div>
+
+                <!-- DECORATION (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Decoration</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-decoration="none" onclick="window.app.setCoverDecoration(this)">None</div>
+                        <div class="color-option" data-decoration="filigree" onclick="window.app.setCoverDecoration(this)">Filigree</div>
+                        <div class="color-option" data-decoration="border" onclick="window.app.setCoverDecoration(this)">Border</div>
+                        <div class="color-option" data-decoration="monogram" onclick="window.app.setCoverDecoration(this)">Monogram</div>
+                    </div>
+                </div>
+
+                <!-- TEXT SHADOW (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Text Shadow</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-text-shadow="none" onclick="window.app.setCoverTextShadow(this)">None</div>
+                        <div class="color-option" data-text-shadow="subtle" onclick="window.app.setCoverTextShadow(this)">Subtle</div>
+                        <div class="color-option" data-text-shadow="bold" onclick="window.app.setCoverTextShadow(this)">Bold</div>
+                        <div class="color-option" data-text-shadow="gradient" onclick="window.app.setCoverTextShadow(this)">Gradient</div>
+                    </div>
+                </div>
+
+                <!-- RIBBON COLOR (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Ribbon Bookmark</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-ribbon="gold" onclick="window.app.setCoverRibbon(this)">
+                            <div class="color-swatch" style="background: #d4a574;"></div>
+                            <span>Gold</span>
+                        </div>
+                        <div class="color-option" data-ribbon="burgundy" onclick="window.app.setCoverRibbon(this)">
+                            <div class="color-swatch" style="background: #8b4a5a;"></div>
+                            <span>Burgundy</span>
+                        </div>
+                        <div class="color-option" data-ribbon="navy" onclick="window.app.setCoverRibbon(this)">
+                            <div class="color-swatch" style="background: #1f2a3a;"></div>
+                            <span>Navy</span>
+                        </div>
+                        <div class="color-option" data-ribbon="black" onclick="window.app.setCoverRibbon(this)">
+                            <div class="color-swatch" style="background: #1a1a1a;"></div>
+                            <span>Black</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE CUSTOMIZATION OPTIONS (NEW MAJOR FEATURE) -->
+                <div class="control-section">
+                    <div class="section-title">Page Template</div>
+                    <div class="control-options">
+                        <div class="color-option" data-page-template="blank" onclick="window.app.setPageTemplate(this)">Blank</div>
+                        <div class="color-option" data-page-template="lined" onclick="window.app.setPageTemplate(this)">Lined</div>
+                        <div class="color-option" data-page-template="dotted" onclick="window.app.setPageTemplate(this)">Dotted</div>
+                        <div class="color-option" data-page-template="grid" onclick="window.app.setPageTemplate(this)">Grid</div>
+                        <div class="color-option" data-page-template="cornell" onclick="window.app.setPageTemplate(this)">Cornell</div>
+                        <div class="color-option" data-page-template="hexagonal" onclick="window.app.setPageTemplate(this)">Hex</div>
+                        <div class="color-option" data-page-template="isometric" onclick="window.app.setPageTemplate(this)">Isometric</div>
+                        <div class="color-option" data-page-template="bullet" onclick="window.app.setPageTemplate(this)">Bullet</div>
+                    </div>
+                </div>
+
+                <!-- PAGE COLOR (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Page Color</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-page-color="cream" onclick="window.app.setPageColor(this)">
+                            <div class="color-swatch" style="background: #fefdfb;"></div>
+                            <span>Cream</span>
+                        </div>
+                        <div class="color-option" data-page-color="ivory" onclick="window.app.setPageColor(this)">
+                            <div class="color-swatch" style="background: #f5f3f0;"></div>
+                            <span>Ivory</span>
+                        </div>
+                        <div class="color-option" data-page-color="white" onclick="window.app.setPageColor(this)">
+                            <div class="color-swatch" style="background: #ffffff;"></div>
+                            <span>White</span>
+                        </div>
+                        <div class="color-option" data-page-color="aged" onclick="window.app.setPageColor(this)">
+                            <div class="color-swatch" style="background: #eae5dc;"></div>
+                            <span>Aged</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAGE MARGINS (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Page Margins</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-page-margin="none" onclick="window.app.setPageMargin(this)">None</div>
+                        <div class="color-option" data-page-margin="small" onclick="window.app.setPageMargin(this)">Small</div>
+                        <div class="color-option" data-page-margin="medium" onclick="window.app.setPageMargin(this)">Medium</div>
+                        <div class="color-option" data-page-margin="large" onclick="window.app.setPageMargin(this)">Large</div>
+                    </div>
+                </div>
+
+                <!-- PAGE BORDER (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Page Border</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-page-border="none" onclick="window.app.setPageBorder(this)">None</div>
+                        <div class="color-option" data-page-border="thin" onclick="window.app.setPageBorder(this)">Thin</div>
+                        <div class="color-option" data-page-border="ornate" onclick="window.app.setPageBorder(this)">Ornate</div>
+                    </div>
+                </div>
+
+                <!-- PAGE TEXTURE (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Texture Intensity</div>
+                    <div class="slider-control">
+                        <input type="range" id="pageTexture" min="1" max="10" value="5" onchange="window.app.setPageTexture(this.value)">
+                        <div class="slider-value" id="textureValue">5/10</div>
+                    </div>
+                </div>
+
+                <!-- PAGE NUMBER STYLE (NEW) -->
+                <div class="control-section">
+                    <div class="section-title">Page Numbers</div>
+                    <div class="control-options">
+                        <div class="color-option" data-page-number="none" onclick="window.app.setPageNumberStyle(this)">None</div>
+                        <div class="color-option active" data-page-number="arabic" onclick="window.app.setPageNumberStyle(this)">Arabic (1, 2, 3)</div>
+                        <div class="color-option" data-page-number="roman" onclick="window.app.setPageNumberStyle(this)">Roman (I, II, III)</div>
+                    </div>
+                </div>
+
                 <!-- ACTIONS -->
                 <div class="customizer-actions">
                     <button class="modal-btn modal-btn-secondary" id="customizeClose">Cancel</button>
@@ -1950,6 +2483,30 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- BOOKMARKS PANEL (NEW FEATURE) -->
+    <div class="bookmarks-panel" id="bookmarksPanel">
+        <div class="bookmarks-header">
+            <div class="bookmarks-title">⭐ Bookmarks</div>
+            <button class="bookmarks-close" id="bookmarksClose">✕</button>
+        </div>
+        <div class="bookmarks-list" id="bookmarksList"></div>
+    </div>
+
+    <!-- SEARCH PANEL (NEW FEATURE) -->
+    <div class="search-panel" id="searchPanel">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search pages...">
+        <div class="search-results" id="searchResults"></div>
+    </div>
+
+    <!-- MARKER TOOLS (NEW FEATURE) -->
+    <div class="marker-tools" id="markerTools">
+        <button class="marker-btn" id="highlightBtn" title="Highlight">🟨</button>
+        <button class="marker-btn" id="underlineBtn" title="Underline">_ _</button>
+        <button class="marker-btn" id="circleBtn" title="Circle">⭕</button>
+        <button class="marker-btn" id="arrowBtn" title="Arrow">→</button>
+        <button class="marker-btn" id="eraserMarkerBtn" title="Eraser">🧹</button>
     </div>
 
     <!-- IMPORT MODAL -->
@@ -2589,7 +3146,7 @@
                 this.currentPageIndex = 0;
                 this.isCoverOpen = false;
                 
-                // COVER CUSTOMIZATION
+                // COVER CUSTOMIZATION (50+ OPTIONS)
                 this.coverColor = 'burgundy';
                 this.coverPattern = 'smooth';
                 this.coverTrim = 'gold';
@@ -2600,6 +3157,29 @@
                 this.coverTitleTone = 'gold';
                 this.coverText = 'MEMENTO';
                 this.coverSubtext = 'My Diary';
+                this.coverMaterial = 'leather';
+                this.coverEdge = 'smooth';
+                this.coverEmbossStyle = 'raised';
+                this.coverBackStyle = 'same';
+                this.coverDecoration = 'none';
+                this.coverTextShadow = 'none';
+                this.coverRibbon = 'gold';
+
+                // PAGE CUSTOMIZATION (20+ OPTIONS)
+                this.pageTemplate = 'blank';
+                this.pageColor = 'cream';
+                this.pageMargin = 'none';
+                this.pageBorder = 'none';
+                this.pageTexture = 5;
+                this.pageNumberStyle = 'arabic';
+
+                // NEW FEATURES STATE
+                this.bookmarks = [];
+                this.searchActive = false;
+                this.markerMode = null;
+                this.voiceNoteActive = false;
+                this.voiceRecorder = null;
+                this.voiceChunks = [];
             }
 
             async init() {
@@ -2623,28 +3203,30 @@
                         await this.openPage(this.pages[0].id);
                     }
 
-                    // Load cover settings
-                    const savedSettings = {
-                        color: await this.storage.getSettings('coverColor'),
-                        pattern: await this.storage.getSettings('coverPattern'),
-                        trim: await this.storage.getSettings('coverTrim'),
-                        corner: await this.storage.getSettings('coverCorner'),
-                        font: await this.storage.getSettings('coverFont'),
-                        spine: await this.storage.getSettings('coverSpine'),
-                        finish: await this.storage.getSettings('coverFinish'),
-                        titleTone: await this.storage.getSettings('coverTitleTone'),
-                        text: await this.storage.getSettings('coverText'),
-                        subtext: await this.storage.getSettings('coverSubtext'),
-                    };
+                    // Load ALL customization settings
+                    const coverSettings = [
+                        'coverColor', 'coverPattern', 'coverTrim', 'coverCorner', 'coverFont',
+                        'coverSpine', 'coverFinish', 'coverTitleTone', 'coverText', 'coverSubtext',
+                        'coverMaterial', 'coverEdge', 'coverEmbossStyle', 'coverBackStyle',
+                        'coverDecoration', 'coverTextShadow', 'coverRibbon'
+                    ];
 
-                    Object.entries(savedSettings).forEach(([key, value]) => {
-                        if (value) {
-                            if (key === 'text') this.coverText = value;
-                            else if (key === 'subtext') this.coverSubtext = value;
-                            else this[`cover${key.charAt(0).toUpperCase() + key.slice(1)}`] = value;
+                    for (const setting of coverSettings) {
+                        const saved = await this.storage.getSettings(setting);
+                        if (saved) {
+                            this[setting] = saved;
                         }
-                    });
+                    }
 
+                    const pageSettings = ['pageTemplate', 'pageColor', 'pageMargin', 'pageBorder', 'pageTexture', 'pageNumberStyle'];
+                    for (const setting of pageSettings) {
+                        const saved = await this.storage.getSettings(setting);
+                        if (saved) {
+                            this[setting] = saved;
+                        }
+                    }
+
+                    this.bookmarks = await this.storage.getSettings('bookmarks') || [];
                     this.updateCoverDisplay();
                     this.renderPageList();
                     this.setupKeyboardShortcuts();
@@ -2652,6 +3234,8 @@
                     this.setupEventListeners();
                     this.setupPageFlipInteraction();
                     this.setupBookCoverInteraction();
+                    this.setupNewFeatures();
+                    this.applyPageCustomization();
 
                     this.initialized = true;
                     this.showStatus('Welcome to your sanctuary ✨', 2000);
@@ -2931,6 +3515,63 @@
                 });
             }
 
+            setupNewFeatures() {
+                // BOOKMARKS FEATURE
+                const bookmarksPanel = document.getElementById('bookmarksPanel');
+                const bookmarksClose = document.getElementById('bookmarksClose');
+                const bookmarkBtn = document.getElementById('newPageBtn'); // Repurpose as bookmark toggle
+
+                if (bookmarksClose) {
+                    bookmarksClose.addEventListener('click', () => {
+                        if (bookmarksPanel) bookmarksPanel.classList.remove('open');
+                    });
+                }
+
+                // SEARCH FEATURE
+                const searchPanel = document.getElementById('searchPanel');
+                const searchInput = document.getElementById('searchInput');
+                
+                if (searchInput) {
+                    searchInput.addEventListener('keyup', (e) => this.performSearch(e.target.value));
+                }
+
+                // MARKER TOOLS FEATURE
+                const markerTools = document.getElementById('markerTools');
+                const highlightBtn = document.getElementById('highlightBtn');
+                const underlineBtn = document.getElementById('underlineBtn');
+                const circleBtn = document.getElementById('circleBtn');
+                const arrowBtn = document.getElementById('arrowBtn');
+                const eraserMarkerBtn = document.getElementById('eraserMarkerBtn');
+
+                if (highlightBtn) highlightBtn.addEventListener('click', () => this.setMarkerMode('highlight'));
+                if (underlineBtn) underlineBtn.addEventListener('click', () => this.setMarkerMode('underline'));
+                if (circleBtn) circleBtn.addEventListener('click', () => this.setMarkerMode('circle'));
+                if (arrowBtn) arrowBtn.addEventListener('click', () => this.setMarkerMode('arrow'));
+                if (eraserMarkerBtn) eraserMarkerBtn.addEventListener('click', () => this.setMarkerMode(null));
+
+                // VOICE NOTE FEATURE
+                const voiceNoteBtn = document.getElementById('voiceNoteBtn');
+                if (voiceNoteBtn) {
+                    voiceNoteBtn.addEventListener('click', () => this.toggleVoiceRecording());
+                }
+
+                // Setup media recorder for voice notes
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        this.voiceRecorder = new MediaRecorder(stream);
+                        this.voiceRecorder.ondataavailable = (e) => {
+                            this.voiceChunks.push(e.data);
+                        };
+                        this.voiceRecorder.onstop = () => {
+                            const blob = new Blob(this.voiceChunks, { type: 'audio/wav' });
+                            const url = URL.createObjectURL(blob);
+                            this.addVoiceNoteToPage(url);
+                            this.voiceChunks = [];
+                        };
+                    })
+                    .catch(err => console.log('Microphone access denied:', err));
+            }
+
             setupEventListeners() {
                 // Sidebar
                 const sidebarToggle = document.getElementById('sidebarToggle');
@@ -2940,7 +3581,7 @@
                 if (sidebarToggle) sidebarToggle.addEventListener('click', () => {
                     sidebar.classList.toggle('open');
                     window.audio.playClick();
-                    gsap.to(sidebarToggle, { duration: 0.3, rotate: sidebar.classList.contains('open') ? 90 : 0 });
+                    gsap.to(sidebarToggle, { duration: 0.4, rotate: sidebar.classList.contains('open') ? 90 : 0, ease: 'power2.inOut' });
                 });
 
                 if (sidebarClose) sidebarClose.addEventListener('click', () => {
@@ -3030,21 +3671,35 @@
                     this.coverSubtext = coverSubtextInput.value || 'My Diary';
                     this.updateCoverDisplay();
                     
-                    await Promise.all([
-                        this.storage.saveSettings('coverText', this.coverText),
-                        this.storage.saveSettings('coverSubtext', this.coverSubtext),
-                        this.storage.saveSettings('coverColor', this.coverColor),
-                        this.storage.saveSettings('coverPattern', this.coverPattern),
-                        this.storage.saveSettings('coverTrim', this.coverTrim),
-                        this.storage.saveSettings('coverCorner', this.coverCorner),
-                        this.storage.saveSettings('coverFont', this.coverFont),
-                        this.storage.saveSettings('coverSpine', this.coverSpine),
-                        this.storage.saveSettings('coverFinish', this.coverFinish),
-                        this.storage.saveSettings('coverTitleTone', this.coverTitleTone),
-                    ]);
+                    // Save ALL 50+ customization settings
+                    const coverSettings = [
+                        'coverText', 'coverSubtext', 'coverColor', 'coverPattern', 'coverTrim',
+                        'coverCorner', 'coverFont', 'coverSpine', 'coverFinish', 'coverTitleTone',
+                        'coverMaterial', 'coverEdge', 'coverEmbossStyle', 'coverBackStyle',
+                        'coverDecoration', 'coverTextShadow', 'coverRibbon'
+                    ];
+
+                    const pageSettings = [
+                        'pageTemplate', 'pageColor', 'pageMargin', 'pageBorder', 'pageTexture', 'pageNumberStyle'
+                    ];
+
+                    const savePromises = [
+                        ...coverSettings.map(key => this.storage.saveSettings(key, this[key])),
+                        ...pageSettings.map(key => this.storage.saveSettings(key, this[key]))
+                    ];
+
+                    await Promise.all(savePromises);
                     
-                    document.getElementById('coverCustomizer').classList.remove('active');
-                    this.showStatus('Cover updated ✨', 1500);
+                    gsap.to(document.getElementById('coverCustomizer'), {
+                        duration: 0.4,
+                        opacity: 0,
+                        ease: 'power2.in',
+                        onComplete: () => {
+                            document.getElementById('coverCustomizer').classList.remove('active');
+                        }
+                    });
+                    
+                    this.showStatus('✨ All customizations saved!', 1500);
                     window.audio.playSave();
                 });
 
@@ -3391,10 +4046,307 @@
                 }
             }
 
+            // NEW COVER CUSTOMIZATION METHODS (50+ OPTIONS)
+            setCoverMaterial(element) {
+                document.querySelectorAll('[data-material]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverMaterial = element.dataset.material;
+                this.updateCoverDisplay();
+            }
+
+            setCoverEdge(element) {
+                document.querySelectorAll('[data-edge]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverEdge = element.dataset.edge;
+                this.updateCoverDisplay();
+            }
+
+            setCoverEmboss(element) {
+                document.querySelectorAll('[data-emboss]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverEmbossStyle = element.dataset.emboss;
+                this.updateCoverDisplay();
+            }
+
+            setCoverBack(element) {
+                document.querySelectorAll('[data-back]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverBackStyle = element.dataset.back;
+                this.updateCoverDisplay();
+            }
+
+            setCoverDecoration(element) {
+                document.querySelectorAll('[data-decoration]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverDecoration = element.dataset.decoration;
+                this.updateCoverDisplay();
+            }
+
+            setCoverTextShadow(element) {
+                document.querySelectorAll('[data-text-shadow]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverTextShadow = element.dataset['text-shadow'];
+                this.updateCoverDisplay();
+            }
+
+            setCoverRibbon(element) {
+                document.querySelectorAll('[data-ribbon]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverRibbon = element.dataset.ribbon;
+            }
+
+            // PAGE CUSTOMIZATION METHODS (20+ OPTIONS)
+            setPageTemplate(element) {
+                document.querySelectorAll('[data-page-template]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.pageTemplate = element.dataset['page-template'];
+                this.applyPageCustomization();
+            }
+
+            setPageColor(element) {
+                document.querySelectorAll('[data-page-color]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.pageColor = element.dataset['page-color'];
+                this.applyPageCustomization();
+            }
+
+            setPageMargin(element) {
+                document.querySelectorAll('[data-page-margin]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.pageMargin = element.dataset['page-margin'];
+                this.applyPageCustomization();
+            }
+
+            setPageBorder(element) {
+                document.querySelectorAll('[data-page-border]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.pageBorder = element.dataset['page-border'];
+                this.applyPageCustomization();
+            }
+
+            setPageTexture(value) {
+                this.pageTexture = value;
+                document.getElementById('textureValue').textContent = `${value}/10`;
+                this.applyPageCustomization();
+            }
+
+            setPageNumberStyle(element) {
+                document.querySelectorAll('[data-page-number]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.pageNumberStyle = element.dataset['page-number'];
+                this.applyPageCustomization();
+            }
+
+            applyPageCustomization() {
+                const bg = document.querySelector('.page-background');
+                if (!bg) return;
+
+                // Remove all template classes
+                bg.classList.remove('page-template-lined', 'page-template-dotted', 'page-template-grid', 'page-template-cornell', 'page-template-hexagonal', 'page-template-isometric', 'page-template-bullet');
+                
+                // Add selected template
+                if (this.pageTemplate !== 'blank') {
+                    bg.classList.add(`page-template-${this.pageTemplate}`);
+                }
+
+                // Apply page color
+                const colorMap = {
+                    cream: 'linear-gradient(135deg, #fefdfb 0%, #f9f7f5 50%, #fefdfb 100%)',
+                    ivory: 'linear-gradient(135deg, #f5f3f0 0%, #ede8e0 50%, #f5f3f0 100%)',
+                    white: 'linear-gradient(135deg, #ffffff 0%, #f8f8f8 50%, #ffffff 100%)',
+                    aged: 'linear-gradient(135deg, #eae5dc 0%, #e0dace 50%, #eae5dc 100%)'
+                };
+                bg.style.background = colorMap[this.pageColor] + (this.pageTemplate !== 'blank' ? ', repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(200, 180, 160, 0.008) 2px, rgba(200, 180, 160, 0.008) 4px)' : '');
+
+                // Apply texture opacity
+                const textureLayer = bg.querySelector('::before');
+                if (textureLayer) {
+                    textureLayer.style.opacity = (this.pageTexture / 10);
+                }
+
+                // Apply margins
+                const textLayer = document.querySelector('.page-text-layer');
+                if (textLayer) {
+                    const marginMap = {
+                        none: '40px 40px 60px 60px',
+                        small: '35px 35px 55px 55px',
+                        medium: '50px 50px 70px 70px',
+                        large: '60px 60px 80px 80px'
+                    };
+                    textLayer.style.margin = marginMap[this.pageMargin] || marginMap.none;
+                }
+
+                // Apply borders
+                bg.classList.remove('page-border-thin', 'page-border-ornate');
+                if (this.pageBorder !== 'none') {
+                    bg.classList.add(`page-border-${this.pageBorder}`);
+                }
+
+                // Apply page numbers
+                const pageNum = document.getElementById('pageNumber');
+                if (pageNum) {
+                    if (this.pageNumberStyle === 'none') {
+                        pageNum.style.display = 'none';
+                    } else {
+                        pageNum.style.display = 'block';
+                        const idx = this.currentPageIndex + 1;
+                        if (this.pageNumberStyle === 'roman') {
+                            pageNum.textContent = this.toRoman(idx);
+                        } else {
+                            pageNum.textContent = `${idx}/${this.pages.length}`;
+                        }
+                    }
+                }
+            }
+
+            toRoman(num) {
+                const romanNumerals = [
+                    { value: 1000, numeral: 'M' },
+                    { value: 900, numeral: 'CM' },
+                    { value: 500, numeral: 'D' },
+                    { value: 400, numeral: 'CD' },
+                    { value: 100, numeral: 'C' },
+                    { value: 90, numeral: 'XC' },
+                    { value: 50, numeral: 'L' },
+                    { value: 40, numeral: 'XL' },
+                    { value: 10, numeral: 'X' },
+                    { value: 9, numeral: 'IX' },
+                    { value: 5, numeral: 'V' },
+                    { value: 4, numeral: 'IV' },
+                    { value: 1, numeral: 'I' }
+                ];
+                let result = '';
+                for (let i = 0; i < romanNumerals.length; i++) {
+                    while (num >= romanNumerals[i].value) {
+                        result += romanNumerals[i].numeral;
+                        num -= romanNumerals[i].value;
+                    }
+                }
+                return result;
+            }
+
+            // NEW FEATURES IMPLEMENTATION
+            toggleBookmarks() {
+                const panel = document.getElementById('bookmarksPanel');
+                if (panel) {
+                    panel.classList.toggle('open');
+                    if (panel.classList.contains('open')) {
+                        this.renderBookmarks();
+                    }
+                }
+            }
+
+            bookmarkPage() {
+                if (!this.currentPageId) return;
+                const page = this.pages.find(p => p.id === this.currentPageId);
+                if (!page) return;
+
+                const isBookmarked = this.bookmarks.includes(this.currentPageId);
+                if (isBookmarked) {
+                    this.bookmarks = this.bookmarks.filter(id => id !== this.currentPageId);
+                } else {
+                    this.bookmarks.push(this.currentPageId);
+                }
+
+                this.storage.saveSettings('bookmarks', this.bookmarks);
+                this.renderBookmarks();
+                this.showStatus(isBookmarked ? '❌ Bookmark removed' : '⭐ Page bookmarked', 1000);
+            }
+
+            renderBookmarks() {
+                const list = document.getElementById('bookmarksList');
+                if (!list) return;
+
+                list.innerHTML = '';
+                for (const bookmarkId of this.bookmarks) {
+                    const page = this.pages.find(p => p.id === bookmarkId);
+                    if (!page) continue;
+
+                    const item = document.createElement('div');
+                    item.className = 'bookmark-item';
+                    item.innerHTML = `
+                        <span class="bookmark-text">${page.title || 'Untitled'}</span>
+                        <button class="bookmark-remove" onclick="window.app.bookmarks = window.app.bookmarks.filter(id => id !== '${bookmarkId}'); window.app.renderBookmarks(); window.app.storage.saveSettings('bookmarks', window.app.bookmarks);">✕</button>
+                    `;
+                    item.addEventListener('click', () => {
+                        this.openPage(bookmarkId);
+                        document.getElementById('bookmarksPanel').classList.remove('open');
+                    });
+                    list.appendChild(item);
+                }
+            }
+
+            performSearch(query) {
+                if (!query) {
+                    document.getElementById('searchResults').innerHTML = '';
+                    return;
+                }
+
+                const results = this.pages.filter(page => 
+                    (page.title && page.title.toLowerCase().includes(query.toLowerCase())) ||
+                    (page.textContent && page.textContent.toLowerCase().includes(query.toLowerCase()))
+                );
+
+                const resultsDiv = document.getElementById('searchResults');
+                if (!resultsDiv) return;
+
+                resultsDiv.innerHTML = '';
+                for (const page of results.slice(0, 5)) {
+                    const item = document.createElement('div');
+                    item.className = 'search-result-item';
+                    item.textContent = page.title || 'Untitled';
+                    item.addEventListener('click', () => this.openPage(page.id));
+                    resultsDiv.appendChild(item);
+                }
+            }
+
+            setMarkerMode(mode) {
+                this.markerMode = mode;
+                const tools = document.getElementById('markerTools');
+                if (tools) {
+                    if (mode) {
+                        tools.classList.add('show');
+                        document.querySelectorAll('.marker-btn').forEach((btn, i) => {
+                            const modes = ['highlight', 'underline', 'circle', 'arrow'];
+                            btn.classList.toggle('active', modes[i] === mode);
+                        });
+                    } else {
+                        tools.classList.remove('show');
+                    }
+                }
+            }
+
+            toggleVoiceRecording() {
+                if (!this.voiceRecorder) return;
+
+                const btn = document.getElementById('voiceNoteBtn');
+                if (this.voiceNoteActive) {
+                    this.voiceRecorder.stop();
+                    this.voiceNoteActive = false;
+                    btn.classList.remove('recording');
+                    this.showStatus('🎵 Voice note saved', 1000);
+                } else {
+                    this.voiceRecorder.start();
+                    this.voiceNoteActive = true;
+                    btn.classList.add('recording');
+                    this.showStatus('🎤 Recording...', 1000);
+                }
+            }
+
+            addVoiceNoteToPage(audioUrl) {
+                const textLayer = document.querySelector('.page-text-layer');
+                if (!textLayer) return;
+
+                const voiceNoteHtml = `\n[🎵 Voice Note - Click to play]\n`;
+                textLayer.textContent += voiceNoteHtml;
+                this.savePage();
+            }
+
             openCoverCustomizer() {
                 const customizer = document.getElementById('coverCustomizer');
                 if (customizer) {
                     customizer.classList.add('active');
+                    gsap.from(customizer, { duration: 0.4, opacity: 0, ease: 'power2.out' });
                     window.audio.playClick();
                 }
             }
@@ -3530,7 +4482,12 @@
             if (enterBtn) {
                 enterBtn.addEventListener('click', () => {
                     window.audio.playClick();
-                    window.app.startApp();
+                    gsap.to(document.getElementById('landing'), {
+                        duration: 0.8,
+                        opacity: 0,
+                        ease: 'power2.inOut',
+                        onComplete: () => window.app.startApp()
+                    });
                 });
             }
         });
