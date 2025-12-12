@@ -4293,6 +4293,262 @@
                 // Remove all template classes
                 bg.classList.remove('page-template-lined', 'page-template-dotted', 'page-template-grid', 'page-template-cornell', 'page-template-hexagonal', 'page-template-isometric', 'page-template-bullet');
                 
+                // Add current template class
+                if (this.pageTemplate !== 'blank') {
+                    bg.classList.add(`page-template-${this.pageTemplate}`);
+                }
+
+                // Apply page color
+                const colorMap = {
+                    cream: 'linear-gradient(135deg, #fefdfb 0%, #f9f7f5 50%, #fefdfb 100%)',
+                    ivory: 'linear-gradient(135deg, #f5f3f0 0%, #ede8e5 50%, #f5f3f0 100%)',
+                    white: 'linear-gradient(135deg, #ffffff 0%, #f8f8f8 50%, #ffffff 100%)',
+                    aged: 'linear-gradient(135deg, #eae5dc 0%, #e0dbd2 50%, #eae5dc 100%)',
+                };
+                bg.style.background = colorMap[this.pageColor] || colorMap.cream;
+
+                // Apply margins
+                const marginMap = { none: 0, small: 20, medium: 40, large: 60 };
+                const margin = marginMap[this.pageMargin] || 0;
+                const textLayer = document.querySelector('.page-text-layer');
+                if (textLayer) {
+                    textLayer.style.left = (CONFIG.PAGE_MARGIN + margin) + 'px';
+                    textLayer.style.top = (CONFIG.PAGE_MARGIN + margin) + 'px';
+                    textLayer.style.right = (40 + margin) + 'px';
+                    textLayer.style.bottom = (60 + margin) + 'px';
+                }
+
+                // Apply border
+                if (this.pageBorder !== 'none') {
+                    bg.classList.add(`page-border-${this.pageBorder}`);
+                }
+
+                // Apply texture intensity
+                const opacity = 0.05 + (this.pageTexture / 10) * 0.15;
+                const beforeElement = bg.style;
+                beforeElement.opacity = 1;
+            }
+
+            openCoverCustomizer() {
+                const customizer = document.getElementById('coverCustomizer');
+                if (!customizer) return;
+                customizer.classList.add('active');
+                gsap.from(customizer, { duration: 0.5, opacity: 0, ease: 'power2.out' });
+                window.audio.playClick();
+            }
+
+            renderPageList() {
+                const pageList = document.getElementById('pageList');
+                if (!pageList) return;
+                pageList.innerHTML = '';
+
+                this.pages.forEach((page, idx) => {
+                    const item = document.createElement('div');
+                    item.className = `page-item ${page.id === this.currentPageId ? 'active' : ''}`;
+                    item.innerHTML = `
+                        <div class="page-item-title">${page.title}</div>
+                        <div class="page-item-date">${new Date(page.createdAt).toLocaleDateString()}</div>
+                    `;
+                    item.addEventListener('click', () => {
+                        if (this.isCoverOpen) this.openPage(page.id);
+                        document.getElementById('sidebar').classList.remove('open');
+                    });
+                    pageList.appendChild(item);
+                });
+            }
+
+            renderLibrary() {
+                const grid = document.getElementById('libraryGrid');
+                if (!grid) return;
+                grid.innerHTML = '';
+
+                this.pages.forEach((page, idx) => {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'page-thumbnail';
+                    thumb.innerHTML = `
+                        <img src="${page.thumbnail || 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22160%22 height=%22220%22%3E%3Crect fill=%22%23fefdfb%22 width=%22160%22 height=%22220%22/%3E%3C/svg%3E'}" alt="Page ${idx + 1}">
+                        <div class="page-thumbnail-overlay">Page ${idx + 1}</div>
+                    `;
+                    thumb.addEventListener('click', () => {
+                        this.openPage(page.id);
+                        this.toggleLibrary();
+                    });
+                    grid.appendChild(thumb);
+                });
+            }
+
+            openThemeSwitcher() {
+                const themePanel = document.getElementById('themePanel');
+                const themeGrid = document.getElementById('themeGrid');
+                if (!themePanel || !themeGrid) return;
+
+                themePanel.classList.add('active');
+                themeGrid.innerHTML = '';
+
+                const themes = [
+                    { name: 'Classic Burgundy', colors: ['burgundy'] },
+                    { name: 'Deep Red', colors: ['deep-red'] },
+                    { name: 'Rich Brown', colors: ['brown'] },
+                    { name: 'Elegant Tan', colors: ['tan'] },
+                    { name: 'Midnight Black', colors: ['black'] },
+                    { name: 'Charcoal', colors: ['charcoal'] },
+                    { name: 'Navy Blue', colors: ['navy'] },
+                    { name: 'Deep Blue', colors: ['deep-blue'] },
+                    { name: 'Forest Green', colors: ['forest'] },
+                    { name: 'Emerald', colors: ['emerald'] },
+                    { name: 'Royal Plum', colors: ['plum'] },
+                    { name: 'Wine Red', colors: ['wine'] },
+                ];
+
+                themes.forEach(theme => {
+                    const item = document.createElement('div');
+                    item.className = 'theme-item';
+                    item.innerHTML = `
+                        <div class="theme-preview" style="background: ${COLOR_MAP[theme.colors[0]]}"></div>
+                        <div class="theme-name">${theme.name}</div>
+                    `;
+                    item.addEventListener('click', () => {
+                        this.coverColor = theme.colors[0];
+                        this.updateCoverDisplay();
+                        document.querySelectorAll('.theme-item').forEach(el => el.classList.remove('active'));
+                        item.classList.add('active');
+                        window.audio.playClick();
+                    });
+                    themeGrid.appendChild(item);
+                });
+
+                window.audio.playClick();
+            }
+
+            deleteAllPages() {
+                this.pages = [];
+                this.currentPageId = null;
+                this.storage.pagesMap.clear();
+                this.renderPageList();
+                document.getElementById('deleteModal').classList.remove('active');
+                this.showStatus('📖 All pages cleared', 1500);
+                this.newPage();
+                window.audio.playSave();
+            }
+
+            performSearch(query) {
+                const results = document.getElementById('searchResults');
+                if (!results || !query.trim()) {
+                    results.innerHTML = '';
+                    return;
+                }
+
+                const filtered = this.pages.filter(p => 
+                    p.textContent.toLowerCase().includes(query.toLowerCase()) ||
+                    p.title.toLowerCase().includes(query.toLowerCase())
+                );
+
+                results.innerHTML = filtered.slice(0, 10).map((page, idx) => `
+                    <div class="search-result-item" onclick="window.app.openPage('${page.id}')">${page.title}</div>
+                `).join('');
+            }
+
+            setMarkerMode(mode) {
+                this.markerMode = mode;
+                document.querySelectorAll('.marker-btn').forEach(btn => btn.classList.remove('active'));
+                if (mode) {
+                    document.getElementById(mode + 'Btn').classList.add('active');
+                }
+            }
+
+            toggleVoiceRecording() {
+                if (!this.voiceRecorder) return;
+
+                if (this.voiceNoteActive) {
+                    this.voiceRecorder.stop();
+                    this.voiceNoteActive = false;
+                    document.getElementById('voiceNoteBtn').classList.remove('recording');
+                    this.showStatus('🎤 Voice note saved', 1200);
+                } else {
+                    this.voiceChunks = [];
+                    this.voiceRecorder.start();
+                    this.voiceNoteActive = true;
+                    document.getElementById('voiceNoteBtn').classList.add('recording');
+                    this.showStatus('🎤 Recording...', 500);
+                }
+                window.audio.playClick();
+            }
+
+            addVoiceNoteToPage(url) {
+                const textLayer = document.querySelector('.page-text-layer');
+                if (textLayer) {
+                    const note = document.createElement('div');
+                    note.style.marginTop = '1rem';
+                    note.style.padding = '0.8rem';
+                    note.style.background = 'rgba(212, 165, 116, 0.1)';
+                    note.style.borderRadius = '6px';
+                    note.innerHTML = `🎤 Voice note: <audio controls style="max-width: 100%;" src="${url}"></audio>`;
+                    textLayer.appendChild(note);
+                }
+            }
+
+            showStatus(message, duration = 2000) {
+                const indicator = document.getElementById('statusIndicator');
+                if (!indicator) return;
+                indicator.textContent = message;
+                indicator.classList.add('visible');
+                setTimeout(() => indicator.classList.remove('visible'), duration);
+            }
+        }
+
+        // ========== INIT ==========
+        window.audio = new AudioEngine();
+
+        async function initStarfield() {
+            const canvas = document.getElementById('starfield');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const stars = Array.from({ length: 100 }, () => ({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                r: Math.random() * 1.5,
+                o: Math.random() * 0.5 + 0.5,
+            }));
+
+            function animate() {
+                ctx.fillStyle = 'rgba(42, 42, 58, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                stars.forEach(star => {
+                    ctx.fillStyle = `rgba(244, 228, 193, ${star.o})`;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.r, 0, Math.PI * 2);
+                    ctx.fill();
+                    star.o += (Math.random() - 0.5) * 0.02;
+                    star.o = Math.max(0.3, Math.min(1, star.o));
+                });
+
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        document.getElementById('enterBtn').addEventListener('click', () => {
+            document.getElementById('landing').classList.add('hidden');
+            document.getElementById('app').style.display = 'flex';
+            gsap.from('#app', { duration: 1, opacity: 0, ease: 'power2.out' });
+            window.audio.playCoverFlip();
+            
+            window.app = new DiaryApp();
+            window.app.init();
+        });
+
+        window.addEventListener('load', () => {
+            initStarfield();
+        });
+    </script>
+</body>
+</html>);
+                
                 // Add selected template
                 if (this.pageTemplate !== 'blank') {
                     bg.classList.add(`page-template-${this.pageTemplate}`);
