@@ -3,25 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Hyper-realistic diary with page-curl physics, handwriting, and offline storage">
-    <title>Diary - Production Edition</title>
+    <meta name="description" content="Premium Luxury Diary with realistic page flips and sound">
+    <title>Luxury Diary - Premium Edition</title>
     
-    <!-- CDN LIBRARIES with integrity checks (latest stable versions) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDB58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6SE0CCbf0PEWXlw==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPi2d+aChB3t/Db1f65Kkplphz2g/3w4XhnZtI9lS4V5UCnPqCPOcFw16eMQ6oLA8B+qsmkQWIVw==" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" integrity="sha512-16esztpmmQRepQVcOdVcjlkMnZaIXuXjk0Lztreqt5P+hODL+9+yZL9ZN7LEy+VXumZqZNvREzvEZW+CqggJQ==" crossorigin="anonymous"></script>
+    <!-- CDN LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+
         :root {
-            --color-bg-primary: #faf9f7;
-            --color-bg-secondary: #f5f3f0;
-            --color-text-primary: #2c2a28;
-            --color-text-secondary: #8b8680;
-            --color-accent: #b8956a;
-            --color-border: #e8e3dc;
-            --color-paper: #fefdfb;
-            --color-shadow: rgba(0, 0, 0, 0.08);
-            --color-shadow-dark: rgba(0, 0, 0, 0.15);
+            /* Premium Luxury Palette */
+            --gold-dark: #d4a574;
+            --gold-light: #f4e4c1;
+            --burgundy-dark: #5c2e3a;
+            --burgundy-light: #8b4a5a;
+            --ivory: #f5f3f0;
+            --cream: #fefdfb;
+            --charcoal: #1a1a1a;
+            --black-luxe: #0f0f0f;
+            --shadow-subtle: rgba(0, 0, 0, 0.08);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --shadow-dark: rgba(0, 0, 0, 0.25);
+            
+            /* Typography */
+            --font-serif: 'Playfair Display', serif;
+            --font-elegant: 'Cormorant Garamond', serif;
+            --font-sans: 'Inter', sans-serif;
         }
 
         * {
@@ -34,14 +44,14 @@
             width: 100%;
             height: 100%;
             overflow: hidden;
-            background: var(--color-bg-primary);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: var(--color-text-primary);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
+            font-family: var(--font-sans);
+            color: var(--charcoal);
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            perspective: 1200px;
         }
 
-        /* LANDING SCREEN */
+        /* ========== LANDING SCREEN ========== */
         #landing {
             position: fixed;
             top: 0;
@@ -51,10 +61,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: radial-gradient(ellipse at center, #2a2a3a 0%, #0f0f1a 100%);
             z-index: 1000;
             opacity: 1;
             transition: opacity 0.8s ease-out;
+            flex-direction: column;
         }
 
         #landing.hidden {
@@ -62,46 +73,109 @@
             opacity: 0;
         }
 
+        #starfieldContainer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        #starfield {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
         .landing-content {
             text-align: center;
             color: white;
+            z-index: 10;
+            backdrop-filter: blur(10px);
+            padding: 4rem;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            background: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .landing-icon {
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            opacity: 0;
+            animation: floatIn 1s ease-out 0.2s forwards;
+        }
+
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(30px) scale(0.8); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         .landing-title {
+            font-family: var(--font-serif);
             font-size: 3.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            letter-spacing: -1px;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
             opacity: 0;
-            animation: fadeInUp 0.8s ease-out 0.2s forwards;
+            animation: fadeInUp 0.8s ease-out 0.3s forwards;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .landing-subtitle {
+            font-family: var(--font-elegant);
             font-size: 1.2rem;
             margin-bottom: 3rem;
             opacity: 0;
-            color: rgba(255,255,255,0.7);
-            animation: fadeInUp 0.8s ease-out 0.4s forwards;
+            color: rgba(244, 228, 193, 0.8);
+            animation: fadeInUp 0.8s ease-out 0.5s forwards;
+            letter-spacing: 1px;
+            font-weight: 400;
         }
 
         .landing-btn {
-            padding: 1rem 3rem;
+            font-family: var(--font-serif);
+            padding: 1.2rem 3.5rem;
             font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
+            font-weight: 700;
+            border: 2px solid var(--gold-dark);
             border-radius: 50px;
-            background: linear-gradient(135deg, var(--color-accent) 0%, #d4a574 100%);
-            color: white;
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            color: var(--black-luxe);
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 30px rgba(184, 149, 106, 0.3);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 15px 40px rgba(212, 165, 116, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             opacity: 0;
-            animation: fadeInUp 0.8s ease-out 0.6s forwards;
+            animation: fadeInUp 0.8s ease-out 0.7s forwards;
+            letter-spacing: 1.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .landing-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .landing-btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
 
         .landing-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(184, 149, 106, 0.4);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 25px 60px rgba(212, 165, 116, 0.5);
         }
 
         @keyframes fadeInUp {
@@ -109,429 +183,193 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* STARFIELD BACKGROUND */
-        #starfield {
+        /* ========== MAIN APP ========== */
+        #app {
+            width: 100%;
+            height: 100%;
+            display: none;
+            background: linear-gradient(135deg, #2a2a3a 0%, #1a1a1a 50%, #252535 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ========== BOOK VIEWER ========== */
+        .book-viewer {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            perspective: 1500px;
+            position: relative;
+        }
+
+        .book-spine {
+            perspective: 1500px;
+            transform-style: preserve-3d;
+            position: relative;
+            width: 600px;
+            height: 800px;
+            max-width: 90%;
+            max-height: 90vh;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.5),
+                0 0 60px rgba(212, 165, 116, 0.15),
+                inset -2px -2px 10px rgba(0, 0, 0, 0.3),
+                inset 2px 2px 10px rgba(255, 255, 255, 0.05);
+            transform-style: preserve-3d;
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            opacity: 1;
+            z-index: 10;
+            overflow: hidden;
+            background: linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%);
+        }
+
+        .book-cover::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            opacity: 0.5;
+            background: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.02) 2px,
+                    rgba(255, 255, 255, 0.02) 4px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(255, 255, 255, 0.01) 2px,
+                    rgba(255, 255, 255, 0.01) 4px
+                );
+            pointer-events: none;
+            border-radius: 12px;
         }
 
-        /* MAIN APP */
-        #app {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            background: var(--color-bg-primary);
-        }
-
-        /* SIDEBAR */
-        .sidebar {
-            width: 280px;
-            height: 100%;
-            background: var(--color-bg-secondary);
-            border-right: 1px solid var(--color-border);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-            box-shadow: 2px 0 8px var(--color-shadow);
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--color-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .sidebar-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--color-text-primary);
-        }
-
-        .sidebar-btn {
-            background: none;
-            border: none;
-            color: var(--color-accent);
-            cursor: pointer;
-            font-size: 1.2rem;
-            padding: 0.5rem;
-        }
-
-        .sidebar-btn:hover {
-            opacity: 0.8;
-        }
-
-        .sidebar-content {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-        }
-
-        .page-item {
-            padding: 0.75rem;
-            margin-bottom: 0.75rem;
-            background: var(--color-paper);
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .page-item:hover {
-            background: white;
-            box-shadow: 0 2px 8px var(--color-shadow);
-        }
-
-        .page-item.active {
-            background: var(--color-accent);
-            color: white;
-            border-color: var(--color-accent);
-        }
-
-        .page-item-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .page-item-date {
-            font-size: 0.8rem;
-            opacity: 0.7;
-        }
-
-        .sidebar-actions {
-            padding: 1rem;
-            border-top: 1px solid var(--color-border);
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .action-btn {
-            padding: 0.75rem;
-            border: 1px solid var(--color-border);
-            background: var(--color-paper);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.95rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-            color: var(--color-text-primary);
-        }
-
-        .action-btn:hover {
-            background: var(--color-accent);
-            color: white;
-            border-color: var(--color-accent);
-        }
-
-        /* MAIN CONTENT */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            position: relative;
-        }
-
-        .toolbar {
-            height: 60px;
-            background: var(--color-paper);
-            border-bottom: 1px solid var(--color-border);
-            display: flex;
-            align-items: center;
-            padding: 0 1.5rem;
-            gap: 1.5rem;
-            box-shadow: 0 2px 4px var(--color-shadow);
-        }
-
-        .toolbar-group {
-            display: flex;
-            gap: 0.75rem;
-            align-items: center;
-        }
-
-        .toolbar-btn {
-            padding: 0.5rem 1rem;
-            border: 1px solid var(--color-border);
-            background: var(--color-bg-secondary);
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: all 0.2s ease;
-            color: var(--color-text-primary);
-        }
-
-        .toolbar-btn:hover {
-            background: var(--color-accent);
-            color: white;
-            border-color: var(--color-accent);
-        }
-
-        .toolbar-btn.active {
-            background: var(--color-accent);
-            color: white;
-            border-color: var(--color-accent);
-        }
-
-        .toolbar-separator {
-            width: 1px;
-            height: 30px;
-            background: var(--color-border);
-        }
-
-        /* COLOR & SIZE CONTROLS */
-        .control-group {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .control-label {
-            font-size: 0.8rem;
-            color: var(--color-text-secondary);
-            font-weight: 500;
-        }
-
-        input[type="color"] {
-            width: 35px;
-            height: 35px;
-            border: 1px solid var(--color-border);
-            border-radius: 4px;
-            cursor: pointer;
-            padding: 2px;
-        }
-
-        input[type="range"] {
-            width: 100px;
-            cursor: pointer;
-        }
-
-        /* CANVAS CONTAINER */
-        .canvas-container {
-            flex: 1;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
-        }
-
-        #pageCanvas {
-            box-shadow: 0 10px 40px var(--color-shadow-dark);
-            border-radius: 4px;
-            cursor: crosshair;
-            background: var(--color-paper);
-            touch-action: none;
-        }
-
-        /* MODALS */
-        .modal {
-            display: none;
-            position: fixed;
+        .book-cover::after {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.1) 100%);
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .cover-emboss {
+            position: relative;
+            z-index: 2;
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 50%, #c9a066 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+            text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .cover-subtitle {
+            font-family: var(--font-elegant);
+            font-size: 1.2rem;
+            letter-spacing: 2px;
+            margin-top: 1.5rem;
+            color: var(--gold-light);
+            opacity: 0.9;
+        }
+
+        .book-cover:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 
+                0 40px 100px rgba(0, 0, 0, 0.6),
+                0 0 80px rgba(212, 165, 116, 0.25);
+        }
+
+        .book-cover.open {
+            opacity: 0;
+            pointer-events: none;
+            transform: rotateY(-180deg) translateZ(-400px);
+        }
+
+        .book-pages {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 0;
+            display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: var(--color-paper);
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--color-text-primary);
-        }
-
-        .modal-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--color-border);
-            border-radius: 6px;
-            font-size: 1rem;
-            margin-bottom: 1.5rem;
-            color: var(--color-text-primary);
-        }
-
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--color-accent);
-            box-shadow: 0 0 0 3px rgba(184, 149, 106, 0.1);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: flex-end;
-        }
-
-        .modal-btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .modal-btn-primary {
-            background: var(--color-accent);
-            color: white;
-        }
-
-        .modal-btn-primary:hover {
-            opacity: 0.9;
-        }
-
-        .modal-btn-secondary {
-            background: var(--color-bg-secondary);
-            color: var(--color-text-primary);
-            border: 1px solid var(--color-border);
-        }
-
-        .modal-btn-secondary:hover {
-            background: var(--color-border);
-        }
-
-        /* LIBRARY VIEW */
-        #libraryView {
-            display: none;
-            flex: 1;
-            overflow-y: auto;
-            padding: 2rem;
-        }
-
-        #libraryView.active {
-            display: block;
-        }
-
-        .library-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .page-thumbnail {
-            aspect-ratio: 3/4;
-            border: 1px solid var(--color-border);
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: var(--color-paper);
-            box-shadow: 0 2px 8px var(--color-shadow);
-        }
-
-        .page-thumbnail:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px var(--color-shadow-dark);
-        }
-
-        .page-thumbnail img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* STATUS INDICATORS */
-        .status-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 0.75rem 1.5rem;
-            background: var(--color-accent);
-            color: white;
-            border-radius: 50px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
-        }
-
-        .status-indicator.visible {
+        .book-pages.show {
             opacity: 1;
             pointer-events: auto;
+            z-index: 10;
         }
 
-        /* RESPONSIVE */
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                max-height: 200px;
-                border-right: none;
-                border-bottom: 1px solid var(--color-border);
-            }
-
-            #app {
-                flex-direction: column;
-            }
-
-            .toolbar {
-                flex-wrap: wrap;
-                height: auto;
-                padding: 0.75rem;
-                gap: 0.75rem;
-            }
-
-            .toolbar-btn {
-                padding: 0.4rem 0.75rem;
-                font-size: 0.8rem;
-            }
-
-            .library-grid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 1rem;
-            }
+        .pages-container {
+            width: 100%;
+            height: 100%;
+            perspective: 1500px;
+            position: relative;
+            transform-style: preserve-3d;
         }
 
-        /* ANIMATIONS */
-        @keyframes fadeInScale {
-            from {
-                opacity: 0;
-                transform: scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
+        .page-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--cream);
+            border-radius: 8px;
+            box-shadow: 
+                0 30px 80px rgba(0, 0, 0, 0.4),
+                inset -1px -1px 3px rgba(0, 0, 0, 0.08),
+                inset 1px 1px 3px rgba(255, 255, 255, 0.5);
+            z-index: -1;
         }
 
-        #pageCanvas {
-            animation: fadeInScale 0.3s ease-out;
-        }
-
-        /* PAGE STYLE */
-        .page-wrapper {
+        .page-canvas-wrapper {
             position: relative;
             width: 100%;
             height: 100%;
+            overflow: hidden;
+            border-radius: 8px;
+            perspective: 1500px;
+            transform-style: preserve-3d;
+        }
+
+        #pageCanvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            border-radius: 4px;
+            touch-action: none;
         }
 
         .page-text-layer {
@@ -542,117 +380,1027 @@
             bottom: 40px;
             font-size: 1rem;
             line-height: 1.8;
-            color: var(--color-text-primary);
+            color: var(--charcoal);
             overflow-y: auto;
             word-wrap: break-word;
             white-space: pre-wrap;
-            font-family: 'Segoe UI', sans-serif;
+            font-family: var(--font-elegant);
+            padding: 0;
+            margin: 0;
+            background: transparent;
+            z-index: 5;
+            font-weight: 400;
         }
 
         .page-text-layer:focus {
             outline: none;
         }
 
-        /* ACCESSIBILITY */
-        .sr-only {
+        .page-number {
             position: absolute;
-            width: 1px;
-            height: 1px;
+            bottom: 25px;
+            right: 35px;
+            font-size: 0.95rem;
+            color: var(--gold-dark);
+            font-weight: 700;
+            opacity: 0;
+            animation: slideInUp 0.5s ease-out 0.3s forwards;
+            font-family: var(--font-serif);
+        }
+
+        @keyframes slideInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-flip-zone {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 180px;
+            height: 180px;
+            cursor: grab;
+            z-index: 20;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 0 0 8px 0;
+        }
+
+        .page-flip-zone:hover {
+            opacity: 0.4;
+            background: radial-gradient(circle at top-left, rgba(212, 165, 116, 0.3), transparent 70%);
+        }
+
+        .page-flip-corner {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, transparent 50%, var(--gold-dark) 50%);
+            border-radius: 0 0 8px 0;
+            opacity: 0;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            box-shadow: -2px -2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .page-flip-zone:hover .page-flip-corner {
+            opacity: 0.7;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 320px;
+            height: 100%;
+            background: linear-gradient(180deg, #2a2520 0%, #1f1a15 100%);
+            border-right: 1px solid rgba(212, 165, 116, 0.2);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.3);
+            transform: translateX(-100%);
+            transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: 100;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(212, 165, 116, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--gold-dark);
+            border-radius: 3px;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .sidebar-toggle {
+            position: fixed;
+            top: 25px;
+            left: 25px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+            color: var(--black-luxe);
+            font-weight: 700;
+        }
+
+        .sidebar-toggle:hover {
+            transform: scale(1.12) rotate(10deg);
+            box-shadow: 0 12px 30px rgba(212, 165, 116, 0.4);
+        }
+
+        .sidebar-header {
+            padding: 2rem 1.5rem;
+            border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-title {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gold-dark);
             padding: 0;
-            margin: -1px;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close:hover {
+            transform: rotate(90deg) scale(1.2);
+            background: rgba(212, 165, 116, 0.1);
+            border-radius: 50%;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .page-item {
+            padding: 1.2rem;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.05) 0%, rgba(212, 165, 116, 0.02) 100%);
+            border: 1px solid rgba(212, 165, 116, 0.15);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            user-select: none;
             overflow: hidden;
-            clip: rect(0, 0, 0, 0);
+            position: relative;
+        }
+
+        .page-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .page-item:hover::before {
+            left: 100%;
+        }
+
+        .page-item:hover {
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.12) 0%, rgba(212, 165, 116, 0.05) 100%);
+            transform: translateX(8px);
+            border-color: var(--gold-dark);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
+        }
+
+        .page-item.active {
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            color: var(--black-luxe);
+            border-color: var(--gold-dark);
+            box-shadow: 0 6px 20px rgba(212, 165, 116, 0.3);
+            font-weight: 600;
+        }
+
+        .page-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.35rem;
+            font-family: var(--font-serif);
+        }
+
+        .page-item-date {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-actions {
+            padding: 1.5rem;
+            border-top: 1px solid rgba(212, 165, 116, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.9rem 1.2rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.4);
+            background: rgba(212, 165, 116, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--gold-light);
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-sans);
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--gold-dark);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+            z-index: -1;
+        }
+
+        .action-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .action-btn:hover {
+            color: var(--black-luxe);
+            border-color: var(--gold-dark);
+            box-shadow: 0 6px 16px rgba(212, 165, 116, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* ========== TOOLBAR ========== */
+        .toolbar {
+            position: fixed;
+            bottom: 25px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: auto;
+            background: linear-gradient(135deg, rgba(42, 37, 32, 0.95) 0%, rgba(31, 26, 21, 0.95) 100%);
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0.9rem 1.8rem;
+            gap: 1rem;
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.4),
+                0 0 30px rgba(212, 165, 116, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(40px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 0.6rem;
+            align-items: center;
+            padding: 0 0.8rem;
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 32px;
+            background: rgba(212, 165, 116, 0.2);
+            margin: 0 0.4rem;
+        }
+
+        .toolbar-btn {
+            padding: 0.6rem 1.1rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            background: rgba(212, 165, 116, 0.08);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            color: var(--gold-light);
             white-space: nowrap;
-            border-width: 0;
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-sans);
+        }
+
+        .toolbar-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: var(--gold-dark);
+            z-index: -1;
+            transition: left 0.4s ease;
+        }
+
+        .toolbar-btn:hover::before {
+            left: 0;
+        }
+
+        .toolbar-btn:hover {
+            color: var(--black-luxe);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(212, 165, 116, 0.2);
+        }
+
+        .toolbar-btn.active {
+            background: var(--gold-dark);
+            color: var(--black-luxe);
+            border-color: var(--gold-dark);
+        }
+
+        input[type="color"] {
+            width: 38px;
+            height: 38px;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            padding: 2px;
+            transition: all 0.3s ease;
+            background: transparent;
+        }
+
+        input[type="color"]:hover {
+            transform: scale(1.12);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.2);
+        }
+
+        input[type="range"] {
+            width: 110px;
+            cursor: pointer;
+            accent-color: var(--gold-dark);
+        }
+
+        select {
+            padding: 0.5rem 0.9rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 6px;
+            background: rgba(212, 165, 116, 0.08);
+            color: var(--gold-light);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: var(--font-sans);
+        }
+
+        select:hover {
+            border-color: var(--gold-dark);
+            box-shadow: 0 4px 12px rgba(212, 165, 116, 0.15);
+        }
+
+        /* Sound Toggle */
+        .sound-toggle {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            width: 55px;
+            height: 55px;
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 101;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(212, 165, 116, 0.3);
+            color: var(--black-luxe);
+            font-weight: 700;
+        }
+
+        .sound-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .sound-toggle.muted {
+            opacity: 0.5;
+        }
+
+        /* ========== LIBRARY VIEW ========== */
+        #libraryView {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #2a2520 0%, #1f1a15 100%);
+            display: none;
+            flex-direction: column;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #libraryView.active {
+            display: flex;
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .library-header {
+            padding: 2.5rem;
+            border-bottom: 1px solid rgba(212, 165, 116, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .library-title {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .library-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--gold-dark);
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        .library-close:hover {
+            transform: rotate(90deg) scale(1.2);
+        }
+
+        .library-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 3rem;
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 2.5rem;
+        }
+
+        .page-thumbnail {
+            aspect-ratio: 3/4;
+            border: 2px solid rgba(212, 165, 116, 0.2);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: linear-gradient(135deg, rgba(212, 165, 116, 0.05), rgba(212, 165, 116, 0.02));
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .page-thumbnail:hover {
+            transform: translateY(-16px) rotateX(8deg) rotateY(-5deg);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3), 0 0 30px rgba(212, 165, 116, 0.2);
+            border-color: var(--gold-dark);
+        }
+
+        .page-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .page-thumbnail-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+            padding: 1.2rem;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            font-family: var(--font-serif);
+        }
+
+        /* ========== STATUS INDICATOR ========== */
+        .status-indicator {
+            position: fixed;
+            bottom: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            color: var(--black-luxe);
+            border-radius: 50px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 12px 30px rgba(212, 165, 116, 0.4);
+            z-index: 45;
+            font-family: var(--font-serif);
+            letter-spacing: 1px;
+        }
+
+        .status-indicator.visible {
+            opacity: 1;
+            pointer-events: auto;
+            animation: popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes popIn {
+            0% { transform: translateX(-50%) scale(0.8); opacity: 0; }
+            100% { transform: translateX(-50%) scale(1); opacity: 1; }
+        }
+
+        /* ========== MODAL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 300;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #3d3530 0%, #2d2620 100%);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 
+                0 25px 70px rgba(0, 0, 0, 0.4),
+                0 0 40px rgba(212, 165, 116, 0.1);
+            animation: slideInDown 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-title {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.9rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--gold-light);
+            background: rgba(212, 165, 116, 0.08);
+            font-family: var(--font-sans);
+            transition: all 0.3s ease;
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--gold-dark);
+            box-shadow: 0 0 0 4px rgba(212, 165, 116, 0.15);
+            transform: scale(1.01);
+        }
+
+        .modal-input::placeholder {
+            color: rgba(212, 165, 116, 0.5);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.9rem 2rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.3);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-family: var(--font-serif);
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold-light) 100%);
+            color: var(--black-luxe);
+            border-color: var(--gold-dark);
+        }
+
+        .modal-btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(212, 165, 116, 0.3);
+        }
+
+        .modal-btn-secondary {
+            background: rgba(212, 165, 116, 0.08);
+            color: var(--gold-light);
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(212, 165, 116, 0.15);
+            transform: translateY(-3px);
+        }
+
+        /* ========== COVER CUSTOMIZER ========== */
+        .cover-customizer {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 400;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .cover-customizer.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .customizer-panel {
+            background: linear-gradient(135deg, #3d3530 0%, #2d2620 100%);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 900px;
+            width: 90%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+        }
+
+        .customizer-preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-book {
+            width: 200px;
+            height: 280px;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .customizer-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .control-label {
+            font-family: var(--font-serif);
+            font-size: 0.95rem;
+            color: var(--gold-light);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .control-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+        }
+
+        .color-option {
+            padding: 0.8rem;
+            border: 2px solid rgba(212, 165, 116, 0.2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(212, 165, 116, 0.05);
+            color: var(--gold-light);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .color-option:hover {
+            border-color: var(--gold-dark);
+            background: rgba(212, 165, 116, 0.12);
+        }
+
+        .color-option.active {
+            border-color: var(--gold-dark);
+            background: rgba(212, 165, 116, 0.2);
+        }
+
+        .color-swatch {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .customizer-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 1.2rem;
+            justify-content: flex-end;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 768px) {
+            .book-spine {
+                width: 95%;
+                height: auto;
+                aspect-ratio: 3/4;
+            }
+
+            .toolbar {
+                width: 95%;
+                bottom: 10px;
+                padding: 0.6rem 1rem;
+                gap: 0.4rem;
+            }
+
+            .toolbar-btn {
+                padding: 0.4rem 0.7rem;
+                font-size: 0.75rem;
+            }
+
+            .landing-title {
+                font-size: 2rem;
+            }
+
+            .customizer-panel {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .control-options {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
     </style>
 </head>
 <body>
     <!-- LANDING SCREEN -->
     <div id="landing">
-        <canvas id="starfield" style="position: absolute; top: 0; left: 0; z-index: -1;"></canvas>
+        <div id="starfieldContainer">
+            <canvas id="starfield"></canvas>
+        </div>
         <div class="landing-content">
-            <h1 class="landing-title">Your Diary</h1>
-            <p class="landing-subtitle">Hyper-realistic journaling experience</p>
-            <button class="landing-btn" onclick="app.startApp()">ENTER</button>
+            <div class="landing-icon">📖</div>
+            <h1 class="landing-title">MEMENTO</h1>
+            <p class="landing-subtitle">Premium Luxury Diary Experience</p>
+            <button class="landing-btn" id="enterBtn">ENTER YOUR SANCTUARY ✨</button>
         </div>
     </div>
 
     <!-- MAIN APP -->
-    <div id="app" style="display: none;">
+    <div id="app">
         <!-- SIDEBAR -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <div class="sidebar-title">Diary</div>
-                <button class="sidebar-btn" onclick="app.toggleLibrary()" title="View all pages">📚</button>
+                <div class="sidebar-title">📖 Pages</div>
+                <button class="sidebar-close" id="sidebarClose">✕</button>
             </div>
             <div class="sidebar-content" id="pageList"></div>
             <div class="sidebar-actions">
-                <button class="action-btn" onclick="app.newPage()">+ New Page</button>
-                <button class="action-btn" onclick="app.exportPDF()">Export PDF</button>
-                <button class="action-btn" onclick="app.exportJSON()">Backup</button>
-                <button class="action-btn" onclick="document.getElementById('importModal').classList.add('active')">Import</button>
+                <button class="action-btn" id="newPageBtn">✨ New Page</button>
+                <button class="action-btn" id="customizeBtn">🎨 Cover</button>
+                <button class="action-btn" id="libraryBtn">📚 Library</button>
+                <button class="action-btn" id="exportPdfBtn">📄 PDF</button>
+                <button class="action-btn" id="exportJsonBtn">💾 Backup</button>
+                <button class="action-btn" id="importJsonBtn">📂 Import</button>
             </div>
         </div>
 
-        <!-- MAIN CONTENT -->
-        <div class="main-content">
-            <!-- TOOLBAR -->
-            <div class="toolbar">
-                <div class="toolbar-group">
-                    <button class="toolbar-btn active" data-mode="text" onclick="app.setMode('text')">📝 Type</button>
-                    <button class="toolbar-btn" data-mode="draw" onclick="app.setMode('draw')">✏️ Draw</button>
+        <!-- SIDEBAR TOGGLE -->
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+
+        <!-- SOUND TOGGLE -->
+        <button class="sound-toggle" id="soundToggle">🔊</button>
+
+        <!-- BOOK VIEWER -->
+        <div class="book-viewer">
+            <div class="book-spine">
+                <div class="book-cover" id="bookCover">
+                    <div class="cover-emboss" id="coverEmboss">MEMENTO</div>
+                    <div class="cover-subtitle" id="coverSubtitle">My Diary</div>
                 </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group" id="drawTools" style="display: none;">
-                    <select class="action-btn" id="brushType" onchange="app.setBrush(this.value)">
-                        <option value="pen">Pen</option>
-                        <option value="pencil">Pencil</option>
-                        <option value="marker">Marker</option>
-                        <option value="eraser">Eraser</option>
-                    </select>
-                </div>
-                <div class="toolbar-group" id="colorControl" style="display: none;">
-                    <label class="control-label">Color:</label>
-                    <input type="color" id="brushColor" value="#000000" onchange="app.setBrushColor(this.value)">
-                </div>
-                <div class="toolbar-group" id="sizeControl" style="display: none;">
-                    <label class="control-label">Size:</label>
-                    <input type="range" id="brushSize" min="1" max="50" value="3" onchange="app.setBrushSize(this.value)">
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <button class="toolbar-btn" onclick="app.undo()" title="Undo (Ctrl+Z)">↶</button>
-                    <button class="toolbar-btn" onclick="app.redo()" title="Redo (Ctrl+Y)">↷</button>
-                </div>
-                <div class="toolbar-separator"></div>
-                <div class="toolbar-group">
-                    <button class="toolbar-btn" onclick="app.savePagePNG()">💾 PNG</button>
-                    <button class="toolbar-btn" onclick="app.savePage()">Save</button>
+
+                <div class="book-pages" id="bookPages">
+                    <div class="pages-container">
+                        <div class="page-background"></div>
+                        <div class="page-canvas-wrapper">
+                            <canvas id="pageCanvas" width="600" height="800"></canvas>
+                            <div class="page-text-layer"></div>
+                            <div class="page-number" id="pageNumber"></div>
+                            <div class="page-flip-zone" id="pageFlipZone">
+                                <div class="page-flip-corner"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <!-- CANVAS AREA -->
-            <div class="canvas-container">
-                <canvas id="pageCanvas" width="800" height="1000"></canvas>
+        <!-- TOOLBAR -->
+        <div class="toolbar" id="toolbar">
+            <div class="toolbar-group">
+                <button class="toolbar-btn active" data-mode="text" id="modeText">📝</button>
+                <button class="toolbar-btn" data-mode="draw" id="modeDraw">✏️</button>
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group" id="drawTools" style="display: none;">
+                <select id="brushType">
+                    <option value="pen">Pen</option>
+                    <option value="pencil">Pencil</option>
+                    <option value="marker">Marker</option>
+                    <option value="eraser">Eraser</option>
+                </select>
+            </div>
+            <div class="toolbar-group" id="colorControl" style="display: none;">
+                <input type="color" id="brushColor" value="#1a1a1a" title="Brush color">
+            </div>
+            <div class="toolbar-group" id="sizeControl" style="display: none;">
+                <input type="range" id="brushSize" min="0.5" max="20" step="0.5" value="2" title="Brush size">
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="undoBtn" title="Undo">↶</button>
+                <button class="toolbar-btn" id="redoBtn" title="Redo">↷</button>
+            </div>
+            <div class="toolbar-separator"></div>
+            <div class="toolbar-group">
+                <button class="toolbar-btn" id="exportPngBtn">🖼️</button>
+                <button class="toolbar-btn" id="saveBtn">💾</button>
             </div>
         </div>
 
         <!-- LIBRARY VIEW -->
         <div id="libraryView">
-            <h2 style="margin-bottom: 2rem; font-size: 1.8rem;">Your Pages</h2>
-            <div class="library-grid" id="libraryGrid"></div>
+            <div class="library-header">
+                <h2 class="library-title">📚 Your Library</h2>
+                <button class="library-close" id="libraryClose">✕</button>
+            </div>
+            <div class="library-content">
+                <div class="library-grid" id="libraryGrid"></div>
+            </div>
         </div>
     </div>
 
-    <!-- MODALS -->
+    <!-- COVER CUSTOMIZER MODAL -->
+    <div class="cover-customizer" id="coverCustomizer">
+        <div class="customizer-panel">
+            <div class="customizer-preview">
+                <div class="preview-book" id="previewBook" style="background: linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%); color: #f4e4c1;">
+                    <div style="font-size: 1.2rem; font-weight: 700; letter-spacing: 2px;" id="previewEmboss">MEMENTO</div>
+                    <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;" id="previewSubtitle">My Diary</div>
+                </div>
+            </div>
+
+            <div class="customizer-controls">
+                <div class="control-group">
+                    <label class="control-label">Leather Color</label>
+                    <div class="control-options">
+                        <div class="color-option active" data-color="burgundy" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #5c2e3a;"></div>
+                            <span>Burgundy</span>
+                        </div>
+                        <div class="color-option" data-color="brown" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #4a3f35;"></div>
+                            <span>Brown</span>
+                        </div>
+                        <div class="color-option" data-color="black" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #1a1a1a;"></div>
+                            <span>Black</span>
+                        </div>
+                        <div class="color-option" data-color="navy" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #2c3a4d;"></div>
+                            <span>Navy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Pattern</label>
+                    <div class="control-options">
+                        <div class="color-option active" data-pattern="smooth" onclick="window.app.setCoverPattern(this)">
+                            Smooth
+                        </div>
+                        <div class="color-option" data-pattern="grain" onclick="window.app.setCoverPattern(this)">
+                            Grain
+                        </div>
+                        <div class="color-option" data-pattern="croc" onclick="window.app.setCoverPattern(this)">
+                            Croc
+                        </div>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Cover Text</label>
+                    <input type="text" id="coverText" class="modal-input" placeholder="Enter cover text" value="MEMENTO" style="color: var(--gold-light);">
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Subtitle</label>
+                    <input type="text" id="coverSubtextInput" class="modal-input" placeholder="Enter subtitle" value="My Diary" style="color: var(--gold-light);">
+                </div>
+
+                <div class="customizer-actions">
+                    <button class="modal-btn modal-btn-secondary" id="customizeClose">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="customizeApply">Apply Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IMPORT MODAL -->
     <div id="importModal" class="modal">
         <div class="modal-content">
-            <h2 class="modal-title">Import Backup</h2>
-            <input type="file" id="importFile" accept=".json" style="margin-bottom: 1.5rem; width: 100%;">
+            <h2 class="modal-title">📂 Import Backup</h2>
+            <input type="file" id="importFile" accept=".json" class="modal-input" placeholder="Choose file">
             <div class="modal-actions">
-                <button class="modal-btn modal-btn-secondary" onclick="document.getElementById('importModal').classList.remove('active')">Cancel</button>
-                <button class="modal-btn modal-btn-primary" onclick="app.importJSON()">Import</button>
+                <button class="modal-btn modal-btn-secondary" id="importCancelBtn">Cancel</button>
+                <button class="modal-btn modal-btn-primary" id="importConfirmBtn">Import</button>
             </div>
         </div>
     </div>
@@ -660,101 +1408,285 @@
     <!-- STATUS INDICATOR -->
     <div id="statusIndicator" class="status-indicator"></div>
 
-    <!-- SCRIPT -->
     <script>
         // ============================================================================
-        // DIARY APP - Production Single-File Implementation
-        // ============================================================================
-        // Core features: realistic page turns, pressure-sensitive drawing,
-        // IndexedDB storage, PDF/PNG export, offline-first architecture
+        // PREMIUM LUXURY DIARY - PRODUCTION VERSION
         // ============================================================================
 
-        // CONSTANTS & CONFIG
         const CONFIG = {
-            CANVAS_WIDTH: 800,
-            CANVAS_HEIGHT: 1000,
+            CANVAS_WIDTH: 600,
+            CANVAS_HEIGHT: 800,
             PAGE_MARGIN: 40,
-            DB_NAME: 'DiaryApp',
-            DB_VERSION: 1,
+            DB_NAME: 'LuxuryDiary',
             AUTOSAVE_DELAY: 5000,
-            BRUSH_SMOOTHING: 0.5,
-            PRESSURE_MULT: 1.5,
+            SOUND_ENABLED: true,
         };
 
-        // UTILITY: IndexedDB Helper
-        class DiaryDB {
+        // ========== AUDIO ENGINE ==========
+        class AudioEngine {
             constructor() {
-                this.db = null;
-                this.init();
+                this.enabled = true;
+                this.audioContext = null;
+                this.initAudio();
             }
 
-            async init() {
-                return new Promise((resolve, reject) => {
-                    const req = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
-                    req.onerror = () => reject(req.error);
-                    req.onsuccess = () => {
-                        this.db = req.result;
-                        resolve();
-                    };
-                    req.onupgradeneeded = (e) => {
-                        const db = e.target.result;
-                        if (!db.objectStoreNames.contains('pages')) {
-                            db.createObjectStore('pages', { keyPath: 'id' });
-                        }
-                    };
-                });
+            initAudio() {
+                try {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.audioContext = new AudioContext();
+                } catch (err) {
+                    console.log('Web Audio API not supported');
+                }
             }
 
-            async savePage(page) {
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction('pages', 'readwrite');
-                    const req = tx.objectStore('pages').put(page);
-                    req.onerror = () => reject(req.error);
-                    req.onsuccess = () => resolve();
-                });
+            playPageTurn() {
+                if (!this.enabled || !this.audioContext) return;
+                const ctx = this.audioContext;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.frequency.setValueAtTime(400, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
             }
 
-            async getPage(id) {
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction('pages', 'readonly');
-                    const req = tx.objectStore('pages').get(id);
-                    req.onerror = () => reject(req.error);
-                    req.onsuccess = () => resolve(req.result);
-                });
+            playPenWrite() {
+                if (!this.enabled || !this.audioContext) return;
+                const ctx = this.audioContext;
+                const bufferSize = ctx.sampleRate * 0.1;
+                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                const data = buffer.getChannelData(0);
+                
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 0.3 - 0.15;
+                }
+                
+                const source = ctx.createBufferSource();
+                const gain = ctx.createGain();
+                source.buffer = buffer;
+                source.connect(gain);
+                gain.connect(ctx.destination);
+                
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                source.start(ctx.currentTime);
             }
 
-            async getAllPages() {
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction('pages', 'readonly');
-                    const req = tx.objectStore('pages').getAll();
-                    req.onerror = () => reject(req.error);
-                    req.onsuccess = () => resolve(req.result);
-                });
+            playClick() {
+                if (!this.enabled || !this.audioContext) return;
+                const ctx = this.audioContext;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.05);
             }
 
-            async deletePage(id) {
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction('pages', 'readwrite');
-                    const req = tx.objectStore('pages').delete(id);
-                    req.onerror = () => reject(req.error);
-                    req.onsuccess = () => resolve();
+            playSave() {
+                if (!this.enabled || !this.audioContext) return;
+                const ctx = this.audioContext;
+                const notes = [523.25, 659.25, 783.99]; // C, E, G
+                
+                notes.forEach((freq, i) => {
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+                    
+                    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.1);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime + i * 0.1);
+                    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + i * 0.1 + 0.1);
+                    
+                    osc.start(ctx.currentTime + i * 0.1);
+                    osc.stop(ctx.currentTime + i * 0.1 + 0.1);
                 });
             }
         }
 
-        // STROKE DATA STRUCTURE
+        // ========== STORAGE MANAGER ==========
+        class StorageManager {
+            constructor() {
+                this.db = null;
+                this.useIndexedDB = true;
+            }
+
+            async init() {
+                try {
+                    return new Promise((resolve) => {
+                        const req = indexedDB.open(CONFIG.DB_NAME, 1);
+                        const timeout = setTimeout(() => {
+                            this.useIndexedDB = false;
+                            resolve(false);
+                        }, 3000);
+
+                        req.onerror = () => {
+                            clearTimeout(timeout);
+                            this.useIndexedDB = false;
+                            resolve(false);
+                        };
+
+                        req.onsuccess = () => {
+                            clearTimeout(timeout);
+                            this.db = req.result;
+                            resolve(true);
+                        };
+
+                        req.onupgradeneeded = (e) => {
+                            const db = e.target.result;
+                            if (!db.objectStoreNames.contains('pages')) {
+                                db.createObjectStore('pages', { keyPath: 'id' });
+                            }
+                            if (!db.objectStoreNames.contains('settings')) {
+                                db.createObjectStore('settings', { keyPath: 'key' });
+                            }
+                        };
+                    });
+                } catch (err) {
+                    this.useIndexedDB = false;
+                    return false;
+                }
+            }
+
+            async savePage(page) {
+                if (this.useIndexedDB && this.db) {
+                    try {
+                        return new Promise((resolve) => {
+                            const tx = this.db.transaction('pages', 'readwrite');
+                            tx.objectStore('pages').put(page);
+                            resolve();
+                        });
+                    } catch (err) {
+                        console.error('Save error:', err);
+                    }
+                } else {
+                    localStorage.setItem(`page_${page.id}`, JSON.stringify(page));
+                }
+            }
+
+            async getPage(id) {
+                if (this.useIndexedDB && this.db) {
+                    try {
+                        return new Promise((resolve) => {
+                            const tx = this.db.transaction('pages', 'readonly');
+                            const req = tx.objectStore('pages').get(id);
+                            req.onerror = () => resolve(null);
+                            req.onsuccess = () => resolve(req.result || null);
+                        });
+                    } catch (err) {
+                        return null;
+                    }
+                } else {
+                    const data = localStorage.getItem(`page_${id}`);
+                    return data ? JSON.parse(data) : null;
+                }
+            }
+
+            async getAllPages() {
+                if (this.useIndexedDB && this.db) {
+                    try {
+                        return new Promise((resolve) => {
+                            const tx = this.db.transaction('pages', 'readonly');
+                            const req = tx.objectStore('pages').getAll();
+                            req.onerror = () => resolve([]);
+                            req.onsuccess = () => resolve(req.result || []);
+                        });
+                    } catch (err) {
+                        return [];
+                    }
+                } else {
+                    const pages = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('page_')) {
+                            pages.push(JSON.parse(localStorage.getItem(key)));
+                        }
+                    }
+                    return pages;
+                }
+            }
+
+            async saveSettings(key, value) {
+                const data = { key, value };
+                if (this.useIndexedDB && this.db) {
+                    try {
+                        return new Promise((resolve) => {
+                            const tx = this.db.transaction('settings', 'readwrite');
+                            tx.objectStore('settings').put(data);
+                            resolve();
+                        });
+                    } catch (err) {
+                        console.error('Settings save error:', err);
+                    }
+                } else {
+                    localStorage.setItem(`setting_${key}`, JSON.stringify(value));
+                }
+            }
+
+            async getSettings(key) {
+                if (this.useIndexedDB && this.db) {
+                    try {
+                        return new Promise((resolve) => {
+                            const tx = this.db.transaction('settings', 'readonly');
+                            const req = tx.objectStore('settings').get(key);
+                            req.onerror = () => resolve(null);
+                            req.onsuccess = () => resolve(req.result?.value || null);
+                        });
+                    } catch (err) {
+                        return null;
+                    }
+                } else {
+                    const data = localStorage.getItem(`setting_${key}`);
+                    return data ? JSON.parse(data) : null;
+                }
+            }
+
+            async deletePage(id) {
+                if (this.useIndexedDB && this.db) {
+                    try {
+                        return new Promise((resolve) => {
+                            const tx = this.db.transaction('pages', 'readwrite');
+                            tx.objectStore('pages').delete(id);
+                            resolve();
+                        });
+                    } catch (err) {
+                        console.error('Delete error:', err);
+                    }
+                } else {
+                    localStorage.removeItem(`page_${id}`);
+                }
+            }
+        }
+
+        // ========== STROKE CLASS ==========
         class Stroke {
-            constructor(brush = 'pen', color = '#000000', size = 3) {
+            constructor(brush = 'pen', color = '#000000', size = 2) {
                 this.brush = brush;
                 this.color = color;
                 this.size = size;
                 this.points = [];
                 this.pressures = [];
+                this.times = [];
             }
 
-            addPoint(x, y, pressure = 1.0) {
-                this.points.push({ x, y });
-                this.pressures.push(Math.max(0.3, Math.min(1.0, pressure)));
+            addPoint(x, y, pressure = 1.0, time = Date.now()) {
+                this.points.push({ x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
+                this.pressures.push(Math.max(0.2, Math.min(1.0, pressure)));
+                this.times.push(time);
             }
 
             toJSON() {
@@ -764,18 +1696,20 @@
                     size: this.size,
                     points: this.points,
                     pressures: this.pressures,
+                    times: this.times,
                 };
             }
 
             static fromJSON(data) {
                 const s = new Stroke(data.brush, data.color, data.size);
-                s.points = data.points;
-                s.pressures = data.pressures;
+                s.points = data.points || [];
+                s.pressures = data.pressures || [];
+                s.times = data.times || [];
                 return s;
             }
         }
 
-        // DRAWING ENGINE
+        // ========== DRAWING ENGINE ==========
         class DrawingEngine {
             constructor(canvas) {
                 this.canvas = canvas;
@@ -788,28 +1722,29 @@
 
                 this.brush = 'pen';
                 this.color = '#000000';
-                this.size = 3;
+                this.size = 2;
 
                 this.lastX = 0;
                 this.lastY = 0;
+                this.lastTime = 0;
 
                 this.setupEventListeners();
                 this.renderPaperTexture();
             }
 
             setupEventListeners() {
-                this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e));
-                this.canvas.addEventListener('pointermove', (e) => this.onPointerMove(e));
-                this.canvas.addEventListener('pointerup', (e) => this.onPointerUp(e));
-                this.canvas.addEventListener('pointercancel', (e) => this.onPointerUp(e));
+                if (!this.canvas) return;
+                this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e), { passive: false });
+                this.canvas.addEventListener('pointermove', (e) => this.onPointerMove(e), { passive: false });
+                this.canvas.addEventListener('pointerup', (e) => this.onPointerUp(e), { passive: false });
+                this.canvas.addEventListener('pointercancel', (e) => this.onPointerUp(e), { passive: false });
             }
 
             renderPaperTexture() {
-                // Simple paper grain effect
                 const imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
                 const data = imageData.data;
                 for (let i = 0; i < data.length; i += 4) {
-                    const noise = Math.random() * 15;
+                    const noise = Math.random() * 8;
                     data[i] = 254 - noise;
                     data[i + 1] = 253 - noise;
                     data[i + 2] = 251 - noise;
@@ -819,19 +1754,25 @@
             }
 
             onPointerDown(e) {
-                if (app.mode !== 'draw') return;
+                if (window.app && window.app.mode !== 'draw') return;
                 
                 e.preventDefault();
                 this.isDrawing = true;
                 const rect = this.canvas.getBoundingClientRect();
-                this.lastX = e.clientX - rect.left;
-                this.lastY = e.clientY - rect.top;
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                this.lastX = (e.clientX - rect.left) * scaleX;
+                this.lastY = (e.clientY - rect.top) * scaleY;
+                this.lastTime = Date.now();
 
                 this.currentStroke = new Stroke(this.brush, this.color, this.size);
-                this.currentStroke.addPoint(this.lastX, this.lastY, e.pressure || 1.0);
+                this.currentStroke.addPoint(this.lastX, this.lastY, e.pressure || 1.0, this.lastTime);
 
                 this.undoStack.push(this.strokes.length);
                 this.redoStack = [];
+
+                window.audio.playPenWrite();
             }
 
             onPointerMove(e) {
@@ -839,81 +1780,97 @@
 
                 e.preventDefault();
                 const rect = this.canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const pressure = e.pressure || 1.0;
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                const pressure = e.pressure || this.estimatePressureFromVelocity(this.lastX, this.lastY, x, y);
+                const time = Date.now();
 
-                this.currentStroke.addPoint(x, y, pressure);
+                this.currentStroke.addPoint(x, y, pressure, time);
                 this.redraw();
+                
+                this.lastX = x;
+                this.lastY = y;
+                this.lastTime = time;
+            }
+
+            estimatePressureFromVelocity(x1, y1, x2, y2) {
+                const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+                return Math.max(0.3, Math.min(1.0, 1 - dist / 50));
             }
 
             onPointerUp(e) {
                 if (!this.isDrawing) return;
-
                 e.preventDefault();
                 this.isDrawing = false;
-                if (this.currentStroke) {
+                if (this.currentStroke && this.currentStroke.points.length > 1) {
                     this.strokes.push(this.currentStroke);
-                    this.currentStroke = null;
                 }
+                this.currentStroke = null;
             }
 
             redraw() {
                 this.renderPaperTexture();
-
-                // Draw all completed strokes
                 for (const stroke of this.strokes) {
                     this.drawStroke(stroke);
                 }
-
-                // Draw current stroke in progress
                 if (this.currentStroke) {
                     this.drawStroke(this.currentStroke);
                 }
             }
 
             drawStroke(stroke) {
-                if (stroke.points.length < 2) return;
+                if (!stroke || !stroke.points || stroke.points.length < 2) return;
 
                 const ctx = this.ctx;
                 ctx.save();
 
-                ctx.strokeStyle = stroke.color;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-
-                if (stroke.brush === 'eraser') {
-                    ctx.globalCompositeOperation = 'destination-out';
-                    ctx.strokeStyle = 'rgba(0,0,0,1)';
-                }
-
-                // Catmull-Rom smoothing for path
                 const points = stroke.points;
-                const pressures = stroke.pressures;
+                const pressures = stroke.pressures || [];
 
+                // Draw with smooth interpolation
                 for (let i = 0; i < points.length - 1; i++) {
-                    const p0 = i > 0 ? points[i - 1] : points[i];
                     const p1 = points[i];
                     const p2 = points[i + 1];
-                    const p3 = i < points.length - 2 ? points[i + 2] : points[i + 1];
+                    const pressure = (pressures[i] || 1.0) * 0.8 + 0.2; // Normalize pressure
+                    const width = Math.max(0.5, stroke.size * pressure);
 
-                    const pressure = pressures[i];
-                    const width = stroke.size * CONFIG.PRESSURE_MULT * pressure;
-
-                    ctx.lineWidth = width;
-
-                    // Variable line width for expressive drawing
-                    if (stroke.brush === 'pencil') {
-                        ctx.globalAlpha = 0.7;
-                    } else if (stroke.brush === 'marker') {
-                        ctx.globalAlpha = 0.5;
+                    // Set stroke style based on brush type
+                    if (stroke.brush === 'eraser') {
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.strokeStyle = 'rgba(0,0,0,1)';
+                        ctx.lineWidth = width * 2;
                     } else {
-                        ctx.globalAlpha = 1.0;
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = stroke.color;
+                        ctx.lineWidth = width;
+
+                        if (stroke.brush === 'pencil') {
+                            ctx.globalAlpha = 0.65;
+                        } else if (stroke.brush === 'marker') {
+                            ctx.globalAlpha = 0.45;
+                        } else {
+                            ctx.globalAlpha = 0.9;
+                        }
                     }
+
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
 
                     ctx.beginPath();
                     ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(p2.x, p2.y);
+                    
+                    // Quadratic curve for smooth interpolation
+                    if (i < points.length - 2) {
+                        const p3 = points[i + 2];
+                        const cpx = (p2.x + p3.x) / 2;
+                        const cpy = (p2.y + p3.y) / 2;
+                        ctx.quadraticCurveTo(p2.x, p2.y, cpx, cpy);
+                    } else {
+                        ctx.lineTo(p2.x, p2.y);
+                    }
                     ctx.stroke();
                 }
 
@@ -948,11 +1905,11 @@
                 const scaledCtx = scaledCanvas.getContext('2d');
                 scaledCtx.scale(scale, scale);
 
-                // Draw paper texture
+                // Draw paper
                 const imgData = this.ctx.createImageData(w, h);
                 const data = imgData.data;
                 for (let i = 0; i < data.length; i += 4) {
-                    const noise = Math.random() * 15;
+                    const noise = Math.random() * 8;
                     data[i] = 254 - noise;
                     data[i + 1] = 253 - noise;
                     data[i + 2] = 251 - noise;
@@ -969,99 +1926,380 @@
             }
 
             drawStrokeOnContext(ctx, stroke) {
-                if (stroke.points.length < 2) return;
-
-                ctx.save();
-                ctx.strokeStyle = stroke.color;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-
-                if (stroke.brush === 'eraser') {
-                    ctx.globalCompositeOperation = 'destination-out';
-                    ctx.strokeStyle = 'rgba(0,0,0,1)';
-                }
+                if (!stroke || !stroke.points || stroke.points.length < 2) return;
 
                 const points = stroke.points;
-                const pressures = stroke.pressures;
+                const pressures = stroke.pressures || [];
 
                 for (let i = 0; i < points.length - 1; i++) {
                     const p1 = points[i];
                     const p2 = points[i + 1];
-                    const pressure = pressures[i];
-                    const width = stroke.size * CONFIG.PRESSURE_MULT * pressure;
+                    const pressure = (pressures[i] || 1.0) * 0.8 + 0.2;
+                    const width = Math.max(0.5, stroke.size * pressure);
 
-                    ctx.lineWidth = width;
-
-                    if (stroke.brush === 'pencil') {
-                        ctx.globalAlpha = 0.7;
-                    } else if (stroke.brush === 'marker') {
-                        ctx.globalAlpha = 0.5;
+                    if (stroke.brush === 'eraser') {
+                        ctx.globalCompositeOperation = 'destination-out';
+                        ctx.strokeStyle = 'rgba(0,0,0,1)';
+                        ctx.lineWidth = width * 2;
                     } else {
-                        ctx.globalAlpha = 1.0;
+                        ctx.globalCompositeOperation = 'source-over';
+                        ctx.strokeStyle = stroke.color;
+                        ctx.lineWidth = width;
+
+                        if (stroke.brush === 'pencil') {
+                            ctx.globalAlpha = 0.65;
+                        } else if (stroke.brush === 'marker') {
+                            ctx.globalAlpha = 0.45;
+                        } else {
+                            ctx.globalAlpha = 0.9;
+                        }
                     }
+
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
 
                     ctx.beginPath();
                     ctx.moveTo(p1.x, p1.y);
-                    ctx.lineTo(p2.x, p2.y);
+                    
+                    if (i < points.length - 2) {
+                        const p3 = points[i + 2];
+                        const cpx = (p2.x + p3.x) / 2;
+                        const cpy = (p2.y + p3.y) / 2;
+                        ctx.quadraticCurveTo(p2.x, p2.y, cpx, cpy);
+                    } else {
+                        ctx.lineTo(p2.x, p2.y);
+                    }
                     ctx.stroke();
                 }
 
-                ctx.restore();
+                ctx.globalCompositeOperation = 'source-over';
+                ctx.globalAlpha = 1.0;
             }
         }
 
-        // MAIN APP
+        // ========== MAIN APP ==========
         class DiaryApp {
             constructor() {
-                this.db = new DiaryDB();
+                this.storage = new StorageManager();
                 this.pages = [];
                 this.currentPageId = null;
                 this.mode = 'text';
                 this.drawingEngine = null;
                 this.autosaveTimer = null;
                 this.initialized = false;
+                this.currentPageIndex = 0;
+                
+                // Cover customization
+                this.coverColor = 'burgundy';
+                this.coverPattern = 'smooth';
+                this.coverText = 'MEMENTO';
+                this.coverSubtext = 'My Diary';
             }
 
             async init() {
-                if (this.initialized) return;
-                this.initialized = true;
+                try {
+                    await this.storage.init();
+                    await new Promise(r => setTimeout(r, 100));
 
-                // Setup drawing engine
-                const canvas = document.getElementById('pageCanvas');
-                this.drawingEngine = new DrawingEngine(canvas);
+                    const canvas = document.getElementById('pageCanvas');
+                    if (!canvas) {
+                        console.error('Canvas not found!');
+                        return;
+                    }
 
-                // Load pages from DB
-                this.pages = await this.db.getAllPages();
-                this.pages.sort((a, b) => b.createdAt - a.createdAt);
+                    this.drawingEngine = new DrawingEngine(canvas);
+                    this.pages = await this.storage.getAllPages();
+                    this.pages.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
-                if (this.pages.length === 0) {
-                    await this.newPage();
-                } else {
-                    await this.openPage(this.pages[0].id);
+                    if (this.pages.length === 0) {
+                        await this.newPage();
+                    } else {
+                        await this.openPage(this.pages[0].id);
+                    }
+
+                    // Load cover settings
+                    const savedCoverColor = await this.storage.getSettings('coverColor');
+                    const savedCoverPattern = await this.storage.getSettings('coverPattern');
+                    const savedCoverText = await this.storage.getSettings('coverText');
+                    const savedCoverSubtext = await this.storage.getSettings('coverSubtext');
+
+                    if (savedCoverColor) this.coverColor = savedCoverColor;
+                    if (savedCoverPattern) this.coverPattern = savedCoverPattern;
+                    if (savedCoverText) this.coverText = savedCoverText;
+                    if (savedCoverSubtext) this.coverSubtext = savedCoverSubtext;
+
+                    this.updateCoverDisplay();
+
+                    this.renderPageList();
+                    this.setupKeyboardShortcuts();
+                    this.setupAutosave();
+                    this.setupEventListeners();
+                    this.setupPageFlipInteraction();
+                    this.setupBookCoverInteraction();
+
+                    this.initialized = true;
+                    this.showStatus('Welcome to your sanctuary ✨', 2000);
+                } catch (err) {
+                    console.error('Init error:', err);
+                }
+            }
+
+            updateCoverDisplay() {
+                const cover = document.getElementById('bookCover');
+                const emboss = document.getElementById('coverEmboss');
+                const subtitle = document.getElementById('coverSubtitle');
+                const preview = document.getElementById('previewBook');
+                const previewEmboss = document.getElementById('previewEmboss');
+                const previewSubtitle = document.getElementById('previewSubtitle');
+
+                const colorMap = {
+                    burgundy: 'linear-gradient(135deg, #5c2e3a 0%, #4a3f35 50%, #3d3530 100%)',
+                    brown: 'linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%)',
+                    black: 'linear-gradient(135deg, #2a2620 0%, #1a1a1a 50%, #0f0f0f 100%)',
+                    navy: 'linear-gradient(135deg, #2c3a4d 0%, #1f2a3a 50%, #151f2e 100%)',
+                };
+
+                if (cover) cover.style.background = colorMap[this.coverColor] || colorMap.burgundy;
+                if (preview) preview.style.background = colorMap[this.coverColor] || colorMap.burgundy;
+                if (emboss) emboss.textContent = this.coverText;
+                if (previewEmboss) previewEmboss.textContent = this.coverText;
+                if (subtitle) subtitle.textContent = this.coverSubtext;
+                if (previewSubtitle) previewSubtitle.textContent = this.coverSubtext;
+            }
+
+            setCoverColor(element) {
+                document.querySelectorAll('[data-color]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverColor = element.dataset.color;
+                this.updateCoverDisplay();
+            }
+
+            setCoverPattern(element) {
+                document.querySelectorAll('[data-pattern]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverPattern = element.dataset.pattern;
+            }
+
+            setupBookCoverInteraction() {
+                const cover = document.getElementById('bookCover');
+                const pages = document.getElementById('bookPages');
+
+                if (!cover || !pages) return;
+
+                cover.addEventListener('click', () => {
+                    cover.classList.add('open');
+                    pages.classList.add('show');
+                    gsap.to(cover, { duration: 0.8, opacity: 0, pointerEvents: 'none', ease: 'power2.inOut' });
+                    gsap.to(pages, { duration: 0.8, opacity: 1, ease: 'power2.inOut' });
+                    window.audio.playPageTurn();
+                    this.showStatus('Opened ✨', 1000);
+                });
+            }
+
+            setupPageFlipInteraction() {
+                const flipZone = document.getElementById('pageFlipZone');
+                let isFlipping = false;
+                let startX, startY;
+
+                if (!flipZone) return;
+
+                flipZone.addEventListener('pointerdown', (e) => {
+                    isFlipping = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    flipZone.style.opacity = '0.6';
+                });
+
+                document.addEventListener('pointermove', (e) => {
+                    if (!isFlipping || !flipZone) return;
+
+                    const deltaX = e.clientX - startX;
+                    const deltaY = e.clientY - startY;
+                    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+                    if (distance > 30) {
+                        const flipProgress = Math.max(0, Math.min(1, -deltaX / 250));
+                        this.animatePageFlip(flipProgress);
+                    }
+                });
+
+                document.addEventListener('pointerup', () => {
+                    if (!isFlipping) return;
+                    isFlipping = false;
+                    if (flipZone) flipZone.style.opacity = '0';
+                    this.completePageFlip();
+                });
+
+                // Swipe
+                let touchStartX = 0;
+                document.addEventListener('touchstart', (e) => {
+                    touchStartX = e.touches[0].clientX;
+                }, false);
+
+                document.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].clientX;
+                    const diff = touchStartX - touchEndX;
+
+                    if (Math.abs(diff) > 80) {
+                        window.audio.playPageTurn();
+                        if (diff > 0) {
+                            this.nextPage();
+                        } else {
+                            this.previousPage();
+                        }
+                    }
+                }, false);
+            }
+
+            animatePageFlip(progress) {
+                const wrapper = document.querySelector('.page-canvas-wrapper');
+                if (!wrapper) return;
+
+                const skew = progress * 20;
+                const rotateY = progress * 25;
+                const opacity = 1 - progress * 0.2;
+
+                wrapper.style.transform = `perspective(1200px) skewY(${skew}deg) rotateY(${rotateY}deg)`;
+                wrapper.style.opacity = opacity;
+                wrapper.style.filter = `brightness(${0.95 + progress * 0.1})`;
+            }
+
+            completePageFlip() {
+                const wrapper = document.querySelector('.page-canvas-wrapper');
+                if (!wrapper) return;
+
+                gsap.to(wrapper, {
+                    duration: 0.5,
+                    skewY: 0,
+                    rotateY: 0,
+                    opacity: 1,
+                    filter: 'brightness(1)',
+                    ease: 'back.out'
+                });
+            }
+
+            setupEventListeners() {
+                // Sidebar
+                const sidebarToggle = document.getElementById('sidebarToggle');
+                const sidebarClose = document.getElementById('sidebarClose');
+                const sidebar = document.getElementById('sidebar');
+
+                if (sidebarToggle) sidebarToggle.addEventListener('click', () => {
+                    sidebar.classList.toggle('open');
+                    window.audio.playClick();
+                    gsap.to(sidebarToggle, { duration: 0.3, rotate: sidebar.classList.contains('open') ? 90 : 0 });
+                });
+
+                if (sidebarClose) sidebarClose.addEventListener('click', () => {
+                    sidebar.classList.remove('open');
+                });
+
+                // Sound toggle
+                const soundToggle = document.getElementById('soundToggle');
+                if (soundToggle) {
+                    soundToggle.addEventListener('click', () => {
+                        window.audio.enabled = !window.audio.enabled;
+                        soundToggle.classList.toggle('muted');
+                        window.audio.playClick();
+                    });
                 }
 
-                this.renderPageList();
-                this.setupKeyboardShortcuts();
+                // Mode buttons
+                const modeText = document.getElementById('modeText');
+                const modeDraw = document.getElementById('modeDraw');
+                if (modeText) modeText.addEventListener('click', () => this.setMode('text'));
+                if (modeDraw) modeDraw.addEventListener('click', () => this.setMode('draw'));
 
-                // Start autosave
-                this.setupAutosave();
+                // Action buttons
+                const newPageBtn = document.getElementById('newPageBtn');
+                const libraryBtn = document.getElementById('libraryBtn');
+                const customizeBtn = document.getElementById('customizeBtn');
+                const exportPdfBtn = document.getElementById('exportPdfBtn');
+                const exportJsonBtn = document.getElementById('exportJsonBtn');
+                const importJsonBtn = document.getElementById('importJsonBtn');
 
-                // Setup resize handler
+                if (newPageBtn) newPageBtn.addEventListener('click', () => this.newPage());
+                if (libraryBtn) libraryBtn.addEventListener('click', () => this.toggleLibrary());
+                if (customizeBtn) customizeBtn.addEventListener('click', () => this.openCoverCustomizer());
+                if (exportPdfBtn) exportPdfBtn.addEventListener('click', () => this.exportPDF());
+                if (exportJsonBtn) exportJsonBtn.addEventListener('click', () => this.exportJSON());
+                if (importJsonBtn) importJsonBtn.addEventListener('click', () => {
+                    document.getElementById('importModal').classList.add('active');
+                });
+
+                // Toolbar buttons
+                const undoBtn = document.getElementById('undoBtn');
+                const redoBtn = document.getElementById('redoBtn');
+                const exportPngBtn = document.getElementById('exportPngBtn');
+                const saveBtn = document.getElementById('saveBtn');
+
+                if (undoBtn) undoBtn.addEventListener('click', () => this.undo());
+                if (redoBtn) redoBtn.addEventListener('click', () => this.redo());
+                if (exportPngBtn) exportPngBtn.addEventListener('click', () => this.savePagePNG());
+                if (saveBtn) saveBtn.addEventListener('click', () => this.savePage());
+
+                // Draw tools
+                const brushType = document.getElementById('brushType');
+                const brushColor = document.getElementById('brushColor');
+                const brushSize = document.getElementById('brushSize');
+
+                if (brushType) brushType.addEventListener('change', (e) => this.setBrush(e.target.value));
+                if (brushColor) brushColor.addEventListener('change', (e) => this.setBrushColor(e.target.value));
+                if (brushSize) brushSize.addEventListener('change', (e) => this.setBrushSize(e.target.value));
+
+                // Import modal
+                const importCancelBtn = document.getElementById('importCancelBtn');
+                const importConfirmBtn = document.getElementById('importConfirmBtn');
+
+                if (importCancelBtn) importCancelBtn.addEventListener('click', () => {
+                    document.getElementById('importModal').classList.remove('active');
+                });
+                if (importConfirmBtn) importConfirmBtn.addEventListener('click', () => this.importJSON());
+
+                // Customizer
+                const customizeClose = document.getElementById('customizeClose');
+                const customizeApply = document.getElementById('customizeApply');
+                const coverText = document.getElementById('coverText');
+                const coverSubtextInput = document.getElementById('coverSubtextInput');
+
+                if (customizeClose) customizeClose.addEventListener('click', () => {
+                    document.getElementById('coverCustomizer').classList.remove('active');
+                });
+
+                if (customizeApply) customizeApply.addEventListener('click', async () => {
+                    this.coverText = coverText.value || 'MEMENTO';
+                    this.coverSubtext = coverSubtextInput.value || 'My Diary';
+                    this.updateCoverDisplay();
+                    await this.storage.saveSettings('coverText', this.coverText);
+                    await this.storage.saveSettings('coverSubtext', this.coverSubtext);
+                    await this.storage.saveSettings('coverColor', this.coverColor);
+                    await this.storage.saveSettings('coverPattern', this.coverPattern);
+                    document.getElementById('coverCustomizer').classList.remove('active');
+                    this.showStatus('Cover updated ✨', 1500);
+                    window.audio.playSave();
+                });
+
+                // Library
+                const libraryClose = document.getElementById('libraryClose');
+                if (libraryClose) libraryClose.addEventListener('click', () => this.toggleLibrary());
+
                 window.addEventListener('resize', () => this.resizeCanvas());
-                this.resizeCanvas();
             }
 
             resizeCanvas() {
-                const container = document.querySelector('.canvas-container');
-                const canvas = document.getElementById('pageCanvas');
+                const spine = document.querySelector('.book-spine');
+                if (!spine) return;
+
+                const container = document.querySelector('.book-viewer');
+                if (!container) return;
+
                 const scale = Math.min(
-                    (container.clientWidth - 40) / CONFIG.CANVAS_WIDTH,
-                    (container.clientHeight - 40) / CONFIG.CANVAS_HEIGHT,
+                    (container.clientWidth - 40) / 600,
+                    (container.clientHeight - 40) / 800,
                     1
                 );
 
-                canvas.style.width = (CONFIG.CANVAS_WIDTH * scale) + 'px';
-                canvas.style.height = (CONFIG.CANVAS_HEIGHT * scale) + 'px';
+                spine.style.transform = `scale(${scale})`;
             }
 
             setupKeyboardShortcuts() {
@@ -1099,7 +2337,7 @@
 
             async newPage() {
                 const page = {
-                    id: Date.now().toString(),
+                    id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
                     title: `Page ${this.pages.length + 1}`,
                     createdAt: Date.now(),
                     updatedAt: Date.now(),
@@ -1108,65 +2346,89 @@
                     thumbnail: '',
                 };
 
-                await this.db.savePage(page);
+                await this.storage.savePage(page);
                 this.pages.unshift(page);
                 await this.openPage(page.id);
                 this.renderPageList();
-                this.showStatus('New page created');
+                this.showStatus('✨ New page', 1200);
+                window.audio.playSave();
             }
 
             async openPage(id) {
-                // Save current page first
-                if (this.currentPageId) {
-                    await this.savePage();
+                try {
+                    if (this.currentPageId) {
+                        await this.savePage();
+                    }
+
+                    const page = await this.storage.getPage(id);
+                    if (!page) return;
+
+                    this.currentPageId = id;
+                    this.currentPageIndex = this.pages.findIndex(p => p.id === id);
+
+                    const oldTextLayer = document.querySelector('.page-text-layer');
+                    if (oldTextLayer) oldTextLayer.remove();
+
+                    if (this.drawingEngine) {
+                        this.drawingEngine.clear();
+                        if (page.strokes && Array.isArray(page.strokes)) {
+                            this.drawingEngine.strokes = page.strokes.map(s => {
+                                try {
+                                    return Stroke.fromJSON(s);
+                                } catch (e) {
+                                    return new Stroke();
+                                }
+                            });
+                            this.drawingEngine.redraw();
+                        }
+                    }
+
+                    const canvas = document.getElementById('pageCanvas');
+                    if (canvas && canvas.parentElement) {
+                        const textLayer = document.createElement('div');
+                        textLayer.className = 'page-text-layer';
+                        textLayer.textContent = page.textContent || '';
+                        textLayer.contentEditable = 'true';
+                        textLayer.setAttribute('aria-label', 'Page text content');
+                        canvas.parentElement.appendChild(textLayer);
+                    }
+
+                    const pageNumber = document.getElementById('pageNumber');
+                    if (pageNumber) {
+                        pageNumber.textContent = `${this.currentPageIndex + 1}/${this.pages.length}`;
+                    }
+
+                    this.renderPageList();
+                    this.showStatus(`📖 Page ${this.currentPageIndex + 1}`, 1000);
+                    this.resizeCanvas();
+
+                    const wrapper = document.querySelector('.page-canvas-wrapper');
+                    if (wrapper) {
+                        gsap.from(wrapper, { duration: 0.5, opacity: 0, y: 30, ease: 'back.out' });
+                    }
+                } catch (err) {
+                    console.error('Open page error:', err);
                 }
-
-                const page = await this.db.getPage(id);
-                if (!page) return;
-
-                this.currentPageId = id;
-
-                // Restore text content
-                const textLayer = document.querySelector('.page-text-layer');
-                if (textLayer) {
-                    textLayer.remove();
-                }
-
-                // Clear drawing
-                this.drawingEngine.clear();
-
-                // Restore strokes
-                if (page.strokes && page.strokes.length > 0) {
-                    this.drawingEngine.strokes = page.strokes.map(s => Stroke.fromJSON(s));
-                    this.drawingEngine.redraw();
-                }
-
-                // Create text layer
-                const canvas = document.getElementById('pageCanvas');
-                const textLayer = document.createElement('div');
-                textLayer.className = 'page-text-layer';
-                textLayer.textContent = page.textContent || '';
-                textLayer.contentEditable = true;
-                textLayer.setAttribute('aria-label', 'Page text content');
-                canvas.parentElement.appendChild(textLayer);
-
-                this.renderPageList();
             }
 
             async savePage() {
-                if (!this.currentPageId) return;
+                try {
+                    if (!this.currentPageId) return;
 
-                const textLayer = document.querySelector('.page-text-layer');
-                const page = await this.db.getPage(this.currentPageId);
-                if (!page) return;
+                    const textLayer = document.querySelector('.page-text-layer');
+                    const page = await this.storage.getPage(this.currentPageId);
+                    if (!page) return;
 
-                page.textContent = textLayer ? textLayer.textContent : '';
-                page.strokes = this.drawingEngine.strokes.map(s => s.toJSON());
-                page.updatedAt = Date.now();
-                page.thumbnail = this.drawingEngine.getImageData(0.25);
+                    page.textContent = textLayer ? textLayer.textContent : '';
+                    page.strokes = this.drawingEngine ? this.drawingEngine.strokes.map(s => s.toJSON()) : [];
+                    page.updatedAt = Date.now();
+                    page.thumbnail = this.drawingEngine ? this.drawingEngine.getImageData(0.2) : '';
 
-                await this.db.savePage(page);
-                this.showStatus('Page saved');
+                    await this.storage.savePage(page);
+                    this.showStatus('💾 Saved', 800);
+                } catch (err) {
+                    console.error('Save error:', err);
+                }
             }
 
             setMode(mode) {
@@ -1178,149 +2440,155 @@
                 const drawTools = document.getElementById('drawTools');
                 const colorControl = document.getElementById('colorControl');
                 const sizeControl = document.getElementById('sizeControl');
+                const canvas = document.getElementById('pageCanvas');
 
                 if (mode === 'draw') {
-                    drawTools.style.display = 'flex';
-                    colorControl.style.display = 'flex';
-                    sizeControl.style.display = 'flex';
-                    document.getElementById('pageCanvas').style.cursor = 'crosshair';
+                    if (drawTools) drawTools.style.display = 'flex';
+                    if (colorControl) colorControl.style.display = 'flex';
+                    if (sizeControl) sizeControl.style.display = 'flex';
+                    if (canvas) canvas.style.cursor = 'crosshair';
+                    this.showStatus('✏️ Drawing mode', 800);
                 } else {
-                    drawTools.style.display = 'none';
-                    colorControl.style.display = 'none';
-                    sizeControl.style.display = 'none';
-                    document.getElementById('pageCanvas').style.cursor = 'default';
+                    if (drawTools) drawTools.style.display = 'none';
+                    if (colorControl) colorControl.style.display = 'none';
+                    if (sizeControl) sizeControl.style.display = 'none';
+                    if (canvas) canvas.style.cursor = 'default';
+                    this.showStatus('📝 Typing mode', 800);
                 }
             }
 
             setBrush(brush) {
-                this.drawingEngine.brush = brush;
+                if (this.drawingEngine) this.drawingEngine.brush = brush;
+                window.audio.playClick();
             }
 
             setBrushColor(color) {
-                this.drawingEngine.color = color;
+                if (this.drawingEngine) this.drawingEngine.color = color;
             }
 
             setBrushSize(size) {
-                this.drawingEngine.size = parseFloat(size);
+                if (this.drawingEngine) this.drawingEngine.size = parseFloat(size);
             }
 
             undo() {
-                this.drawingEngine.undo();
+                if (this.drawingEngine) this.drawingEngine.undo();
             }
 
             redo() {
-                this.drawingEngine.redo();
+                if (this.drawingEngine) this.drawingEngine.redo();
             }
 
             async savePagePNG() {
-                if (!this.currentPageId) return;
-                const link = document.createElement('a');
-                link.href = this.drawingEngine.getImageData(2);
-                link.download = `page-${this.currentPageId}.png`;
-                link.click();
-                this.showStatus('PNG exported');
+                try {
+                    if (!this.currentPageId || !this.drawingEngine) return;
+                    const link = document.createElement('a');
+                    link.href = this.drawingEngine.getImageData(2);
+                    link.download = `${this.coverText.toUpperCase()}-page-${this.currentPageIndex + 1}.png`;
+                    link.click();
+                    this.showStatus('🖼️ PNG exported', 1200);
+                    window.audio.playSave();
+                } catch (err) {
+                    console.error('PNG export error:', err);
+                }
             }
 
             async exportPDF() {
-                if (this.pages.length === 0) {
-                    this.showStatus('No pages to export');
-                    return;
+                try {
+                    if (this.pages.length === 0) {
+                        this.showStatus('No pages to export');
+                        return;
+                    }
+
+                    this.showStatus('📄 Generating PDF...');
+
+                    if (!window.jspdf) {
+                        this.showStatus('Loading...');
+                        return;
+                    }
+
+                    const { jsPDF } = window.jspdf;
+                    const pdf = new jsPDF('p', 'mm', 'a4');
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+
+                    for (let i = 0; i < Math.min(this.pages.length, 50); i++) {
+                        const page = this.pages[i];
+                        const imgData = page.thumbnail || '';
+
+                        if (i > 0) pdf.addPage();
+                        if (imgData) {
+                            pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+                        }
+                        pdf.setFontSize(10);
+                        pdf.text(`${i + 1}`, pageWidth - 20, pageHeight - 10);
+                    }
+
+                    pdf.save(`${this.coverText.toLowerCase()}-diary.pdf`);
+                    this.showStatus('📄 PDF exported', 1200);
+                    window.audio.playSave();
+                } catch (err) {
+                    console.error('PDF export error:', err);
                 }
-
-                this.showStatus('Generating PDF...');
-
-                // Use jsPDF and html2canvas
-                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-                const pageWidth = pdf.internal.pageSize.getWidth();
-                const pageHeight = pdf.internal.pageSize.getHeight();
-
-                for (let i = 0; i < this.pages.length; i++) {
-                    const page = this.pages[i];
-                    const imgData = page.thumbnail || await this.capturePageImage(page.id);
-
-                    if (i > 0) pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
-
-                    // Add page number
-                    pdf.setFontSize(10);
-                    pdf.text(`${i + 1}`, pageWidth - 20, pageHeight - 10);
-                }
-
-                pdf.save('diary.pdf');
-                this.showStatus('PDF exported');
-            }
-
-            async capturePageImage(pageId) {
-                const page = await this.db.getPage(pageId);
-                if (!page) return '';
-
-                const canvas = document.createElement('canvas');
-                canvas.width = CONFIG.CANVAS_WIDTH;
-                canvas.height = CONFIG.CANVAS_HEIGHT;
-                const ctx = canvas.getContext('2d');
-
-                // Draw paper
-                for (let i = 0; i < canvas.width * canvas.height; i += 4) {
-                    const noise = Math.random() * 15;
-                }
-
-                // Draw strokes
-                for (const strokeData of (page.strokes || [])) {
-                    const stroke = Stroke.fromJSON(strokeData);
-                    this.drawingEngine.drawStrokeOnContext(ctx, stroke);
-                }
-
-                // Draw text (simple rendering)
-                if (page.textContent) {
-                    ctx.fillStyle = '#2c2a28';
-                    ctx.font = '14px Segoe UI';
-                    const lines = page.textContent.split('\n');
-                    lines.forEach((line, i) => {
-                        ctx.fillText(line, 40, 60 + i * 20);
-                    });
-                }
-
-                return canvas.toDataURL('image/png');
             }
 
             async exportJSON() {
-                const allPages = await this.db.getAllPages();
-                const data = JSON.stringify(allPages, null, 2);
-                const blob = new Blob([data], { type: 'application/json' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `diary-backup-${Date.now()}.json`;
-                link.click();
-                this.showStatus('Backup exported');
+                try {
+                    const allPages = await this.storage.getAllPages();
+                    const data = JSON.stringify(allPages, null, 2);
+                    const blob = new Blob([data], { type: 'application/json' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = `${this.coverText.toLowerCase()}-backup-${Date.now()}.json`;
+                    link.click();
+                    this.showStatus('💾 Backup exported', 1200);
+                    window.audio.playSave();
+                } catch (err) {
+                    console.error('JSON export error:', err);
+                }
             }
 
             async importJSON() {
-                const fileInput = document.getElementById('importFile');
-                const file = fileInput.files[0];
-                if (!file) return;
+                try {
+                    const fileInput = document.getElementById('importFile');
+                    const file = fileInput.files[0];
+                    if (!file) return;
 
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    try {
-                        const imported = JSON.parse(e.target.result);
-                        for (const page of imported) {
-                            page.id = Date.now().toString() + Math.random();
-                            await this.db.savePage(page);
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        try {
+                            const imported = JSON.parse(e.target.result);
+                            if (!Array.isArray(imported)) {
+                                this.showStatus('Invalid format');
+                                return;
+                            }
+
+                            for (const page of imported) {
+                                page.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
+                                await this.storage.savePage(page);
+                            }
+
+                            this.pages = await this.storage.getAllPages();
+                            this.renderPageList();
+                            document.getElementById('importModal').classList.remove('active');
+                            fileInput.value = '';
+                            this.showStatus('✓ Imported', 1200);
+                            window.audio.playSave();
+                        } catch (err) {
+                            this.showStatus('Import failed');
                         }
-                        this.pages = await this.db.getAllPages();
-                        this.renderPageList();
-                        document.getElementById('importModal').classList.remove('active');
-                        this.showStatus('Backup imported');
-                    } catch (err) {
-                        this.showStatus('Import failed: ' + err.message);
-                    }
-                };
-                reader.readAsText(file);
+                    };
+                    reader.readAsText(file);
+                } catch (err) {
+                    console.error('Import error:', err);
+                }
             }
 
             async nextPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx < this.pages.length - 1) {
+                    window.audio.playPageTurn();
+                    gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: -50 });
+                    await new Promise(r => setTimeout(r, 300));
                     await this.openPage(this.pages[idx + 1].id);
                 }
             }
@@ -1328,128 +2596,172 @@
             async previousPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx > 0) {
+                    window.audio.playPageTurn();
+                    gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: 50 });
+                    await new Promise(r => setTimeout(r, 300));
                     await this.openPage(this.pages[idx - 1].id);
                 }
             }
 
             toggleLibrary() {
                 const lib = document.getElementById('libraryView');
-                const main = document.querySelector('.main-content');
+                if (!lib) return;
+
                 lib.classList.toggle('active');
-                main.style.display = lib.classList.contains('active') ? 'none' : 'flex';
+                gsap.to(lib, { duration: 0.5, opacity: lib.classList.contains('active') ? 1 : 0 });
 
                 if (lib.classList.contains('active')) {
                     this.renderLibrary();
+                    document.getElementById('sidebar').classList.remove('open');
+                }
+            }
+
+            openCoverCustomizer() {
+                const customizer = document.getElementById('coverCustomizer');
+                if (customizer) {
+                    customizer.classList.add('active');
+                    window.audio.playClick();
                 }
             }
 
             renderPageList() {
                 const pageList = document.getElementById('pageList');
+                if (!pageList) return;
+
                 pageList.innerHTML = '';
 
-                for (const page of this.pages.slice(0, 20)) {
+                for (const page of this.pages.slice(0, 30)) {
                     const item = document.createElement('div');
                     item.className = 'page-item' + (page.id === this.currentPageId ? ' active' : '');
                     item.innerHTML = `
-                        <div class="page-item-title">${page.title}</div>
-                        <div class="page-item-date">${new Date(page.updatedAt).toLocaleDateString()}</div>
+                        <div class="page-item-title">${page.title || 'Untitled'}</div>
+                        <div class="page-item-date">${new Date(page.updatedAt || page.createdAt).toLocaleDateString()}</div>
                     `;
-                    item.onclick = () => this.openPage(page.id);
+                    item.addEventListener('click', () => {
+                        this.openPage(page.id);
+                        document.getElementById('sidebar').classList.remove('open');
+                    });
                     pageList.appendChild(item);
                 }
             }
 
             renderLibrary() {
                 const grid = document.getElementById('libraryGrid');
+                if (!grid) return;
+
                 grid.innerHTML = '';
 
                 for (const page of this.pages) {
                     const thumb = document.createElement('div');
                     thumb.className = 'page-thumbnail';
                     if (page.thumbnail) {
-                        thumb.innerHTML = `<img src="${page.thumbnail}" alt="${page.title}">`;
+                        const img = document.createElement('img');
+                        img.src = page.thumbnail;
+                        img.alt = page.title || 'Page';
+                        thumb.appendChild(img);
+                        const overlay = document.createElement('div');
+                        overlay.className = 'page-thumbnail-overlay';
+                        overlay.textContent = page.title || 'Untitled';
+                        thumb.appendChild(overlay);
                     } else {
-                        thumb.style.background = 'var(--color-bg-secondary)';
-                        thumb.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem;">${page.title[0]}</div>`;
+                        thumb.style.background = 'rgba(212, 165, 116, 0.1)';
+                        thumb.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:2.5rem;">${(page.title || 'P')[0]}</div>`;
                     }
-                    thumb.onclick = () => {
+                    thumb.addEventListener('click', () => {
                         this.toggleLibrary();
                         this.openPage(page.id);
-                    };
+                    });
                     grid.appendChild(thumb);
                 }
             }
 
-            showStatus(msg) {
+            showStatus(msg, duration = 1500) {
                 const indicator = document.getElementById('statusIndicator');
+                if (!indicator) return;
+
                 indicator.textContent = msg;
                 indicator.classList.add('visible');
                 setTimeout(() => {
                     indicator.classList.remove('visible');
-                }, 2000);
+                }, duration);
             }
 
             startApp() {
-                document.getElementById('landing').classList.add('hidden');
-                document.getElementById('app').style.display = 'flex';
+                const landing = document.getElementById('landing');
+                const app = document.getElementById('app');
+                if (landing) landing.classList.add('hidden');
+                if (app) app.style.display = 'flex';
                 this.init();
             }
         }
 
-        // STARFIELD ANIMATION
+        // ========== STARFIELD ==========
         function initStarfield() {
-            const canvas = document.getElementById('starfield');
-            const ctx = canvas.getContext('2d');
-            
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+            try {
+                const canvas = document.getElementById('starfield');
+                if (!canvas) return;
 
-            const stars = [];
-            for (let i = 0; i < 200; i++) {
-                stars.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    radius: Math.random() * 1.5,
-                    opacity: Math.random() * 0.5 + 0.5,
-                });
-            }
+                const ctx = canvas.getContext('2d');
+                if (!ctx) return;
 
-            function animate() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-
-                for (const star of stars) {
-                    ctx.globalAlpha = star.opacity;
-                    ctx.beginPath();
-                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-                    ctx.fill();
-                    
-                    star.opacity += (Math.random() - 0.5) * 0.1;
-                    star.opacity = Math.max(0.2, Math.min(1, star.opacity));
-                }
-
-                requestAnimationFrame(animate);
-            }
-
-            animate();
-
-            window.addEventListener('resize', () => {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-            });
+
+                const stars = [];
+                for (let i = 0; i < 250; i++) {
+                    stars.push({
+                        x: Math.random() * canvas.width,
+                        y: Math.random() * canvas.height,
+                        radius: Math.random() * 1.5,
+                        opacity: Math.random() * 0.6 + 0.3,
+                    });
+                }
+
+                function animate() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    ctx.fillStyle = 'rgba(244, 228, 193, 0.9)';
+
+                    for (const star of stars) {
+                        ctx.globalAlpha = star.opacity;
+                        ctx.beginPath();
+                        ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        star.opacity += (Math.random() - 0.5) * 0.08;
+                        star.opacity = Math.max(0.2, Math.min(0.8, star.opacity));
+                    }
+
+                    requestAnimationFrame(animate);
+                }
+
+                animate();
+
+                window.addEventListener('resize', () => {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                });
+            } catch (err) {
+                console.error('Starfield error:', err);
+            }
         }
 
-        // GLOBAL APP INSTANCE
-        const app = new DiaryApp();
+        // ========== INIT ==========
+        window.app = new DiaryApp();
+        window.audio = new AudioEngine();
 
-        // INIT
         document.addEventListener('DOMContentLoaded', () => {
             initStarfield();
+            const enterBtn = document.getElementById('enterBtn');
+            if (enterBtn) {
+                enterBtn.addEventListener('click', () => {
+                    window.audio.playClick();
+                    window.app.startApp();
+                });
+            }
         });
 
-        // REGISTER SERVICE WORKER for offline support (optional)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('data:text/javascript,self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(clients.matchAll().then(c=>Promise.all(c.map(client=>client.navigate(client.url))))));').catch(() => {});
+        if (document.readyState !== 'loading') {
+            initStarfield();
         }
     </script>
 </body>
