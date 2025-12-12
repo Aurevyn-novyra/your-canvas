@@ -1,668 +1,396 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Created with love by Priyanshu for Ria(Chiku/Chotu Priyanshuuu) </title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --gold: #D4AF37;
-            --dark-bg: #0A0E27;
-            --darker-bg: #050810;
-            --light-text: #F5F5F5;
-            --soft-gray: #B0B0B0;
-            --accent: #C9A961;
-        }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My RealDiary — Priyanshu & Ria</title>
+  <meta name="description" content="Realistic diary web app — page turn, write, save PNG, and library (single file)." />
+  <style>
+    /* ---------- Reset ---------- */
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body,#app{height:100%}
+    body{
+      font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(ellipse at 10% 10%, rgba(255,255,255,0.02) 0%, transparent 20%),
+                  linear-gradient(180deg,#05060a 0%, #0b0d12 60%);
+      color:#e9eef8; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+      overflow:hidden;
+    }
 
-        * { margin:0; padding:0; box-sizing:border-box; }
-        html,body { height:100%; background:linear-gradient(135deg,var(--darker-bg) 0%,var(--dark-bg) 100%); color:var(--light-text); font-family:'Poppins',sans-serif; }
-        body { display:flex; flex-direction:column; min-height:100vh; }
+    /* ---------- Background stars / particles ---------- */
+    .bg-stars{position:fixed;inset:0;pointer-events:none;z-index:0;}
+    .bg-stars canvas{width:100%;height:100%;display:block}
 
-        #particlesContainer { position:fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:1; }
+    /* ---------- Centered glass Enter ---------- */
+    .enter-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:10}
+    .glass{
+      width:min(720px,90%);max-width:980px;padding:48px;border-radius:16px;backdrop-filter: blur(8px) saturate(120%);
+      background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.06);box-shadow:0 8px 40px rgba(3,6,15,0.7);display:flex;gap:24px;align-items:center;
+    }
+    .glass .title{flex:1}
+    .glass h1{font-size:28px;letter-spacing:0.6px;margin-bottom:6px}
+    .glass p{opacity:0.7;font-size:14px}
+    .enter-btn{padding:14px 28px;border-radius:12px;border:none;cursor:pointer;font-weight:700;font-size:16px;
+      background:linear-gradient(90deg,#ffd86b,#ff6060);color:#111;box-shadow:0 6px 18px rgba(255,96,96,0.18);transform:translateY(0);transition:transform .18s ease, box-shadow .18s ease;
+    }
+    .enter-btn:active{transform:translateY(2px);box-shadow:0 3px 8px rgba(0,0,0,0.2)}
 
-        .header {
-            background: linear-gradient(to bottom, rgba(212,175,55,0.08), transparent);
-            padding:18px; text-align:center; backdrop-filter: blur(10px);
-            border-bottom:1px solid rgba(212,175,55,0.15); z-index:100; position:relative;
-        }
-        .header h1 { font-family:'Playfair Display',serif; font-size:28px; background:linear-gradient(135deg,var(--gold),var(--accent)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:4px; }
-        .header p { font-size:12px; color:var(--soft-gray); letter-spacing:1px; }
+    /* ---------- App layout ---------- */
+    #app{position:relative;z-index:5;display:none}
+    .topbar{height:72px;display:flex;align-items:center;padding:0 20px;gap:12px;border-bottom:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(0,0,0,0.12), transparent)}
+    .logo{display:flex;align-items:center;gap:12px}
+    .logo .mark{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,#ffd86b,#ff6060);display:flex;align-items:center;justify-content:center;font-weight:800;color:#111}
+    .top-actions{margin-left:auto;display:flex;gap:8px}
+    .btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;color:inherit;cursor:pointer}
 
-        .main-container { display:flex; flex:1; gap:20px; padding:18px; position:relative; z-index:2; overflow:hidden; }
+    /* ---------- Main split ---------- */
+    .main{display:flex;height:calc(100% - 72px)}
+    .sidebar{width:340px;border-right:1px solid rgba(255,255,255,0.02);padding:18px;overflow:auto}
+    .content{flex:1;display:flex;align-items:center;justify-content:center;position:relative;padding:20px}
 
-        #canvasContainer {
-            flex:1; display:flex; justify-content:center; align-items:center; position:relative;
-            border-radius:12px; background:rgba(255,255,255,0.98); box-shadow:0 8px 32px rgba(0,0,0,0.3); overflow:hidden;
-            border:1px solid rgba(212,175,55,0.2);
-        }
+    /* ---------- Library cards ---------- */
+    .lib-grid{display:grid;grid-template-columns:1fr;gap:12px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;display:flex;gap:12px;align-items:center}
+    .thumb{width:64px;height:48px;border-radius:8px;background:#f5f5f5;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,0.06)}
+    .meta{flex:1}
+    .meta h4{font-size:14px}
+    .meta p{font-size:12px;opacity:0.7}
 
-        #drawingCanvas { display:block; touch-action:none; cursor:crosshair; background:transparent; }
+    /* ---------- Diary / Book container ---------- */
+    .book-wrap{width:min(980px,92%);height:min(640px,82%);position:relative;perspective:1800px}
+    .book{position:absolute;inset:0;margin:auto;width:820px;height:560px;transform-style:preserve-3d;transition:all .8s cubic-bezier(.2,.8,.2,1);display:flex;align-items:center;justify-content:center}
 
-        .toolbar { width:320px; display:flex; flex-direction:column; gap:12px; max-height:calc(100vh - 160px); overflow:auto; }
-        .panel { background:rgba(15,23,42,0.85); border-radius:12px; padding:14px; border:1px solid rgba(212,175,55,0.12); backdrop-filter:blur(8px); box-shadow:0 8px 32px rgba(0,0,0,0.28); }
-        .panel-title { font-size:13px; font-weight:600; color:var(--gold); text-transform:uppercase; margin-bottom:10px; display:flex; gap:8px; align-items:center; }
+    /* Cover */
+    .cover{position:absolute;left:0;top:0;width:50%;height:100%;border-radius:12px;transform-origin:left center;backface-visibility:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
+    .cover .front{position:absolute;inset:0;border-radius:12px;padding:28px;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:12px;background:linear-gradient(180deg,#5b2a6e,#2b0e3a);color:white}
+    .cover .spine{position:absolute;right:-28px;top:10%;width:28px;height:80%;background:linear-gradient(180deg,#3a123c,#1b0715);border-radius:4px}
 
-        .brush-selector { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
-        .brush-btn { padding:10px; border-radius:8px; border:1px solid rgba(212,175,55,0.18); background:rgba(212,175,55,0.06); color:var(--light-text); cursor:pointer; font-size:12px; }
-        .brush-btn.active { background:var(--gold); color:var(--darker-bg); box-shadow:0 0 12px rgba(212,175,55,0.28); }
+    /* Pages stack */
+    .pages{position:absolute;left:50%;top:0;width:50%;height:100%;transform-style:preserve-3d;pointer-events:auto}
+    .page{position:absolute;left:0;top:0;width:100%;height:100%;background:#fff;border-radius:10px;box-shadow:0 12px 40px rgba(2,6,10,0.6);overflow:hidden}
+    .page .paper{position:absolute;inset:16px;border-radius:6px;padding:24px;overflow:auto;background:linear-gradient(180deg,#fbf9f6,#f6f2ed);background-size:600px 600px}
 
-        input[type="range"] { width:100%; -webkit-appearance:none; height:6px; background:linear-gradient(to right, rgba(212,175,55,0.15), rgba(212,175,55,0.3)); border-radius:6px; }
-        input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--accent)); box-shadow:0 0 8px rgba(212,175,55,0.2); cursor:pointer; border:none; }
+    /* Page content editable area */
+    .editor{width:100%;height:100%;outline:none;font-size:18px;line-height:1.6;color:#111;background:transparent}
 
-        .color-display { height:60px; border-radius:8px; border:2px solid rgba(212,175,55,0.12); box-shadow:inset 0 2px 8px rgba(0,0,0,0.2); }
-        .color-inputs { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:8px; }
-        input[type="color"] { height:40px; border-radius:6px; border:1px solid rgba(212,175,55,0.12); cursor:pointer; }
-        .hex-input { padding:8px; border-radius:6px; background:rgba(212,175,55,0.05); border:1px solid rgba(212,175,55,0.08); color:var(--light-text); font-family:monospace; }
+    /* Page-turn animation helper */
+    .turning{transition:transform .9s cubic-bezier(.2,.8,.2,1), box-shadow .9s;transform-origin:left center}
 
-        .btn-group { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
-        button { padding:10px 14px; border-radius:8px; border:1px solid rgba(212,175,55,0.12); background:rgba(212,175,55,0.06); color:var(--light-text); cursor:pointer; font-weight:500; }
-        button.primary { background:linear-gradient(135deg,var(--gold),var(--accent)); color:var(--darker-bg); border-color:var(--gold); font-weight:600; }
+    /* Tiny controls overlaid */
+    .page-controls{position:absolute;right:16px;bottom:16px;display:flex;gap:8px}
 
-        .palette-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:10px; }
-        .palette-color { width:100%; aspect-ratio:1; border-radius:6px; border:2px solid rgba(212,175,55,0.08); cursor:pointer; }
+    /* Hidden index overlay */
+    .index-overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(2,6,10,0.6), rgba(2,6,10,0.85));display:none;align-items:center;justify-content:center;z-index:40}
+    .index-panel{width:min(900px,96%);height:min(600px,86%);background:linear-gradient(180deg,#0a0b0f,#060608);border-radius:12px;padding:18px;overflow:auto}
 
-        .footer { text-align:center; padding:14px 12px; background:linear-gradient(to top, rgba(212,175,55,0.06), transparent); border-top:1px solid rgba(212,175,55,0.12); color:var(--soft-gray); }
+    /* Responsive */
+    @media(max-width:900px){.sidebar{display:none}.book-wrap{width:92%;height:72%}}
 
-        @media (max-width:1024px) { .main-container { flex-direction:column; } .toolbar { width:100%; max-height:220px; flex-direction:row; overflow-x:auto; } .panel { min-width:240px; flex-shrink:0; } }
-
-        .sparkle { position:absolute; pointer-events:none; border-radius:50%; width:6px; height:6px; animation:sparkle 0.6s ease-out forwards; }
-        @keyframes sparkle { 0% { opacity:1; transform:scale(1); } 100% { opacity:0; transform:scale(0.2); } }
-
-        .toast { position:fixed; bottom:30px; right:30px; background:rgba(212,175,55,0.95); color:var(--darker-bg); padding:10px 14px; border-radius:8px; z-index:2000; }
-    </style>
+    /* small helpers */
+    .muted{opacity:0.6;font-size:13px}
+  </style>
 </head>
 <body>
-    <div id="particlesContainer" aria-hidden="true"></div>
 
-    <div class="header">
-        <h1>✨ Drawing Canvas</h1>
-        <p>Created with love by Priyanshu for Ria(Chiku/Chotu Priyanshuuu) </p>
+<div class="bg-stars"><canvas id="stars"></canvas></div>
+
+<!-- ENTER GLASS -->
+<div class="enter-wrap" id="enterWrap">
+  <div class="glass" role="dialog" aria-modal="true">
+    <div class="title">
+      <h1>Open Your RealDiary</h1>
+      <p>Click ENTER to open a realistic diary — write, save as PNG, and keep all pages in your index. Works offline (stored in your browser).</p>
+      <p class="muted">Tip: Tap the page corners to turn. Use the "Save" button to add to Library.</p>
     </div>
-
-    <div class="main-container">
-        <div id="canvasContainer">
-            <canvas id="drawingCanvas"></canvas>
-        </div>
-
-        <div class="toolbar" aria-hidden="false">
-            <div class="panel">
-                <div class="panel-title">🎨 Brush Type</div>
-                <div class="brush-selector">
-                    <button class="brush-btn active" data-brush="pencil">Pencil</button>
-                    <button class="brush-btn" data-brush="charcoal">Charcoal</button>
-                    <button class="brush-btn" data-brush="marker">Marker</button>
-                    <button class="brush-btn" data-brush="oil">Oil</button>
-                    <button class="brush-btn" data-brush="watercolor">Watercolor</button>
-                    <button class="brush-btn" data-brush="airbrush">Airbrush</button>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">⚙️ Brush Settings</div>
-                <div class="slider-group">
-                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Size</span><span id="sizeValue">10</span></div>
-                    <input type="range" id="brushSize" min="1" max="200" value="10">
-                </div>
-                <div class="slider-group">
-                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Opacity</span><span id="opacityValue">100%</span></div>
-                    <input type="range" id="brushOpacity" min="0" max="100" value="100">
-                </div>
-                <div class="slider-group">
-                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Hardness</span><span id="hardnessValue">100%</span></div>
-                    <input type="range" id="brushHardness" min="0" max="100" value="100">
-                </div>
-                <div class="slider-group">
-                    <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--soft-gray);margin-bottom:6px;"><span>Flow</span><span id="flowValue">100%</span></div>
-                    <input type="range" id="brushFlow" min="0" max="100" value="100">
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">🎯 Color</div>
-                <div class="color-section">
-                    <div id="colorDisplay" class="color-display"></div>
-                    <div class="color-inputs">
-                        <input type="color" id="colorPicker" value="#000000">
-                        <input type="text" id="hexInput" class="hex-input" maxlength="7" placeholder="#000000" value="#000000">
-                    </div>
-                </div>
-                <div style="margin-top:12px;">
-                    <div style="font-size:12px;color:var(--soft-gray);margin-bottom:6px;">Alpha (Color)</div>
-                    <input type="range" id="colorAlpha" min="0" max="255" value="255">
-                </div>
-
-                <div style="margin-top:12px;">
-                    <div class="panel-title">Quick Colors</div>
-                    <div class="palette-grid">
-                        <div class="palette-color" style="background:#000000;"></div>
-                        <div class="palette-color" style="background:#FFFFFF;"></div>
-                        <div class="palette-color" style="background:#FF6B6B;"></div>
-                        <div class="palette-color" style="background:#FFD93D;"></div>
-                        <div class="palette-color" style="background:#6BCB77;"></div>
-                        <div class="palette-color" style="background:#4D96FF;"></div>
-                        <div class="palette-color" style="background:#D4AF37;"></div>
-                        <div class="palette-color" style="background:#FF6B9D;"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">🛠️ Tools</div>
-                <div class="btn-group">
-                    <button id="eraserBtn">Eraser</button>
-                    <button id="smudgeBtn">Smudge</button>
-                    <button id="undoBtn">↶ Undo</button>
-                    <button id="redoBtn">↷ Redo</button>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">↔️ Symmetry</div>
-                <div class="btn-group">
-                    <button id="mirrorBtn">Mirror</button>
-                    <button id="radialBtn">Radial</button>
-                </div>
-            </div>
-
-            <div class="panel">
-                <div class="panel-title">📋 Canvas</div>
-                <div class="btn-group">
-                    <button id="clearBtn">Clear Canvas</button>
-                    <button id="downloadBtn" class="primary">⬇️ Download</button>
-                </div>
-            </div>
-        </div>
+    <div>
+      <button class="enter-btn" id="enterBtn">ENTER</button>
     </div>
+  </div>
+</div>
 
-    <div class="footer">Forever — For Ria(Chiku ywrr)</div>
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="logo"><div class="mark">RD</div><div><strong>RealDiary</strong><div style="font-size:12px;opacity:0.6">Priyanshu • Ria</div></div></div>
+    <div class="top-actions">
+      <button class="btn" id="openIndexBtn">📚 Index</button>
+      <button class="btn" id="newPageBtn">➕ New Page</button>
+      <button class="btn" id="downloadAllBtn">⬇️ Export All</button>
+    </div>
+  </div>
 
-    <script>
-    // --- Elements & context
-    const canvas = document.getElementById('drawingCanvas');
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const container = document.getElementById('canvasContainer');
-    const particles = document.getElementById('particlesContainer');
+  <div class="main">
+    <aside class="sidebar">
+      <h3>Saved Pages</h3>
+      <div class="lib-grid" id="libraryList">
+        <!-- Library items injected here -->
+      </div>
+    </aside>
 
-    // State
-    let DPR = Math.max(1, window.devicePixelRatio || 1);
-    let isDrawing = false;
-    let currentBrush = 'pencil';
-    let currentColorHex = '#000000';
-    let colorAlpha = 1; // 0..1 (from colorAlpha slider)
-    let brushSize = 10;
-    let brushOpacity = 1; // 0..1 (from opacity slider)
-    let brushHardness = 1;
-    let brushFlow = 1;
-    let isErasing = false;
-    let isSmudging = false;
-    let enableMirror = false;
-    let enableRadial = false;
-    let points = [];
-    let layers = [];
-    let currentLayerIndex = 0;
-    let history = [];
-    let historyStep = -1;
-    const MAX_HISTORY = 50;
+    <section class="content">
+      <div class="book-wrap" id="bookWrap">
+        <div class="book" id="book">
+          <!-- Cover -->
+          <div class="cover" id="cover" style="z-index:30;">
+            <div class="front" id="coverFront">
+              <div style="font-size:20px;font-weight:700">My RealDiary</div>
+              <div style="opacity:0.85">A place for memories & notes</div>
+              <div style="margin-top:14px;font-size:12px;opacity:0.85">Tap cover to open →</div>
+            </div>
+            <div class="spine"></div>
+          </div>
 
-    // --- Utility: convert hex + alpha to rgba string
-    function hexToRgba(hex, alpha = 1) {
-        if (!hex) return `rgba(0,0,0,${alpha})`;
-        const h = hex.replace('#','');
-        const bigint = parseInt(h.length === 3 ? h.split('').map(c=>c+c).join('') : h, 16);
-        const r = (bigint >> 16) & 255;
-        const g = (bigint >> 8) & 255;
-        const b = bigint & 255;
-        return `rgba(${r},${g},${b},${alpha})`;
+          <!-- Pages area -->
+          <div class="pages" id="pages" style="z-index:10;left:50%">
+            <!-- JS will add pages here -->
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- INDEX OVERLAY -->
+<div class="index-overlay" id="indexOverlay">
+  <div class="index-panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h2 style="margin:0">Library</h2>
+      <div><button class="btn" id="closeIndex">Close</button></div>
+    </div>
+    <div id="indexGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px"></div>
+  </div>
+</div>
+
+<!-- Hidden download anchor -->
+<a id="downloadAnchor" style="display:none"></a>
+
+<!-- External lib: html2canvas for screenshots -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNa5xH5qYfYjKqB2Z+gL2K6bGv9H8tCkKfTq3o2jUu6s3Zq3Z5Yk1pF5mXADYz0Q2YqBq0g1QZQ/2jz2jz2jz==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script>
+// ---------- Utilities ----------
+const $ = sel => document.querySelector(sel);
+const qs = sel => document.querySelectorAll(sel);
+
+// ---------- Starfield Background ----------
+(function stars(){
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  function resize(){canvas.width=innerWidth;canvas.height=innerHeight}
+  addEventListener('resize', resize); resize();
+  const stars=[]; for(let i=0;i<220;i++){stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,r:Math.random()*1.4,alpha:Math.random()*0.9})}
+  function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);for(const s of stars){ctx.beginPath();ctx.globalAlpha=s.alpha;ctx.fillStyle='white';ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()} }
+  setInterval(()=>{for(const s of stars){s.alpha=0.5+Math.random()*0.8}s.x+=Math.random()*1-0.4;if(s.x>canvas.width)s.x=0;if(s.x<0)s.x=canvas.width} , 800);
+  (function loop(){draw();requestAnimationFrame(loop)})();
+})();
+
+// ---------- App State ----------
+const state = {
+  pages: [], // {id, title, content, created}
+  currentIndex: 0,
+  coverOpen: false
+};
+
+// ---------- Local Storage Handling ----------
+const LS_KEY = 'realdiary_pages_v1';
+function loadFromStorage(){
+  try{const raw=localStorage.getItem(LS_KEY);if(raw){state.pages=JSON.parse(raw);}else{state.pages=[];}}
+  catch(e){console.warn('load err',e);state.pages=[]}
+}
+function saveToStorage(){localStorage.setItem(LS_KEY, JSON.stringify(state.pages));renderLibrary();renderIndexGrid()}
+
+// ---------- Helpers ----------
+function uid(prefix='p'){return prefix+Math.random().toString(36).slice(2,9)}
+
+// ---------- Create a new blank page object ----------
+function newBlankPage(){return {id:uid(),title:'Untitled',content:'',created:Date.now()}}
+
+// ---------- Render Library (sidebar) ----------
+function renderLibrary(){
+  const container = $('#libraryList');container.innerHTML='';
+  if(state.pages.length===0){container.innerHTML='<div class="muted">No saved pages yet. Save a page using Save → Add to Library.</div>';return}
+  state.pages.slice().reverse().forEach(p=>{
+    const el = document.createElement('div');el.className='card';
+    el.innerHTML = `<div class="thumb" data-id="${p.id}"><canvas width="160" height="120"></canvas></div><div class="meta"><h4>${escapeHtml(p.title)}</h4><p>${new Date(p.created).toLocaleString()}</p></div><div><button class="btn" data-load="${p.id}">Open</button></div>`;
+    container.appendChild(el);
+    // draw thumbnail
+    const c = el.querySelector('canvas'); const ctx=c.getContext('2d'); ctx.fillStyle='#f6f2eb'; ctx.fillRect(0,0,c.width,c.height);
+    ctx.fillStyle='#222'; ctx.font='12px sans-serif'; ctx.fillText((p.title||'Untitled').slice(0,18),8,20);
+  });
+}
+
+function renderIndexGrid(){
+  const g = $('#indexGrid'); g.innerHTML='';
+  state.pages.slice().reverse().forEach(p=>{
+    const card = document.createElement('div');card.style.background='linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.1))';card.style.padding='12px';card.style.borderRadius='8px';
+    card.innerHTML = `<div style="display:flex;gap:8px"><div style="flex:1"><strong>${escapeHtml(p.title)}</strong><div style="font-size:12px;opacity:0.7">${new Date(p.created).toLocaleString()}</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class='btn' data-open='${p.id}'>Open</button><button class='btn' data-download='${p.id}'>Download PNG</button></div></div>`;
+    g.appendChild(card);
+  });
+}
+
+// ---------- Escape HTML helper ----------
+function escapeHtml(str=''){return String(str).replace(/[&<>"]/g,c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' })[c])}
+
+// ---------- Book / Pages DOM Handling ----------
+const pagesContainer = $('#pages');
+function clearPages(){pagesContainer.innerHTML=''}
+
+function createPageElement(pageObj,indexFromRight=0){
+  // indexFromRight: 0 is topmost
+  const wrapper = document.createElement('div'); wrapper.className='page'; wrapper.dataset.id=pageObj.id; wrapper.style.zIndex = 20 - indexFromRight;
+  // paper texture via canvas background drawn later
+  const paper = document.createElement('div'); paper.className='paper';
+  const title = document.createElement('div'); title.style.fontWeight=700; title.style.marginBottom='6px'; title.textContent = pageObj.title;
+  const editable = document.createElement('div'); editable.className='editor'; editable.contentEditable=true; editable.spellcheck=false; editable.innerHTML = pageObj.content || '';
+  paper.appendChild(title); paper.appendChild(editable);
+
+  const controls = document.createElement('div'); controls.className='page-controls';
+  const saveBtn = document.createElement('button'); saveBtn.className='btn'; saveBtn.textContent='💾 Save';
+  const pngBtn = document.createElement('button'); pngBtn.className='btn'; pngBtn.textContent='📷 Save PNG';
+  controls.appendChild(saveBtn); controls.appendChild(pngBtn);
+  paper.appendChild(controls);
+
+  wrapper.appendChild(paper);
+
+  // page-turn by clicking right side
+  wrapper.addEventListener('click', (e)=>{
+    // only respond when clicking near right edge to turn
+    const rect = wrapper.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    if(x > rect.width*0.75){
+      turnPage(wrapper);
     }
+  });
 
-    // --- Layers creation & management
-    function createLayer(w = canvas.width, h = canvas.height) {
-        const layerCanvas = document.createElement('canvas');
-        layerCanvas.width = Math.max(1, w);
-        layerCanvas.height = Math.max(1, h);
-        const lctx = layerCanvas.getContext('2d');
-        lctx.clearRect(0,0,layerCanvas.width,layerCanvas.height);
-        return {
-            canvas: layerCanvas,
-            ctx: lctx,
-            name: `Layer ${layers.length + 1}`,
-            visible: true,
-            opacity: 1,
-            blendMode: 'source-over'
-        };
-    }
+  // Save handler
+  saveBtn.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    const id = wrapper.dataset.id; const content = editable.innerHTML; const p = state.pages.find(x=>x.id===id);
+    if(p){p.content=content; p.title = (title.textContent||'Untitled'); saveToStorage(); alert('Saved to Library (updated).'); renderLibrary();}
+    else{ // not in library yet
+      const newP = {id:wrapper.dataset.id, title:title.textContent||'Untitled', content:content, created:Date.now()}; state.pages.push(newP); saveToStorage(); alert('Saved to Library.'); renderLibrary();}
+  });
 
-    function initLayers() {
-        layers = [];
-        layers.push(createLayer(canvas.width, canvas.height));
-        currentLayerIndex = 0;
-        history = [];
-        historyStep = -1;
-        saveToHistory(); // save the blank initial state
-    }
+  // PNG handler
+  pngBtn.addEventListener('click', (ev)=>{ev.stopPropagation(); takePagePNG(wrapper, pageObj.title||'page')});
 
-    // Resize all layer canvases while preserving content
-    function resizeLayers(newW, newH) {
-        for (let layer of layers) {
-            if (layer.canvas.width === newW && layer.canvas.height === newH) continue;
-            const temp = document.createElement('canvas');
-            temp.width = newW;
-            temp.height = newH;
-            const tctx = temp.getContext('2d');
-            // draw existing content onto temp (no scaling - keep same pixel dimensions by copying at top-left)
-            tctx.drawImage(layer.canvas, 0, 0, layer.canvas.width, layer.canvas.height, 0, 0, newW, newH);
-            layer.canvas.width = newW;
-            layer.canvas.height = newH;
-            layer.ctx = layer.canvas.getContext('2d');
-            layer.ctx.clearRect(0,0,newW,newH);
-            layer.ctx.drawImage(temp, 0, 0);
-        }
-    }
+  return wrapper;
+}
 
-    // --- Canvas resize with DPR handling
-    function resizeCanvas() {
-        DPR = Math.max(1, window.devicePixelRatio || 1);
-        const rect = container.getBoundingClientRect();
-        const cssW = Math.max(100, Math.floor(rect.width));
-        const cssH = Math.max(100, Math.floor(rect.height));
-        canvas.style.width = cssW + 'px';
-        canvas.style.height = cssH + 'px';
-        const newW = Math.floor(cssW * DPR);
-        const newH = Math.floor(cssH * DPR);
+function renderPagesFromState(){
+  clearPages();
+  // ensure at least one page open
+  if(state.pages.length===0){ // create a temporary unsaved page
+    const temp = newBlankPage(); temp.id='temp'; temp.title='Untitled'; temp.content='';
+    const el = createPageElement(temp,0); pagesContainer.appendChild(el); state.currentIndex=0; return;
+  }
+  // We'll render top 6 pages (simulate infinite by lazy)
+  const arr = state.pages.slice(-6); // last ones
+  arr.forEach((p,i)=>{ const el = createPageElement(p,i); pagesContainer.appendChild(el); });
+}
 
-        // store previous layer images and resize
-        resizeLayers(newW, newH);
+// ---------- Page Turn Animation ----------
+function turnPage(pageEl){
+  pageEl.classList.add('turning');
+  pageEl.style.transform = 'rotateY(-160deg) translateX(-40px)';
+  pageEl.style.boxShadow = '0 40px 120px rgba(2,6,10,0.8)';
+  setTimeout(()=>{ // after animation, remove it (simulate book flipping)
+    pageEl.remove();
+  },900);
+}
 
-        // set main canvas size (pixel size)
-        canvas.width = newW;
-        canvas.height = newH;
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0); // scale drawing operations to CSS pixels
+// ---------- Cover open animation ----------
+const cover = $('#cover');
+cover.addEventListener('click', ()=>{
+  if(state.coverOpen) return; state.coverOpen=true; openCover();
+});
+function openCover(){
+  // animate cover to left rotation
+  cover.style.transition='transform 900ms cubic-bezier(.2,.8,.2,1), left 900ms';
+  cover.style.transform='rotateY(-160deg) translateX(-28px)';
+  // bring pages into visibility
+  setTimeout(()=>{
+    $('#app').style.display='block';
+    document.getElementById('enterWrap').style.display='none';
+    // populate pages container
+    renderPagesFromState();
+  },380);
+}
 
-        redrawLayers();
-    }
+// ---------- Enter button ----------
+$('#enterBtn').addEventListener('click', ()=>{
+  // animate enter out, show app & book
+  document.getElementById('enterWrap').style.transition='opacity 300ms'; document.getElementById('enterWrap').style.opacity=0;
+  setTimeout(()=>{document.getElementById('enterWrap').style.display='none'; $('#app').style.display='block';},320);
+  // tiny delay then animate cover pop
+  setTimeout(()=>{cover.style.transform='translateZ(12px)';},120);
+});
 
-    window.addEventListener('resize', () => {
-        // small debounce
-        clearTimeout(window.___resizeTimeout);
-        window.___resizeTimeout = setTimeout(resizeCanvas, 80);
-    });
+// ---------- New Page ----------
+$('#newPageBtn').addEventListener('click', ()=>{
+  const p = newBlankPage(); p.title='Page '+(state.pages.length+1); state.pages.push(p); saveToStorage(); renderLibrary(); renderPagesFromState();
+});
 
-    // --- Redraw combined layers onto main canvas
-    function redrawLayers() {
-        // Fill background white (or keep transparent by commenting out)
-        ctx.save();
-        ctx.setTransform(1,0,0,1,0,0); // reset transform to fill full pixel grid
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.restore();
+// ---------- Download all as JSON bundle (Export All) ----------
+$('#downloadAllBtn').addEventListener('click', ()=>{
+  const data = JSON.stringify(state.pages, null, 2); const blob = new Blob([data], {type:'application/json'}); const url=URL.createObjectURL(blob);
+  const a = document.getElementById('downloadAnchor'); a.href=url; a.download='realdiary-backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000);
+});
 
-        // draw each layer
-        for (let layer of layers) {
-            if (!layer.visible) continue;
-            ctx.globalAlpha = layer.opacity;
-            ctx.globalCompositeOperation = layer.blendMode || 'source-over';
-            // drawImage expects pixel canvas sizes, but because we set ctx transform with DPR, we draw image scaled by 1/DPR automatically
-            ctx.drawImage(layer.canvas, 0, 0, layer.canvas.width / DPR, layer.canvas.height / DPR);
-        }
-        ctx.globalAlpha = 1;
-        ctx.globalCompositeOperation = 'source-over';
-    }
+// ---------- Index Overlay ----------
+$('#openIndexBtn').addEventListener('click', ()=>{ $('#indexOverlay').style.display='flex'; renderIndexGrid(); });
+$('#closeIndex').addEventListener('click', ()=>{ $('#indexOverlay').style.display='none'; });
 
-    // --- History (undo/redo)
-    function saveToHistory() {
-        // cap history
-        if (historyStep < history.length - 1) {
-            history = history.slice(0, historyStep + 1);
-        }
-        // save each layer as dataURL (may be memory heavy; cap length)
-        const snapshot = layers.map(layer => layer.canvas.toDataURL('image/png'));
-        history.push(snapshot);
-        historyStep = history.length - 1;
-        if (history.length > MAX_HISTORY) {
-            history.shift();
-            historyStep = history.length - 1;
-        }
-    }
+// index grid actions (open, download)
+$('#indexOverlay').addEventListener('click', (e)=>{
+  const openId = e.target.closest('[data-open]')?.dataset.open;
+  const downloadId = e.target.closest('[data-download]')?.dataset.download;
+  if(openId){openSavedPage(openId); $('#indexOverlay').style.display='none';}
+  if(downloadId){const p = state.pages.find(x=>x.id===downloadId); if(p) downloadPagePNGFromData(p);}
+});
 
-    function restoreFromHistory() {
-        if (historyStep < 0 || historyStep >= history.length) return;
-        const snapshot = history[historyStep];
-        let loaded = 0;
-        for (let i = 0; i < snapshot.length; i++) {
-            const data = snapshot[i];
-            if (!data) { loaded++; continue; }
-            const img = new Image();
-            img.onload = () => {
-                // adjust layer canvas to match current size just in case
-                layers[i].ctx.clearRect(0,0,layers[i].canvas.width, layers[i].canvas.height);
-                // draw onto layer ctx scaled to layer canvas pixel size
-                layers[i].ctx.drawImage(img, 0, 0, layers[i].canvas.width, layers[i].canvas.height);
-                loaded++;
-                if (loaded === snapshot.length) {
-                    redrawLayers();
-                }
-            };
-            img.src = data;
-        }
-    }
+// ---------- Library sidebar open buttons ----------
+$('#libraryList').addEventListener('click', (e)=>{
+  const id = e.target.closest('[data-load]')?.dataset.load; if(id){openSavedPage(id)}
+});
 
-    function undo() {
-        if (historyStep > 0) {
-            historyStep--;
-            restoreFromHistory();
-        } else {
-            showToast('No more undo');
-        }
-    }
-    function redo() {
-        if (historyStep < history.length - 1) {
-            historyStep++;
-            restoreFromHistory();
-        } else {
-            showToast('No more redo');
-        }
-    }
+function openSavedPage(id){
+  const p = state.pages.find(x=>x.id===id); if(!p) return alert('Page not found');
+  // render that single page on top
+  clearPages(); const el = createPageElement(p,0); pagesContainer.appendChild(el);
+}
 
-    // --- Brush textures & draw
-    function getBrushTexture() {
-        switch (currentBrush) {
-            case 'pencil': return { alpha: 0.85, blur: 0 };
-            case 'charcoal': return { alpha: 0.5 + Math.random() * 0.25, blur: 0.5 };
-            case 'marker': return { alpha: 0.9, blur: 0.2 };
-            case 'oil': return { alpha: 0.6 + Math.random() * 0.12, blur: 1 };
-            case 'watercolor': return { alpha: 0.25 + Math.random() * 0.25, blur: 2 };
-            case 'airbrush': return { alpha: 0.18, blur: 3 };
-            default: return { alpha: 0.8, blur: 0 };
-        }
-    }
+// ---------- PNG from Page element ----------
+function takePagePNG(pageEl, title='page'){
+  // use html2canvas to render the pageEl
+  html2canvas(pageEl, {scale:2, useCORS:true, backgroundColor:null}).then(canvas=>{
+    canvas.toBlob(blob=>{ const url = URL.createObjectURL(blob); const a = document.getElementById('downloadAnchor'); a.href=url; a.download = (title.replace(/[^a-z0-9]/gi,'_')||'page') + '.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); });
+  }).catch(err=>{console.error(err); alert('Could not export PNG: '+err.message)});
+}
 
-    function drawCurve(fromX, fromY, toX, toY) {
-        const layer = layers[currentLayerIndex];
-        const lctx = layer.ctx;
+function downloadPagePNGFromData(pageData){
+  // render a temporary offscreen page for crisp png
+  const tmp = document.createElement('div'); tmp.style.width='800px'; tmp.style.height='560px'; tmp.style.padding='16px'; tmp.style.background='#fff'; tmp.style.borderRadius='10px'; tmp.innerHTML=`<div style="padding:24px;font-family:sans-serif;color:#111"><h2>${escapeHtml(pageData.title)}</h2><div style="font-size:15px">${pageData.content}</div></div>`;
+  document.body.appendChild(tmp);
+  html2canvas(tmp, {scale:2}).then(canvas=>{ canvas.toBlob(blob=>{ const url = URL.createObjectURL(blob); const a = document.getElementById('downloadAnchor'); a.href=url; a.download=(pageData.title.replace(/[^a-z0-9]/gi,'_')||'page')+'.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); tmp.remove(); }); }).catch(e=>{tmp.remove(); alert('Error: '+e.message)});
+}
 
-        lctx.save();
-        lctx.lineCap = 'round';
-        lctx.lineJoin = 'round';
+// ---------- Init ----------
+function init(){loadFromStorage(); renderLibrary(); renderIndexGrid();
+  // show enter overlay by default
+  document.getElementById('enterWrap').style.display='flex';
+  // draw initial cover position
+  cover.style.left='calc(50% - 410px)'; cover.style.width='50%'; cover.style.height='100%';
+  // position book
+  const bookEl = document.getElementById('book'); bookEl.style.left='50%';
+}
 
-        // brush dynamics
-        const texture = getBrushTexture();
-        let effectiveAlpha = texture.alpha * brushOpacity * brushFlow;
-        const finalAlpha = isErasing ? 1 : effectiveAlpha;
-        const strokeW = brushSize * (brushHardness * 0.9 + 0.1);
+init();
 
-        lctx.globalAlpha = finalAlpha;
-        lctx.lineWidth = strokeW;
-        lctx.filter = isSmudging ? `blur(${Math.max(1, brushSize * 0.06)}px)` : 'none';
+// ---------- small UX: save on unload ----------
+addEventListener('beforeunload', ()=>{ saveToStorage(); });
 
-        if (isErasing) {
-            lctx.globalCompositeOperation = 'destination-out';
-            lctx.strokeStyle = `rgba(0,0,0,${finalAlpha})`;
-        } else {
-            lctx.globalCompositeOperation = 'source-over';
-            // combine color alpha slider with brushOpacity/flow
-            const colorA = colorAlpha * brushOpacity * brushFlow;
-            lctx.strokeStyle = hexToRgba(currentColorHex, Math.max(0.01, colorA));
-        }
-
-        // simple smooth line
-        lctx.beginPath();
-        lctx.moveTo(fromX, fromY);
-        lctx.lineTo(toX, toY);
-        lctx.stroke();
-
-        lctx.restore();
-
-        // Add sparkle occasionally (positioning relative to container)
-        if (!isErasing && Math.random() < 0.06) {
-            createSparkleAtCanvasPos(toX, toY);
-        }
-    }
-
-    // Sparkle placed relative to container (so CSS coords match)
-    function createSparkleAtCanvasPos(canvasX, canvasY) {
-        const rect = canvas.getBoundingClientRect();
-        // convert canvas coords (CSS px) to page coords using container rect (we used DPR scaling earlier)
-        // canvasX, canvasY are in CSS pixels (because we set ctx transform to DPR), so map directly
-        const pageX = rect.left + canvasX;
-        const pageY = rect.top + canvasY;
-        const sparkle = document.createElement('div');
-        sparkle.className = 'sparkle';
-        sparkle.style.left = (pageX - 3) + 'px'; // center
-        sparkle.style.top = (pageY - 3) + 'px';
-        sparkle.style.background = currentColorHex;
-        sparkle.style.boxShadow = `0 0 8px ${currentColorHex}`;
-        particles.appendChild(sparkle);
-        setTimeout(() => sparkle.remove(), 650);
-    }
-
-    // --- Pointer handling (with pointer capture)
-    canvas.addEventListener('pointerdown', (e) => {
-        e.preventDefault();
-        canvas.setPointerCapture && canvas.setPointerCapture(e.pointerId);
-        isDrawing = true;
-        const rect = canvas.getBoundingClientRect();
-        // convert to CSS pixels (our drawing uses CSS pixel coords because ctx scaled by DPR)
-        const x = (e.clientX - rect.left);
-        const y = (e.clientY - rect.top);
-        points = [{x,y}];
-
-        // save state to history (start of a stroke)
-        saveToHistory();
-    });
-
-    canvas.addEventListener('pointermove', (e) => {
-        if (!isDrawing) return;
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX - rect.left);
-        const y = (e.clientY - rect.top);
-
-        if (points.length > 0) {
-            const last = points[points.length - 1];
-            drawCurve(last.x, last.y, x, y);
-
-            if (enableMirror) {
-                const mirrorX = (canvas.width / DPR) - x;
-                const mirrorLastX = (canvas.width / DPR) - last.x;
-                drawCurve(mirrorLastX, last.y, mirrorX, y);
-            }
-
-            if (enableRadial) {
-                const centerX = (canvas.width / DPR) / 2;
-                const centerY = (canvas.height / DPR) / 2;
-                const angle = Math.atan2(y - centerY, x - centerX);
-                const dist = Math.hypot(x - centerX, y - centerY);
-                const segments = 6;
-                for (let i = 1; i < segments; i++) {
-                    const a = angle + (i * Math.PI * 2 / segments);
-                    const radX = centerX + Math.cos(a) * dist;
-                    const radY = centerY + Math.sin(a) * dist;
-                    const lastDist = Math.hypot(last.x - centerX, last.y - centerY);
-                    drawCurve(
-                        centerX + Math.cos(a) * lastDist,
-                        centerY + Math.sin(a) * lastDist,
-                        radX, radY
-                    );
-                }
-            }
-        }
-        points.push({x,y});
-        redrawLayers();
-    });
-
-    canvas.addEventListener('pointerup', (e) => {
-        isDrawing = false;
-        canvas.releasePointerCapture && canvas.releasePointerCapture(e.pointerId);
-        points = [];
-        // after finishing stroke, save snapshot for redo/undo (already saved at start, but good to push final)
-        saveToHistory();
-    });
-
-    canvas.addEventListener('pointerleave', () => { isDrawing = false; points = []; });
-
-    // --- UI bindings
-    document.querySelectorAll('.brush-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.brush-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentBrush = btn.dataset.brush;
-            isErasing = false;
-            document.getElementById('eraserBtn').style.background = '';
-        });
-    });
-
-    document.getElementById('brushSize').addEventListener('input', (e) => {
-        brushSize = Number(e.target.value);
-        document.getElementById('sizeValue').textContent = brushSize;
-    });
-
-    document.getElementById('brushOpacity').addEventListener('input', (e) => {
-        brushOpacity = Number(e.target.value) / 100;
-        document.getElementById('opacityValue').textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById('brushHardness').addEventListener('input', (e) => {
-        brushHardness = Number(e.target.value) / 100;
-        document.getElementById('hardnessValue').textContent = `${e.target.value}%`;
-    });
-
-    document.getElementById('brushFlow').addEventListener('input', (e) => {
-        brushFlow = Number(e.target.value) / 100;
-        document.getElementById('flowValue').textContent = `${e.target.value}%`;
-    });
-
-    const colorPicker = document.getElementById('colorPicker');
-    const hexInput = document.getElementById('hexInput');
-    const colorDisplay = document.getElementById('colorDisplay');
-    const colorAlphaInput = document.getElementById('colorAlpha');
-
-    colorPicker.addEventListener('input', (e) => {
-        currentColorHex = e.target.value;
-        hexInput.value = e.target.value;
-        updateColorDisplay();
-    });
-
-    hexInput.addEventListener('input', (e) => {
-        const v = e.target.value;
-        if (/^#([0-9A-Fa-f]{6})$/.test(v)) {
-            currentColorHex = v;
-            colorPicker.value = v;
-            updateColorDisplay();
-        }
-    });
-
-    colorAlphaInput.addEventListener('input', (e) => {
-        colorAlpha = Number(e.target.value) / 255;
-        updateColorDisplay();
-    });
-
-    function updateColorDisplay() {
-        colorDisplay.style.background = currentColorHex;
-        colorDisplay.style.opacity = colorAlpha;
-    }
-
-    document.querySelectorAll('.palette-color').forEach(elem => {
-        elem.addEventListener('click', () => {
-            const bg = window.getComputedStyle(elem).backgroundColor;
-            // convert rgb(...) to hex
-            const hex = rgbToHex(bg);
-            currentColorHex = hex;
-            colorPicker.value = hex;
-            hexInput.value = hex;
-            updateColorDisplay();
-        });
-    });
-
-    function rgbToHex(rgb) {
-        const m = rgb.match(/\d+/g);
-        if (!m) return '#000000';
-        const r = parseInt(m[0]).toString(16).padStart(2,'0');
-        const g = parseInt(m[1]).toString(16).padStart(2,'0');
-        const b = parseInt(m[2]).toString(16).padStart(2,'0');
-        return `#${r}${g}${b}`;
-    }
-
-    // Eraser toggle
-    document.getElementById('eraserBtn').addEventListener('click', () => {
-        isErasing = !isErasing;
-        isSmudging = false;
-        document.getElementById('smudgeBtn').style.background = '';
-        document.getElementById('eraserBtn').style.background = isErasing ? 'rgba(212,175,55,0.3)' : '';
-    });
-
-    // Smudge (basic)
-    document.getElementById('smudgeBtn').addEventListener('click', () => {
-        isSmudging = !isSmudging;
-        isErasing = false;
-        document.getElementById('eraserBtn').style.background = '';
-        document.getElementById('smudgeBtn').style.background = isSmudging ? 'rgba(212,175,55,0.3)' : '';
-    });
-
-    // Undo/Redo
-    document.getElementById('undoBtn').addEventListener('click', undo);
-    document.getElementById('redoBtn').addEventListener('click', redo);
-
-    // Symmetry
-    document.getElementById('mirrorBtn').addEventListener('click', () => {
-        enableMirror = !enableMirror;
-        document.getElementById('mirrorBtn').style.background = enableMirror ? 'rgba(212,175,55,0.3)' : '';
-    });
-    document.getElementById('radialBtn').addEventListener('click', () => {
-        enableRadial = !enableRadial;
-        document.getElementById('radialBtn').style.background = enableRadial ? 'rgba(212,175,55,0.3)' : '';
-    });
-
-    // Clear canvas
-    document.getElementById('clearBtn').addEventListener('click', () => {
-        if (!confirm('Clear entire canvas? This cannot be undone.')) return;
-        for (let layer of layers) {
-            layer.ctx.clearRect(0,0,layer.canvas.width, layer.canvas.height);
-        }
-        redrawLayers();
-        saveToHistory();
-    });
-
-    // Download: merge layers at CSS-size resolution and download PNG
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-        // create temp canvas at pixel resolution (scaled by DPR)
-        const out = document.createElement('canvas');
-        out.width = canvas.width;
-        out.height = canvas.height;
-        const octx = out.getContext('2d');
-        // white bg
-        octx.fillStyle = '#ffffff';
-        octx.fillRect(0,0,out.width,out.height);
-        // draw each layer (they are stored at pixel resolution)
-        for (let layer of layers) {
-            if (!layer.visible) continue;
-            octx.globalAlpha = layer.opacity;
-            octx.globalCompositeOperation = layer.blendMode || 'source-over';
-            octx.drawImage(layer.canvas, 0, 0);
-        }
-        const link = document.createElement('a');
-        link.href = out.toDataURL('image/png');
-        link.download = 'drawing-priyanshu-ria.png';
-        link.click();
-    });
-
-    // --- Small toast utility
-    function showToast(text, ms = 1400) {
-        const t = document.createElement('div');
-        t.className = 'toast';
-        t.textContent = text;
-        document.body.appendChild(t);
-        setTimeout(() => t.remove(), ms);
-    }
-
-    // --- Init
-    updateColorDisplay();
-    // set initial canvas size after DOM paints
-    setTimeout(() => {
-        resizeCanvas();
-        initLayers();
-        redrawLayers();
-    }, 30);
-    </script>
+</script>
 </body>
 </html>
