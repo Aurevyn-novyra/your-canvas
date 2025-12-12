@@ -3,16 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Premium Luxury Diary with realistic textures and animations">
-    <title>Luxury Diary - Ultimate Edition</title>
+    <meta name="description" content="Premium Luxury Diary with extreme realism and unlimited customization">
+    <title>Luxury Diary - Extreme Edition</title>
     
-    <!-- CDN LIBRARIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Cormorant+Garamond:wght@400;600;700&family=Inter:wght@400;500;600;700&family=Cinzel:wght@400;600;700&family=Libre+Baskerville:wght@400;700&display=swap');
 
         :root {
             --gold-dark: #d4a574;
@@ -23,12 +22,11 @@
             --cream: #fefdfb;
             --charcoal: #1a1a1a;
             --black-luxe: #0f0f0f;
-            --shadow-subtle: rgba(0, 0, 0, 0.08);
-            --shadow-medium: rgba(0, 0, 0, 0.15);
-            --shadow-dark: rgba(0, 0, 0, 0.25);
             
             --font-serif: 'Playfair Display', serif;
             --font-elegant: 'Cormorant Garamond', serif;
+            --font-cinzel: 'Cinzel', serif;
+            --font-baskerville: 'Libre Baskerville', serif;
             --font-sans: 'Inter', sans-serif;
         }
 
@@ -204,39 +202,13 @@
             height: 800px;
             max-width: 90%;
             max-height: 90vh;
-        }
-
-        /* LEATHER GRAIN PATTERN */
-        @supports (background: conic-gradient(from 0deg)) {
-            .leather-grain {
-                background-image: 
-                    repeating-linear-gradient(
-                        90deg,
-                        transparent,
-                        transparent 2px,
-                        rgba(255, 255, 255, 0.03) 2px,
-                        rgba(255, 255, 255, 0.03) 4px
-                    ),
-                    repeating-linear-gradient(
-                        0deg,
-                        transparent,
-                        transparent 2px,
-                        rgba(255, 255, 255, 0.02) 2px,
-                        rgba(255, 255, 255, 0.02) 4px
-                    );
-            }
+            filter: drop-shadow(0 40px 120px rgba(0, 0, 0, 0.7)) drop-shadow(0 0 100px rgba(212, 165, 116, 0.15));
         }
 
         .book-cover {
             width: 100%;
             height: 100%;
             border-radius: 12px;
-            box-shadow: 
-                0 30px 100px rgba(0, 0, 0, 0.6),
-                0 0 60px rgba(212, 165, 116, 0.15),
-                inset -3px -3px 15px rgba(0, 0, 0, 0.4),
-                inset 3px 3px 15px rgba(255, 255, 255, 0.08);
-            transform-style: preserve-3d;
             position: absolute;
             cursor: pointer;
             transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -251,8 +223,17 @@
             z-index: 10;
             overflow: hidden;
             background: linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%);
+            transform-style: preserve-3d;
+            box-shadow: 
+                0 30px 100px rgba(0, 0, 0, 0.6),
+                0 0 60px rgba(212, 165, 116, 0.15),
+                inset -3px -3px 15px rgba(0, 0, 0, 0.4),
+                inset 3px 3px 15px rgba(255, 255, 255, 0.08),
+                inset -1px -1px 2px rgba(0, 0, 0, 0.8),
+                inset 1px 1px 2px rgba(255, 255, 255, 0.15);
         }
 
+        /* REALISTIC LEATHER TEXTURES */
         .book-cover::before {
             content: '';
             position: absolute;
@@ -260,23 +241,34 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
+            background-image: 
                 repeating-linear-gradient(
                     90deg,
-                    transparent,
+                    transparent 0px,
                     transparent 2px,
-                    rgba(255, 255, 255, 0.02) 2px,
-                    rgba(255, 255, 255, 0.02) 4px
+                    rgba(255, 255, 255, 0.03) 2px,
+                    rgba(255, 255, 255, 0.03) 4px
                 ),
                 repeating-linear-gradient(
                     0deg,
-                    transparent,
-                    transparent 2px,
-                    rgba(255, 255, 255, 0.01) 2px,
-                    rgba(255, 255, 255, 0.01) 4px
+                    transparent 0px,
+                    transparent 1px,
+                    rgba(0, 0, 0, 0.05) 1px,
+                    rgba(0, 0, 0, 0.05) 2px
+                ),
+                radial-gradient(
+                    circle at 20% 80%,
+                    rgba(255, 255, 255, 0.1) 0%,
+                    transparent 50%
+                ),
+                radial-gradient(
+                    circle at 80% 20%,
+                    rgba(0, 0, 0, 0.15) 0%,
+                    transparent 50%
                 );
             pointer-events: none;
             border-radius: 12px;
+            z-index: 2;
         }
 
         .book-cover::after {
@@ -286,14 +278,15 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(0, 0, 0, 0.15) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%, rgba(0, 0, 0, 0.12) 100%);
             border-radius: 12px;
             pointer-events: none;
+            z-index: 3;
         }
 
         .cover-emboss {
             position: relative;
-            z-index: 2;
+            z-index: 4;
             font-family: var(--font-serif);
             font-size: 3.5rem;
             font-weight: 900;
@@ -301,8 +294,8 @@
             background: linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 50%, #c9a066 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.6));
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            filter: drop-shadow(3px 3px 6px rgba(0, 0, 0, 0.6)) drop-shadow(1px 1px 2px rgba(255, 255, 255, 0.2));
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.7);
         }
 
         .cover-subtitle {
@@ -311,27 +304,64 @@
             letter-spacing: 2px;
             margin-top: 1.5rem;
             color: var(--gold-light);
-            opacity: 0.9;
+            opacity: 0.95;
+            position: relative;
+            z-index: 4;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
         }
 
-        .book-cover:hover {
-            transform: translateY(-12px) scale(1.02);
-            box-shadow: 
-                0 40px 120px rgba(0, 0, 0, 0.7),
-                0 0 80px rgba(212, 165, 116, 0.25);
+        .cover-decoration {
+            position: absolute;
+            z-index: 4;
+            opacity: 0.7;
         }
 
-        .book-cover.flipping {
-            cursor: grabbing;
+        .corner-ornament {
+            width: 80px;
+            height: 80px;
+            border: 2px solid var(--gold-dark);
+            opacity: 0.4;
+            pointer-events: none;
         }
 
-        /* BACK COVER (inside) */
+        .top-left-corner {
+            top: 20px;
+            left: 20px;
+            border-right: none;
+            border-bottom: none;
+            border-radius: 8px 0 0 0;
+        }
+
+        .top-right-corner {
+            top: 20px;
+            right: 20px;
+            border-left: none;
+            border-bottom: none;
+            border-radius: 0 8px 0 0;
+        }
+
+        .bottom-left-corner {
+            bottom: 20px;
+            left: 20px;
+            border-right: none;
+            border-top: none;
+            border-radius: 0 0 0 8px;
+        }
+
+        .bottom-right-corner {
+            bottom: 20px;
+            right: 20px;
+            border-left: none;
+            border-top: none;
+            border-radius: 0 0 8px 0;
+        }
+
         .back-cover {
             position: absolute;
             width: 100%;
             height: 100%;
             border-radius: 12px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(245, 243, 240, 0.95) 100%);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.92) 0%, rgba(245, 243, 240, 0.97) 100%);
             backface-visibility: hidden;
             transform: rotateY(180deg);
             display: flex;
@@ -370,6 +400,17 @@
             pointer-events: none;
         }
 
+        .book-cover:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 
+                0 40px 120px rgba(0, 0, 0, 0.7),
+                0 0 80px rgba(212, 165, 116, 0.25);
+        }
+
+        .book-cover.flipping {
+            cursor: grabbing;
+        }
+
         .book-pages {
             width: 100%;
             height: 100%;
@@ -397,7 +438,7 @@
             transform-style: preserve-3d;
         }
 
-        /* PAPER TEXTURE */
+        /* REALISTIC PAPER */
         .page-background {
             position: absolute;
             width: 100%;
@@ -407,7 +448,8 @@
             box-shadow: 
                 0 30px 80px rgba(0, 0, 0, 0.4),
                 inset -2px 0 8px rgba(0, 0, 0, 0.08),
-                inset 2px 0 8px rgba(255, 255, 255, 0.4);
+                inset 2px 0 8px rgba(255, 255, 255, 0.4),
+                inset 0 1px 3px rgba(0, 0, 0, 0.05);
             z-index: -1;
             border: 1px solid rgba(0, 0, 0, 0.05);
         }
@@ -424,21 +466,26 @@
                     0deg,
                     transparent,
                     transparent 2px,
-                    rgba(200, 180, 160, 0.01) 2px,
-                    rgba(200, 180, 160, 0.01) 4px
+                    rgba(200, 180, 160, 0.008) 2px,
+                    rgba(200, 180, 160, 0.008) 4px
                 ),
                 repeating-linear-gradient(
                     90deg,
                     transparent,
                     transparent 1px,
-                    rgba(200, 180, 160, 0.005) 1px,
-                    rgba(200, 180, 160, 0.005) 2px
+                    rgba(200, 180, 160, 0.004) 1px,
+                    rgba(200, 180, 160, 0.004) 2px
+                ),
+                radial-gradient(
+                    ellipse 400px 300px at 20% 30%,
+                    rgba(255, 255, 255, 0.15) 0%,
+                    transparent 50%
                 );
             pointer-events: none;
             border-radius: 8px;
         }
 
-        /* PAGE BINDING/SPINE */
+        /* PAGE BINDING */
         .page-binding {
             position: absolute;
             left: 0;
@@ -449,7 +496,8 @@
             z-index: 5;
             box-shadow: 
                 inset -1px 0 3px rgba(255, 255, 255, 0.2),
-                inset 1px 0 3px rgba(0, 0, 0, 0.5);
+                inset 1px 0 3px rgba(0, 0, 0, 0.5),
+                0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .page-binding::before {
@@ -462,9 +510,9 @@
             background: repeating-linear-gradient(
                 0deg,
                 transparent,
-                transparent 1px,
-                rgba(255, 255, 255, 0.1) 1px,
-                rgba(255, 255, 255, 0.1) 2px
+                transparent 3px,
+                rgba(255, 255, 255, 0.08) 3px,
+                rgba(255, 255, 255, 0.08) 4px
             );
         }
 
@@ -511,7 +559,6 @@
             outline: none;
         }
 
-        /* PAGE EDGE HIGHLIGHT */
         .page-edge {
             position: absolute;
             right: 0;
@@ -1229,11 +1276,12 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             z-index: 400;
             align-items: center;
             justify-content: center;
             backdrop-filter: blur(8px);
+            overflow-y: auto;
         }
 
         .cover-customizer.active {
@@ -1246,25 +1294,28 @@
             border: 1px solid rgba(212, 165, 116, 0.3);
             border-radius: 16px;
             padding: 2.5rem;
-            max-width: 900px;
-            width: 90%;
+            max-width: 1200px;
+            width: 95%;
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 2fr;
             gap: 3rem;
-            max-height: 90vh;
+            max-height: 95vh;
             overflow-y: auto;
-            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.5);
+            margin: auto;
         }
 
         .customizer-preview {
             display: flex;
             align-items: center;
             justify-content: center;
+            position: sticky;
+            top: 0;
         }
 
         .preview-book {
-            width: 200px;
-            height: 280px;
+            width: 220px;
+            height: 310px;
             border-radius: 8px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             display: flex;
@@ -1274,23 +1325,84 @@
             text-align: center;
             padding: 20px;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-book::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(
+                    90deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(255, 255, 255, 0.02) 1px,
+                    rgba(255, 255, 255, 0.02) 2px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 1px,
+                    rgba(0, 0, 0, 0.03) 1px,
+                    rgba(0, 0, 0, 0.03) 2px
+                );
+            border-radius: 8px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .preview-book-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .customizer-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            overflow-y: auto;
+            max-height: 95vh;
+            padding-right: 1rem;
+        }
+
+        .control-section {
+            border: 1px solid rgba(212, 165, 116, 0.15);
+            border-radius: 8px;
+            padding: 1.5rem;
+            background: rgba(212, 165, 116, 0.03);
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 1.1rem;
+            color: var(--gold-light);
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .control-group {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
         }
 
         .control-label {
             font-family: var(--font-serif);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: var(--gold-light);
             font-weight: 600;
             letter-spacing: 0.5px;
@@ -1298,7 +1410,7 @@
 
         .control-options {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
             gap: 0.6rem;
         }
 
@@ -1309,29 +1421,60 @@
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.4rem;
             background: rgba(212, 165, 116, 0.05);
             color: var(--gold-light);
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
+            text-align: center;
         }
 
         .color-option:hover {
             border-color: var(--gold-dark);
             background: rgba(212, 165, 116, 0.12);
+            transform: translateY(-2px);
         }
 
         .color-option.active {
             border-color: var(--gold-dark);
-            background: rgba(212, 165, 116, 0.2);
+            background: rgba(212, 165, 116, 0.25);
+            box-shadow: 0 0 12px rgba(212, 165, 116, 0.3);
         }
 
         .color-swatch {
-            width: 20px;
-            height: 20px;
-            border-radius: 3px;
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
             border: 1px solid rgba(0, 0, 0, 0.2);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .text-input-group {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .text-input-group input {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1.5px solid rgba(212, 165, 116, 0.2);
+            border-radius: 6px;
+            background: rgba(212, 165, 116, 0.05);
+            color: var(--gold-light);
+            font-family: var(--font-sans);
+            transition: all 0.3s ease;
+        }
+
+        .text-input-group input:focus {
+            outline: none;
+            border-color: var(--gold-dark);
+            box-shadow: 0 0 8px rgba(212, 165, 116, 0.2);
+        }
+
+        .text-input-group input::placeholder {
+            color: rgba(212, 165, 116, 0.4);
         }
 
         .customizer-actions {
@@ -1339,9 +1482,45 @@
             display: flex;
             gap: 1.2rem;
             justify-content: flex-end;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(212, 165, 116, 0.15);
+        }
+
+        .option-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .slider-control {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .slider-control input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+            accent-color: var(--gold-dark);
+        }
+
+        .slider-value {
+            font-size: 0.85rem;
+            color: var(--gold-dark);
+            font-weight: 600;
         }
 
         /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .customizer-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .customizer-preview {
+                position: static;
+            }
+        }
+
         @media (max-width: 768px) {
             .book-3d-container {
                 width: 95%;
@@ -1366,12 +1545,16 @@
             }
 
             .customizer-panel {
-                grid-template-columns: 1fr;
-                gap: 2rem;
+                max-width: 100%;
+                padding: 1.5rem;
             }
 
             .control-options {
-                grid-template-columns: repeat(3, 1fr);
+                grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+            }
+
+            .option-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1385,7 +1568,7 @@
         <div class="landing-content">
             <div class="landing-icon">📖</div>
             <h1 class="landing-title">MEMENTO</h1>
-            <p class="landing-subtitle">Premium Luxury Diary Experience</p>
+            <p class="landing-subtitle">Ultimate Luxury Diary Experience</p>
             <button class="landing-btn" id="enterBtn">ENTER YOUR SANCTUARY ✨</button>
         </div>
     </div>
@@ -1423,6 +1606,11 @@
             <div class="book-3d-container" id="book3dContainer">
                 <!-- FRONT COVER -->
                 <div class="book-cover" id="bookCover">
+                    <div class="cover-decoration corner-ornament top-left-corner"></div>
+                    <div class="cover-decoration corner-ornament top-right-corner"></div>
+                    <div class="cover-decoration corner-ornament bottom-left-corner"></div>
+                    <div class="cover-decoration corner-ornament bottom-right-corner"></div>
+                    
                     <div class="cover-emboss" id="coverEmboss">MEMENTO</div>
                     <div class="cover-subtitle" id="coverSubtitle">My Diary</div>
                     <div class="back-cover">
@@ -1500,38 +1688,91 @@
     <!-- COVER CUSTOMIZER MODAL -->
     <div class="cover-customizer" id="coverCustomizer">
         <div class="customizer-panel">
+            <!-- PREVIEW -->
             <div class="customizer-preview">
-                <div class="preview-book" id="previewBook" style="background: linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%); color: #f4e4c1;">
-                    <div style="font-size: 1.2rem; font-weight: 700; letter-spacing: 2px;" id="previewEmboss">MEMENTO</div>
-                    <div style="font-size: 0.8rem; margin-top: 0.5rem; opacity: 0.8;" id="previewSubtitle">My Diary</div>
+                <div class="preview-book" id="previewBook" style="background: linear-gradient(135deg, #5c2e3a 0%, #4a3f35 50%, #3d3530 100%); color: #f4e4c1;">
+                    <div class="preview-book-content">
+                        <div style="font-size: 1.3rem; font-weight: 700; letter-spacing: 2px; margin-bottom: 0.8rem; font-family: var(--font-serif);" id="previewEmboss">MEMENTO</div>
+                        <div style="font-size: 0.7rem; opacity: 0.8; letter-spacing: 1px; font-family: var(--font-elegant);" id="previewSubtitle">My Diary</div>
+                        <div style="margin-top: 1rem; opacity: 0.6; font-size: 0.8rem;">
+                            <div style="margin-top: 0.5rem;">✦</div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+            <!-- CONTROLS -->
             <div class="customizer-controls">
-                <div class="control-group">
-                    <label class="control-label">Leather Color</label>
+                <!-- LEATHER COLOR -->
+                <div class="control-section">
+                    <div class="section-title">Leather Color</div>
                     <div class="control-options">
                         <div class="color-option active" data-color="burgundy" onclick="window.app.setCoverColor(this)">
                             <div class="color-swatch" style="background: #5c2e3a;"></div>
                             <span>Burgundy</span>
                         </div>
+                        <div class="color-option" data-color="deep-red" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #8b1a1a;"></div>
+                            <span>Deep Red</span>
+                        </div>
                         <div class="color-option" data-color="brown" onclick="window.app.setCoverColor(this)">
                             <div class="color-swatch" style="background: #4a3f35;"></div>
                             <span>Brown</span>
+                        </div>
+                        <div class="color-option" data-color="tan" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #8b7355;"></div>
+                            <span>Tan</span>
                         </div>
                         <div class="color-option" data-color="black" onclick="window.app.setCoverColor(this)">
                             <div class="color-swatch" style="background: #1a1a1a;"></div>
                             <span>Black</span>
                         </div>
+                        <div class="color-option" data-color="charcoal" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #2a2a2a;"></div>
+                            <span>Charcoal</span>
+                        </div>
                         <div class="color-option" data-color="navy" onclick="window.app.setCoverColor(this)">
-                            <div class="color-swatch" style="background: #2c3a4d;"></div>
+                            <div class="color-swatch" style="background: #1f2a3a;"></div>
                             <span>Navy</span>
+                        </div>
+                        <div class="color-option" data-color="deep-blue" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #2c3a4d;"></div>
+                            <span>Deep Blue</span>
+                        </div>
+                        <div class="color-option" data-color="forest" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #1f3a2a;"></div>
+                            <span>Forest</span>
+                        </div>
+                        <div class="color-option" data-color="emerald" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #2a4a3a;"></div>
+                            <span>Emerald</span>
+                        </div>
+                        <div class="color-option" data-color="plum" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #4a2a4a;"></div>
+                            <span>Plum</span>
+                        </div>
+                        <div class="color-option" data-color="wine" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #5a1a2a;"></div>
+                            <span>Wine</span>
+                        </div>
+                        <div class="color-option" data-color="cream" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #d4c5a0;"></div>
+                            <span>Cream</span>
+                        </div>
+                        <div class="color-option" data-color="gold" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #a0832a;"></div>
+                            <span>Gold</span>
+                        </div>
+                        <div class="color-option" data-color="copper" onclick="window.app.setCoverColor(this)">
+                            <div class="color-swatch" style="background: #8b4513;"></div>
+                            <span>Copper</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <label class="control-label">Pattern</label>
+                <!-- LEATHER TEXTURE -->
+                <div class="control-section">
+                    <div class="section-title">Leather Texture</div>
                     <div class="control-options">
                         <div class="color-option active" data-pattern="smooth" onclick="window.app.setCoverPattern(this)">
                             Smooth
@@ -1542,19 +1783,167 @@
                         <div class="color-option" data-pattern="croc" onclick="window.app.setCoverPattern(this)">
                             Croc
                         </div>
+                        <div class="color-option" data-pattern="ripple" onclick="window.app.setCoverPattern(this)">
+                            Ripple
+                        </div>
+                        <div class="color-option" data-pattern="vintage" onclick="window.app.setCoverPattern(this)">
+                            Vintage
+                        </div>
+                        <div class="color-option" data-pattern="embossed" onclick="window.app.setCoverPattern(this)">
+                            Embossed
+                        </div>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <label class="control-label">Cover Text</label>
-                    <input type="text" id="coverText" class="modal-input" placeholder="Enter cover text" value="MEMENTO" style="color: var(--gold-light);">
+                <!-- METALLIC ACCENTS -->
+                <div class="control-section">
+                    <div class="section-title">Trim Color</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-trim="gold" onclick="window.app.setCoverTrim(this)">
+                            <div class="color-swatch" style="background: #d4a574;"></div>
+                            <span>Gold</span>
+                        </div>
+                        <div class="color-option" data-trim="silver" onclick="window.app.setCoverTrim(this)">
+                            <div class="color-swatch" style="background: #c0c0c0;"></div>
+                            <span>Silver</span>
+                        </div>
+                        <div class="color-option" data-trim="rose-gold" onclick="window.app.setCoverTrim(this)">
+                            <div class="color-swatch" style="background: #d4845c;"></div>
+                            <span>Rose Gold</span>
+                        </div>
+                        <div class="color-option" data-trim="bronze" onclick="window.app.setCoverTrim(this)">
+                            <div class="color-swatch" style="background: #8b5a3c;"></div>
+                            <span>Bronze</span>
+                        </div>
+                        <div class="color-option" data-trim="copper" onclick="window.app.setCoverTrim(this)">
+                            <div class="color-swatch" style="background: #a0572a;"></div>
+                            <span>Copper</span>
+                        </div>
+                        <div class="color-option" data-trim="matte" onclick="window.app.setCoverTrim(this)">
+                            <div class="color-swatch" style="background: #808080;"></div>
+                            <span>Matte</span>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="control-group">
-                    <label class="control-label">Subtitle</label>
-                    <input type="text" id="coverSubtextInput" class="modal-input" placeholder="Enter subtitle" value="My Diary" style="color: var(--gold-light);">
+                <!-- CORNER ORNAMENTS -->
+                <div class="control-section">
+                    <div class="section-title">Corner Style</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-corner="elegant" onclick="window.app.setCoverCorner(this)">
+                            Elegant
+                        </div>
+                        <div class="color-option" data-corner="simple" onclick="window.app.setCoverCorner(this)">
+                            Simple
+                        </div>
+                        <div class="color-option" data-corner="ornate" onclick="window.app.setCoverCorner(this)">
+                            Ornate
+                        </div>
+                        <div class="color-option" data-corner="hidden" onclick="window.app.setCoverCorner(this)">
+                            Hidden
+                        </div>
+                    </div>
                 </div>
 
+                <!-- EMBOSS FONT -->
+                <div class="control-section">
+                    <div class="section-title">Cover Font</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-font="serif" onclick="window.app.setCoverFont(this)" style="font-family: var(--font-serif);">
+                            Serif
+                        </div>
+                        <div class="color-option" data-font="elegant" onclick="window.app.setCoverFont(this)" style="font-family: var(--font-elegant);">
+                            Elegant
+                        </div>
+                        <div class="color-option" data-font="cinzel" onclick="window.app.setCoverFont(this)" style="font-family: var(--font-cinzel);">
+                            Cinzel
+                        </div>
+                        <div class="color-option" data-font="baskerville" onclick="window.app.setCoverFont(this)" style="font-family: var(--font-baskerville);">
+                            Baskerville
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPINE STYLE -->
+                <div class="control-section">
+                    <div class="section-title">Spine Design</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-spine="simple" onclick="window.app.setCoverSpine(this)">
+                            Simple
+                        </div>
+                        <div class="color-option" data-spine="stitched" onclick="window.app.setCoverSpine(this)">
+                            Stitched
+                        </div>
+                        <div class="color-option" data-spine="riveted" onclick="window.app.setCoverSpine(this)">
+                            Riveted
+                        </div>
+                        <div class="color-option" data-spine="reinforced" onclick="window.app.setCoverSpine(this)">
+                            Reinforced
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COVER TEXT CUSTOMIZATION -->
+                <div class="control-section">
+                    <div class="section-title">Cover Text</div>
+                    <div class="control-group">
+                        <label class="control-label">Main Title</label>
+                        <input type="text" id="coverText" class="modal-input" placeholder="Enter title" value="MEMENTO" style="color: var(--gold-light);">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Subtitle</label>
+                        <input type="text" id="coverSubtextInput" class="modal-input" placeholder="Enter subtitle" value="My Diary" style="color: var(--gold-light);">
+                    </div>
+                </div>
+
+                <!-- TITLE STYLING -->
+                <div class="control-section">
+                    <div class="section-title">Title Color</div>
+                    <div class="option-row">
+                        <div class="control-group">
+                            <label class="control-label">Title Tone</label>
+                            <div class="control-options">
+                                <div class="color-option active" data-title-tone="gold" onclick="window.app.setCoverTitleTone(this)">
+                                    <div class="color-swatch" style="background: #f4e4c1;"></div>
+                                    <span>Gold</span>
+                                </div>
+                                <div class="color-option" data-title-tone="silver" onclick="window.app.setCoverTitleTone(this)">
+                                    <div class="color-swatch" style="background: #e8e8e8;"></div>
+                                    <span>Silver</span>
+                                </div>
+                                <div class="color-option" data-title-tone="white" onclick="window.app.setCoverTitleTone(this)">
+                                    <div class="color-swatch" style="background: #ffffff;"></div>
+                                    <span>White</span>
+                                </div>
+                                <div class="color-option" data-title-tone="dark" onclick="window.app.setCoverTitleTone(this)">
+                                    <div class="color-swatch" style="background: #1a1a1a;"></div>
+                                    <span>Dark</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GLOSSINESS -->
+                <div class="control-section">
+                    <div class="section-title">Finish</div>
+                    <div class="control-options">
+                        <div class="color-option active" data-finish="matte" onclick="window.app.setCoverFinish(this)">
+                            Matte
+                        </div>
+                        <div class="color-option" data-finish="semi-gloss" onclick="window.app.setCoverFinish(this)">
+                            Semi-Gloss
+                        </div>
+                        <div class="color-option" data-finish="gloss" onclick="window.app.setCoverFinish(this)">
+                            Gloss
+                        </div>
+                        <div class="color-option" data-finish="satin" onclick="window.app.setCoverFinish(this)">
+                            Satin
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACTIONS -->
                 <div class="customizer-actions">
                     <button class="modal-btn modal-btn-secondary" id="customizeClose">Cancel</button>
                     <button class="modal-btn modal-btn-primary" id="customizeApply">Apply Changes</button>
@@ -1580,7 +1969,7 @@
 
     <script>
         // ============================================================================
-        // PREMIUM LUXURY DIARY - WITH REALISTIC TEXTURES & COVER FLIP
+        // EXTREME REALISM LUXURY DIARY WITH UNLIMITED CUSTOMIZATION
         // ============================================================================
 
         const CONFIG = {
@@ -1613,7 +2002,6 @@
                 if (!this.enabled || !this.audioContext) return;
                 const ctx = this.audioContext;
                 
-                // Page flip sound: woody whoosh with frequency sweep
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 const filter = ctx.createBiquadFilter();
@@ -1640,7 +2028,6 @@
                 if (!this.enabled || !this.audioContext) return;
                 const ctx = this.audioContext;
                 
-                // Deep woody flip sound
                 const osc1 = ctx.createOscillator();
                 const osc2 = ctx.createOscillator();
                 const gain = ctx.createGain();
@@ -1668,34 +2055,6 @@
                 osc2.start(ctx.currentTime);
                 osc1.stop(ctx.currentTime + 0.6);
                 osc2.stop(ctx.currentTime + 0.6);
-            }
-
-            playPenWrite() {
-                if (!this.enabled || !this.audioContext) return;
-                const ctx = this.audioContext;
-                const bufferSize = ctx.sampleRate * 0.08;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 0.2 - 0.1) * (1 - i / bufferSize);
-                }
-                
-                const source = ctx.createBufferSource();
-                const gain = ctx.createGain();
-                const filter = ctx.createBiquadFilter();
-                
-                source.buffer = buffer;
-                source.connect(filter);
-                filter.connect(gain);
-                gain.connect(ctx.destination);
-                
-                filter.type = 'highpass';
-                filter.frequency.setValueAtTime(3000, ctx.currentTime);
-                
-                gain.gain.setValueAtTime(0.15, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.08);
-                source.start(ctx.currentTime);
             }
 
             playClick() {
@@ -1991,7 +2350,7 @@
                 this.undoStack.push(this.strokes.length);
                 this.redoStack = [];
 
-                window.audio.playPenWrite();
+                window.audio.playClick();
             }
 
             onPointerMove(e) {
@@ -2191,6 +2550,32 @@
             }
         }
 
+        // ========== COLOR DEFINITIONS ==========
+        const COLOR_MAP = {
+            burgundy: 'linear-gradient(135deg, #5c2e3a 0%, #4a3f35 50%, #3d3530 100%)',
+            'deep-red': 'linear-gradient(135deg, #8b1a1a 0%, #6b1515 50%, #5a1010 100%)',
+            brown: 'linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%)',
+            tan: 'linear-gradient(135deg, #8b7355 0%, #7a5f42 50%, #6b4e35 100%)',
+            black: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 50%, #050505 100%)',
+            charcoal: 'linear-gradient(135deg, #2a2a2a 0%, #1f1f1f 50%, #151515 100%)',
+            navy: 'linear-gradient(135deg, #1f2a3a 0%, #192230 50%, #0f1620 100%)',
+            'deep-blue': 'linear-gradient(135deg, #2c3a4d 0%, #253340 50%, #1a2630 100%)',
+            forest: 'linear-gradient(135deg, #1f3a2a 0%, #183020 50%, #0f2415 100%)',
+            emerald: 'linear-gradient(135deg, #2a4a3a 0%, #234035 50%, #1a3028 100%)',
+            plum: 'linear-gradient(135deg, #4a2a4a 0%, #3f2540 50%, #342050 100%)',
+            wine: 'linear-gradient(135deg, #5a1a2a 0%, #501520 50%, #451015 100%)',
+            cream: 'linear-gradient(135deg, #d4c5a0 0%, #c8b890 50%, #b8a878 100%)',
+            gold: 'linear-gradient(135deg, #a0832a 0%, #907520 50%, #806e15 100%)',
+            copper: 'linear-gradient(135deg, #8b4513 0%, #7a3d10 50%, #6b360d 100%)',
+        };
+
+        const FONT_MAP = {
+            serif: 'var(--font-serif)',
+            elegant: 'var(--font-elegant)',
+            cinzel: 'var(--font-cinzel)',
+            baskerville: 'var(--font-baskerville)',
+        };
+
         // ========== MAIN APP ==========
         class DiaryApp {
             constructor() {
@@ -2204,8 +2589,15 @@
                 this.currentPageIndex = 0;
                 this.isCoverOpen = false;
                 
+                // COVER CUSTOMIZATION
                 this.coverColor = 'burgundy';
                 this.coverPattern = 'smooth';
+                this.coverTrim = 'gold';
+                this.coverCorner = 'elegant';
+                this.coverFont = 'serif';
+                this.coverSpine = 'simple';
+                this.coverFinish = 'matte';
+                this.coverTitleTone = 'gold';
                 this.coverText = 'MEMENTO';
                 this.coverSubtext = 'My Diary';
             }
@@ -2232,18 +2624,28 @@
                     }
 
                     // Load cover settings
-                    const savedCoverColor = await this.storage.getSettings('coverColor');
-                    const savedCoverPattern = await this.storage.getSettings('coverPattern');
-                    const savedCoverText = await this.storage.getSettings('coverText');
-                    const savedCoverSubtext = await this.storage.getSettings('coverSubtext');
+                    const savedSettings = {
+                        color: await this.storage.getSettings('coverColor'),
+                        pattern: await this.storage.getSettings('coverPattern'),
+                        trim: await this.storage.getSettings('coverTrim'),
+                        corner: await this.storage.getSettings('coverCorner'),
+                        font: await this.storage.getSettings('coverFont'),
+                        spine: await this.storage.getSettings('coverSpine'),
+                        finish: await this.storage.getSettings('coverFinish'),
+                        titleTone: await this.storage.getSettings('coverTitleTone'),
+                        text: await this.storage.getSettings('coverText'),
+                        subtext: await this.storage.getSettings('coverSubtext'),
+                    };
 
-                    if (savedCoverColor) this.coverColor = savedCoverColor;
-                    if (savedCoverPattern) this.coverPattern = savedCoverPattern;
-                    if (savedCoverText) this.coverText = savedCoverText;
-                    if (savedCoverSubtext) this.coverSubtext = savedCoverSubtext;
+                    Object.entries(savedSettings).forEach(([key, value]) => {
+                        if (value) {
+                            if (key === 'text') this.coverText = value;
+                            else if (key === 'subtext') this.coverSubtext = value;
+                            else this[`cover${key.charAt(0).toUpperCase() + key.slice(1)}`] = value;
+                        }
+                    });
 
                     this.updateCoverDisplay();
-
                     this.renderPageList();
                     this.setupKeyboardShortcuts();
                     this.setupAutosave();
@@ -2265,20 +2667,58 @@
                 const preview = document.getElementById('previewBook');
                 const previewEmboss = document.getElementById('previewEmboss');
                 const previewSubtitle = document.getElementById('previewSubtitle');
+                const cornerElements = document.querySelectorAll('.corner-ornament');
 
-                const colorMap = {
-                    burgundy: 'linear-gradient(135deg, #5c2e3a 0%, #4a3f35 50%, #3d3530 100%)',
-                    brown: 'linear-gradient(135deg, #4a3f35 0%, #3d3530 50%, #2d2620 100%)',
-                    black: 'linear-gradient(135deg, #2a2620 0%, #1a1a1a 50%, #0f0f0f 100%)',
-                    navy: 'linear-gradient(135deg, #2c3a4d 0%, #1f2a3a 50%, #151f2e 100%)',
-                };
-
-                if (cover) cover.style.background = colorMap[this.coverColor] || colorMap.burgundy;
-                if (preview) preview.style.background = colorMap[this.coverColor] || colorMap.burgundy;
-                if (emboss) emboss.textContent = this.coverText;
-                if (previewEmboss) previewEmboss.textContent = this.coverText;
+                if (cover) cover.style.background = COLOR_MAP[this.coverColor] || COLOR_MAP.burgundy;
+                if (preview) preview.style.background = COLOR_MAP[this.coverColor] || COLOR_MAP.burgundy;
+                
+                if (emboss) {
+                    emboss.style.fontFamily = FONT_MAP[this.coverFont] || FONT_MAP.serif;
+                    emboss.textContent = this.coverText;
+                }
+                if (previewEmboss) {
+                    previewEmboss.style.fontFamily = FONT_MAP[this.coverFont] || FONT_MAP.serif;
+                    previewEmboss.textContent = this.coverText;
+                }
+                
                 if (subtitle) subtitle.textContent = this.coverSubtext;
                 if (previewSubtitle) previewSubtitle.textContent = this.coverSubtext;
+
+                // Apply corner style
+                const cornerOpacity = this.coverCorner === 'hidden' ? 0 : (this.coverCorner === 'ornate' ? 0.8 : 0.4);
+                cornerElements.forEach(el => {
+                    el.style.opacity = cornerOpacity;
+                    if (this.coverCorner === 'simple') el.style.borderWidth = '1px';
+                    else if (this.coverCorner === 'ornate') el.style.borderWidth = '3px';
+                });
+
+                // Apply spine style
+                const binding = document.querySelector('.page-binding');
+                if (binding) {
+                    if (this.coverSpine === 'stitched') {
+                        binding.style.backgroundImage = 'repeating-linear-gradient(0deg, rgba(255,255,255,0.1) 0px, rgba(255,255,255,0.1) 2px, transparent 2px, transparent 6px)';
+                    } else if (this.coverSpine === 'riveted') {
+                        binding.style.backgroundImage = 'radial-gradient(circle, rgba(212, 165, 116, 0.3) 2px, transparent 2px)';
+                        binding.style.backgroundSize = '4px 8px';
+                        binding.style.backgroundPosition = '0 0';
+                    } else {
+                        binding.style.backgroundImage = 'none';
+                    }
+                }
+
+                // Apply finish
+                const cover2 = document.getElementById('bookCover');
+                if (cover2) {
+                    if (this.coverFinish === 'gloss') {
+                        cover2.style.filter = 'brightness(1.1)';
+                    } else if (this.coverFinish === 'semi-gloss') {
+                        cover2.style.filter = 'brightness(1.05)';
+                    } else if (this.coverFinish === 'satin') {
+                        cover2.style.filter = 'brightness(1.02)';
+                    } else {
+                        cover2.style.filter = 'brightness(1)';
+                    }
+                }
             }
 
             setCoverColor(element) {
@@ -2294,31 +2734,72 @@
                 this.coverPattern = element.dataset.pattern;
             }
 
+            setCoverTrim(element) {
+                document.querySelectorAll('[data-trim]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverTrim = element.dataset.trim;
+            }
+
+            setCoverCorner(element) {
+                document.querySelectorAll('[data-corner]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverCorner = element.dataset.corner;
+                this.updateCoverDisplay();
+            }
+
+            setCoverFont(element) {
+                document.querySelectorAll('[data-font]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverFont = element.dataset.font;
+                this.updateCoverDisplay();
+            }
+
+            setCoverSpine(element) {
+                document.querySelectorAll('[data-spine]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverSpine = element.dataset.spine;
+                this.updateCoverDisplay();
+            }
+
+            setCoverFinish(element) {
+                document.querySelectorAll('[data-finish]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverFinish = element.dataset.finish;
+                this.updateCoverDisplay();
+            }
+
+            setCoverTitleTone(element) {
+                document.querySelectorAll('[data-title-tone]').forEach(el => el.classList.remove('active'));
+                element.classList.add('active');
+                this.coverTitleTone = element.dataset['title-tone'];
+                const emboss = document.getElementById('coverEmboss');
+                if (emboss) {
+                    const toneMap = {
+                        gold: 'linear-gradient(135deg, var(--gold-light) 0%, var(--gold-dark) 50%, #c9a066 100%)',
+                        silver: 'linear-gradient(135deg, #e8e8e8 0%, #c0c0c0 50%, #a0a0a0 100%)',
+                        white: 'linear-gradient(135deg, #ffffff 0%, #f5f5f5 50%, #e0e0e0 100%)',
+                        dark: 'linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 50%, #050505 100%)',
+                    };
+                    emboss.style.backgroundImage = toneMap[this.coverTitleTone];
+                }
+            }
+
             setupBookCoverInteraction() {
                 const cover = document.getElementById('bookCover');
-                const pages = document.getElementById('bookPages');
-                const container = document.getElementById('book3dContainer');
-
-                if (!cover || !pages || !container) return;
-
-                cover.addEventListener('click', () => {
-                    this.openCover();
-                });
+                if (!cover) return;
+                cover.addEventListener('click', () => this.openCover());
             }
 
             openCover() {
                 const cover = document.getElementById('bookCover');
                 const pages = document.getElementById('bookPages');
-                const container = document.getElementById('book3dContainer');
                 const returnBtn = document.getElementById('returnCoverBtn');
 
-                if (!cover || !pages || !container) return;
+                if (!cover || !pages) return;
 
-                // Start flip animation
                 cover.classList.add('flipping');
                 this.isCoverOpen = true;
 
-                // Animate cover flip with 3D rotation
                 gsap.to(cover, {
                     duration: 0.8,
                     rotationY: 180,
@@ -2329,14 +2810,10 @@
                     }
                 });
 
-                // Show pages
                 gsap.to(pages, { duration: 0.8, opacity: 1, ease: 'power2.inOut' });
                 pages.classList.add('show');
 
-                // Show return button
-                if (returnBtn) {
-                    returnBtn.classList.add('show');
-                }
+                if (returnBtn) returnBtn.classList.add('show');
 
                 window.audio.playCoverFlip();
                 this.showStatus('Welcome! ✨', 1000);
@@ -2350,11 +2827,8 @@
                 if (!cover || !pages) return;
 
                 this.isCoverOpen = false;
-
-                // Save current page first
                 this.savePage();
 
-                // Animate cover back
                 gsap.to(cover, {
                     duration: 0.8,
                     rotationY: 0,
@@ -2362,15 +2836,11 @@
                     ease: 'power2.inOut'
                 });
 
-                // Hide pages
                 gsap.to(pages, { duration: 0.8, opacity: 0, ease: 'power2.inOut', onComplete: () => {
                     pages.classList.remove('show');
                 }});
 
-                // Hide return button
-                if (returnBtn) {
-                    returnBtn.classList.remove('show');
-                }
+                if (returnBtn) returnBtn.classList.remove('show');
 
                 window.audio.playCoverFlip();
                 this.showStatus('Cover closed', 800);
@@ -2480,9 +2950,7 @@
                 // Return to cover button
                 const returnCoverBtn = document.getElementById('returnCoverBtn');
                 if (returnCoverBtn) {
-                    returnCoverBtn.addEventListener('click', () => {
-                        this.closeCover();
-                    });
+                    returnCoverBtn.addEventListener('click', () => this.closeCover());
                 }
 
                 // Sound toggle
@@ -2561,10 +3029,20 @@
                     this.coverText = coverText.value || 'MEMENTO';
                     this.coverSubtext = coverSubtextInput.value || 'My Diary';
                     this.updateCoverDisplay();
-                    await this.storage.saveSettings('coverText', this.coverText);
-                    await this.storage.saveSettings('coverSubtext', this.coverSubtext);
-                    await this.storage.saveSettings('coverColor', this.coverColor);
-                    await this.storage.saveSettings('coverPattern', this.coverPattern);
+                    
+                    await Promise.all([
+                        this.storage.saveSettings('coverText', this.coverText),
+                        this.storage.saveSettings('coverSubtext', this.coverSubtext),
+                        this.storage.saveSettings('coverColor', this.coverColor),
+                        this.storage.saveSettings('coverPattern', this.coverPattern),
+                        this.storage.saveSettings('coverTrim', this.coverTrim),
+                        this.storage.saveSettings('coverCorner', this.coverCorner),
+                        this.storage.saveSettings('coverFont', this.coverFont),
+                        this.storage.saveSettings('coverSpine', this.coverSpine),
+                        this.storage.saveSettings('coverFinish', this.coverFinish),
+                        this.storage.saveSettings('coverTitleTone', this.coverTitleTone),
+                    ]);
+                    
                     document.getElementById('coverCustomizer').classList.remove('active');
                     this.showStatus('Cover updated ✨', 1500);
                     window.audio.playSave();
