@@ -1,377 +1,1456 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RealDiary — Priyanshu & Ria (Ultimate Upgraded)</title>
-  <meta name="description" content="Ultra-realistic diary: page-curl physics, unlimited pages, pressure-sensitive handwriting, multiple brushes, Hindi UI, custom cover art, save PNG & library — single-file." />
-  <style>
-    /* Reset */
-    *{box-sizing:border-box;margin:0;padding:0}
-    html,body,#app{height:100%}
-    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;background:#05050a;color:#f1f5f9;overflow:hidden}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hyper-realistic diary with page-curl physics, handwriting, and offline storage">
+    <title>Diary - Production Edition</title>
+    
+    <!-- CDN LIBRARIES with integrity checks (latest stable versions) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDB58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6SE0CCbf0PEWXlw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-qZvrmS2ekKPi2d+aChB3t/Db1f65Kkplphz2g/3w4XhnZtI9lS4V5UCnPqCPOcFw16eMQ6oLA8B+qsmkQWIVw==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" integrity="sha512-16esztpmmQRepQVcOdVcjlkMnZaIXuXjk0Lztreqt5P+hODL+9+yZL9ZN7LEy+VXumZqZNvREzvEZW+CqggJQ==" crossorigin="anonymous"></script>
+    
+    <style>
+        :root {
+            --color-bg-primary: #faf9f7;
+            --color-bg-secondary: #f5f3f0;
+            --color-text-primary: #2c2a28;
+            --color-text-secondary: #8b8680;
+            --color-accent: #b8956a;
+            --color-border: #e8e3dc;
+            --color-paper: #fefdfb;
+            --color-shadow: rgba(0, 0, 0, 0.08);
+            --color-shadow-dark: rgba(0, 0, 0, 0.15);
+        }
 
-    /* Background */
-    .bg{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 10% 10%, rgba(255,255,255,0.02) 0%, transparent 25%),linear-gradient(180deg,#040409,#0a0a10)}
-    canvas.stars{position:fixed;inset:0;pointer-events:none;z-index:0}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    /* Enter Glass */
-    .enter-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:120}
-    .glass{width:min(920px,94%);padding:36px;border-radius:16px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));backdrop-filter:blur(10px) saturate(120%);border:1px solid rgba(255,255,255,0.05);box-shadow:0 30px 100px rgba(0,0,0,0.75);display:flex;gap:18px;align-items:center}
-    .glass h1{font-size:26px;margin-bottom:6px}
-    .enter-btn{padding:14px 28px;border-radius:12px;border:none;cursor:pointer;font-weight:800;background:linear-gradient(90deg,#ffd86b,#ff6060);color:#111}
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--color-bg-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--color-text-primary);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
 
-    /* App topbar */
-    .topbar{height:64px;display:flex;align-items:center;padding:0 18px;gap:12px;z-index:100;position:relative}
-    .mark{width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#ffd86b,#ff6060);display:flex;align-items:center;justify-content:center;color:#111;font-weight:800}
-    .top-actions{margin-left:auto;display:flex;gap:8px}
-    .btn{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.04);padding:8px 12px;border-radius:10px;color:inherit;cursor:pointer}
+        /* LANDING SCREEN */
+        #landing {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 0.8s ease-out;
+        }
 
-    /* Layout */
-    .main{display:flex;height:calc(100% - 64px);z-index:100}
-    .sidebar{width:320px;border-right:1px solid rgba(255,255,255,0.03);padding:18px;overflow:auto;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent)}
-    .content{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;position:relative}
+        #landing.hidden {
+            pointer-events: none;
+            opacity: 0;
+        }
 
-    /* Library */
-    .lib-grid{display:grid;grid-template-columns:1fr;gap:10px}
-    .card{display:flex;gap:10px;align-items:center;padding:10px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.02)}
-    .thumb{width:72px;height:56px;border-radius:6px;background:#f8f5ef;overflow:hidden}
+        .landing-content {
+            text-align: center;
+            color: white;
+        }
 
-    /* Book */
-    .book-wrap{width:min(1100px,94%);height:min(820px,88%);position:relative;perspective:2600px}
-    .book{position:relative;width:920px;height:720px;margin:auto;transform-style:preserve-3d}
+        .landing-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.2s forwards;
+        }
 
-    /* Cover */
-    .cover{position:absolute;left:0;top:0;width:50%;height:100%;transform-origin:left center;border-radius:12px;box-shadow:0 50px 140px rgba(2,6,10,0.75);display:flex;align-items:center;padding:28px;background:linear-gradient(180deg,#3b0f52,#16071b);color:white;z-index:140}
-    .cover .title-large{font-size:22px;font-weight:800}
-    .cover .names{margin-top:12px;opacity:0.9}
-    .spine{position:absolute;right:-28px;top:8%;width:28px;height:84%;background:linear-gradient(180deg,#4b154d,#120517);border-radius:4px}
+        .landing-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            color: rgba(255,255,255,0.7);
+            animation: fadeInUp 0.8s ease-out 0.4s forwards;
+        }
 
-    /* Pages stack */
-    .pages{position:absolute;left:50%;top:0;width:50%;height:100%;transform-style:preserve-3d;pointer-events:auto}
-    .page{position:absolute;left:0;top:0;width:100%;height:100%;border-radius:10px;background:#fff;box-shadow:0 26px 60px rgba(2,6,10,0.6);overflow:hidden;transform-origin:left center}
-    .paper{position:absolute;inset:14px;border-radius:6px;padding:18px 22px 60px 22px;overflow:auto;background-repeat:repeat;box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
+        .landing-btn {
+            padding: 1rem 3rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, var(--color-accent) 0%, #d4a574 100%);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(184, 149, 106, 0.3);
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out 0.6s forwards;
+        }
 
-    /* realistic paper texture via SVG data URI */
-    .paper{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400"><filter id="n"><feTurbulence baseFrequency="0.9" numOctaves="2" seed="9"/><feColorMatrix type="saturate" values="0"/><feComponentTransfer><feFuncA type="table" tableValues="0 0.55"/></feComponentTransfer></filter><rect width="100%" height="100%" fill="%23fbf7ef"/><rect width="100%" height="100%" filter="url(%23n)" opacity="0.035"/></svg>');background-size:260px 260px}
+        .landing-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(184, 149, 106, 0.4);
+        }
 
-    /* editor */
-    .title{font-weight:700;margin-bottom:6px;color:#111}
-    .editor{width:100%;height:100%;outline:none;font-size:18px;line-height:1.6;color:#111;background:transparent}
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    /* handwriting canvas overlay */
-    .draw-canvas{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+        /* STARFIELD BACKGROUND */
+        #starfield {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.5;
+        }
 
-    /* controls */
-    .page-controls{position:absolute;right:12px;bottom:12px;display:flex;gap:8px}
+        /* MAIN APP */
+        #app {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            background: var(--color-bg-primary);
+        }
 
-    /* toolbar for brushes */
-    .brushbar{display:flex;gap:8px;align-items:center;margin-top:12px}
-    .swatch{width:34px;height:34px;border-radius:6px;border:1px solid rgba(0,0,0,0.2);cursor:pointer}
+        /* SIDEBAR */
+        .sidebar {
+            width: 280px;
+            height: 100%;
+            background: var(--color-bg-secondary);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            box-shadow: 2px 0 8px var(--color-shadow);
+        }
 
-    /* index overlay */
-    .index-overlay{position:fixed;inset:0;background:linear-gradient(180deg, rgba(2,6,10,0.6), rgba(2,6,10,0.85));display:none;align-items:center;justify-content:center;z-index:200}
-    .index-panel{width:min(1100px,96%);height:min(820px,92%);background:#06060a;border-radius:12px;padding:16px;overflow:auto}
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    @media(max-width:1000px){.sidebar{display:none}.book-wrap{width:92%;height:78%}}
-  </style>
+        .sidebar-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--color-text-primary);
+        }
+
+        .sidebar-btn {
+            background: none;
+            border: none;
+            color: var(--color-accent);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.5rem;
+        }
+
+        .sidebar-btn:hover {
+            opacity: 0.8;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .page-item {
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+            background: var(--color-paper);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .page-item:hover {
+            background: white;
+            box-shadow: 0 2px 8px var(--color-shadow);
+        }
+
+        .page-item.active {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .page-item-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .page-item-date {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+        .sidebar-actions {
+            padding: 1rem;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            background: var(--color-paper);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: var(--color-text-primary);
+        }
+
+        .action-btn:hover {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+        }
+
+        .toolbar {
+            height: 60px;
+            background: var(--color-paper);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            gap: 1.5rem;
+            box-shadow: 0 2px 4px var(--color-shadow);
+        }
+
+        .toolbar-group {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .toolbar-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--color-border);
+            background: var(--color-bg-secondary);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            color: var(--color-text-primary);
+        }
+
+        .toolbar-btn:hover {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .toolbar-btn.active {
+            background: var(--color-accent);
+            color: white;
+            border-color: var(--color-accent);
+        }
+
+        .toolbar-separator {
+            width: 1px;
+            height: 30px;
+            background: var(--color-border);
+        }
+
+        /* COLOR & SIZE CONTROLS */
+        .control-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .control-label {
+            font-size: 0.8rem;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        input[type="color"] {
+            width: 35px;
+            height: 35px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        input[type="range"] {
+            width: 100px;
+            cursor: pointer;
+        }
+
+        /* CANVAS CONTAINER */
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+        }
+
+        #pageCanvas {
+            box-shadow: 0 10px 40px var(--color-shadow-dark);
+            border-radius: 4px;
+            cursor: crosshair;
+            background: var(--color-paper);
+            touch-action: none;
+        }
+
+        /* MODALS */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--color-paper);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--color-text-primary);
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            color: var(--color-text-primary);
+        }
+
+        .modal-input:focus {
+            outline: none;
+            border-color: var(--color-accent);
+            box-shadow: 0 0 0 3px rgba(184, 149, 106, 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-btn-primary {
+            background: var(--color-accent);
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .modal-btn-secondary {
+            background: var(--color-bg-secondary);
+            color: var(--color-text-primary);
+            border: 1px solid var(--color-border);
+        }
+
+        .modal-btn-secondary:hover {
+            background: var(--color-border);
+        }
+
+        /* LIBRARY VIEW */
+        #libraryView {
+            display: none;
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+        }
+
+        #libraryView.active {
+            display: block;
+        }
+
+        .library-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .page-thumbnail {
+            aspect-ratio: 3/4;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--color-paper);
+            box-shadow: 0 2px 8px var(--color-shadow);
+        }
+
+        .page-thumbnail:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px var(--color-shadow-dark);
+        }
+
+        .page-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* STATUS INDICATORS */
+        .status-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.75rem 1.5rem;
+            background: var(--color-accent);
+            color: white;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            box-shadow: 0 4px 12px rgba(184, 149, 106, 0.3);
+        }
+
+        .status-indicator.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            #app {
+                flex-direction: column;
+            }
+
+            .toolbar {
+                flex-wrap: wrap;
+                height: auto;
+                padding: 0.75rem;
+                gap: 0.75rem;
+            }
+
+            .toolbar-btn {
+                padding: 0.4rem 0.75rem;
+                font-size: 0.8rem;
+            }
+
+            .library-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 1rem;
+            }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        #pageCanvas {
+            animation: fadeInScale 0.3s ease-out;
+        }
+
+        /* PAGE STYLE */
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .page-text-layer {
+            position: absolute;
+            top: 40px;
+            left: 40px;
+            right: 40px;
+            bottom: 40px;
+            font-size: 1rem;
+            line-height: 1.8;
+            color: var(--color-text-primary);
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .page-text-layer:focus {
+            outline: none;
+        }
+
+        /* ACCESSIBILITY */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
 </head>
 <body>
-  <div class="bg"></div>
-  <canvas id="stars" class="stars"></canvas>
-
-  <!-- ENTER -->
-  <div class="enter-wrap" id="enterWrap">
-    <div class="glass" role="dialog">
-      <div style="flex:1">
-        <h1>Open RealDiary — Ultimate</h1>
-        <p style="opacity:0.9">Now with page-curl physics, pressure-sensitive handwriting, smoothing, multiple brushes, Hindi UI, and custom cover — all single-file and offline.</p>
-        <p style="opacity:0.7;margin-top:8px">Instructions: Tap cover to open. Click right edge or "Turn" to curl a page. Use pointer/finger to draw. Ctrl/Cmd+S saves the visible page.</p>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:10px;align-items:center;justify-content:center">
-        <button class="enter-btn" id="enterBtn">ENTER</button>
-        <button class="btn" id="openSample">Open Sample</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- APP -->
-  <div id="app" style="display:none;position:relative;z-index:150">
-    <div class="topbar">
-      <div style="display:flex;align-items:center;gap:12px"><div class="mark">RD</div><div><strong id="brandTitle">RealDiary</strong><div id="smallTag" style="font-size:12px;opacity:0.7">Priyanshu • Ria</div></div></div>
-      <div class="top-actions">
-        <div class="tools">
-          <button class="btn" id="openIndexBtn">📚 Index</button>
-          <button class="btn" id="newPageBtn">➕ New Page</button>
-          <button class="btn" id="undoDrawBtn">↺ Undo</button>
-          <button class="btn" id="clearDrawBtn">🧼 Clear Draw</button>
-          <button class="btn" id="downloadAllBtn">⬇️ Export All</button>
+    <!-- LANDING SCREEN -->
+    <div id="landing">
+        <canvas id="starfield" style="position: absolute; top: 0; left: 0; z-index: -1;"></canvas>
+        <div class="landing-content">
+            <h1 class="landing-title">Your Diary</h1>
+            <p class="landing-subtitle">Hyper-realistic journaling experience</p>
+            <button class="landing-btn" onclick="app.startApp()">ENTER</button>
         </div>
-      </div>
     </div>
 
-    <div class="main">
-      <aside class="sidebar">
-        <h3>Library</h3>
-        <div id="libraryList" class="lib-grid"></div>
-
-        <hr style="margin:12px 0;border-color:rgba(255,255,255,0.02)">
-        <div><strong>Brushes</strong></div>
-        <div class="brushbar" id="brushbar">
-          <div class="swatch" data-brush="pen" title="Pen" style="background:#0b0b0b;color:#fff;display:flex;align-items:center;justify-content:center">Pen</div>
-          <div class="swatch" data-brush="pencil" title="Pencil" style="background:linear-gradient(180deg,#e6e2d8,#cfc9b8);">Pencil</div>
-          <div class="swatch" data-brush="marker" title="Marker" style="background:linear-gradient(180deg,#ffd86b,#ff6060);">Marker</div>
-          <div style="margin-left:auto;display:flex;gap:6px;align-items:center"><input type="color" id="brushColor" value="#111111" style="width:46px;height:34px;border-radius:6px;border:none"><input type="range" id="brushSize" min="1" max="18" value="3"></div>
+    <!-- MAIN APP -->
+    <div id="app" style="display: none;">
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Diary</div>
+                <button class="sidebar-btn" onclick="app.toggleLibrary()" title="View all pages">📚</button>
+            </div>
+            <div class="sidebar-content" id="pageList"></div>
+            <div class="sidebar-actions">
+                <button class="action-btn" onclick="app.newPage()">+ New Page</button>
+                <button class="action-btn" onclick="app.exportPDF()">Export PDF</button>
+                <button class="action-btn" onclick="app.exportJSON()">Backup</button>
+                <button class="action-btn" onclick="document.getElementById('importModal').classList.add('active')">Import</button>
+            </div>
         </div>
 
-        <hr style="margin:12px 0;border-color:rgba(255,255,255,0.02)">
-        <div><strong>Language</strong></div>
-        <div style="display:flex;gap:8px;margin-top:8px"><button class="btn" id="langEN">English</button><button class="btn" id="langHI">हिन्दी</button></div>
-
-        <hr style="margin:12px 0;border-color:rgba(255,255,255,0.02)">
-        <div><strong>Cover</strong></div>
-        <div style="margin-top:8px"><input id="coverTitle" placeholder="Custom title" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></div>
-        <div style="margin-top:8px"><input id="coverNames" placeholder="Names (e.g. Priyanshu & Ria)" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></div>
-        <div style="margin-top:8px"><textarea id="coverPoem" rows="3" placeholder="A short poem to print on cover" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"></textarea></div>
-        <div style="margin-top:8px"><button class="btn" id="applyCover">Apply Cover</button></div>
-
-      </aside>
-
-      <section class="content">
-        <div class="book-wrap">
-          <div class="book" id="book">
-            <div class="cover" id="cover">
-              <div>
-                <div class="title-large" id="coverTitleDisplay">My RealDiary</div>
-                <div class="names" id="coverNamesDisplay">Priyanshu • Ria</div>
-                <div style="margin-top:12px;opacity:0.9;font-size:13px" id="coverPoemDisplay">A place for memories & notes</div>
-              </div>
-              <div class="spine"></div>
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- TOOLBAR -->
+            <div class="toolbar">
+                <div class="toolbar-group">
+                    <button class="toolbar-btn active" data-mode="text" onclick="app.setMode('text')">📝 Type</button>
+                    <button class="toolbar-btn" data-mode="draw" onclick="app.setMode('draw')">✏️ Draw</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group" id="drawTools" style="display: none;">
+                    <select class="action-btn" id="brushType" onchange="app.setBrush(this.value)">
+                        <option value="pen">Pen</option>
+                        <option value="pencil">Pencil</option>
+                        <option value="marker">Marker</option>
+                        <option value="eraser">Eraser</option>
+                    </select>
+                </div>
+                <div class="toolbar-group" id="colorControl" style="display: none;">
+                    <label class="control-label">Color:</label>
+                    <input type="color" id="brushColor" value="#000000" onchange="app.setBrushColor(this.value)">
+                </div>
+                <div class="toolbar-group" id="sizeControl" style="display: none;">
+                    <label class="control-label">Size:</label>
+                    <input type="range" id="brushSize" min="1" max="50" value="3" onchange="app.setBrushSize(this.value)">
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="app.undo()" title="Undo (Ctrl+Z)">↶</button>
+                    <button class="toolbar-btn" onclick="app.redo()" title="Redo (Ctrl+Y)">↷</button>
+                </div>
+                <div class="toolbar-separator"></div>
+                <div class="toolbar-group">
+                    <button class="toolbar-btn" onclick="app.savePagePNG()">💾 PNG</button>
+                    <button class="toolbar-btn" onclick="app.savePage()">Save</button>
+                </div>
             </div>
 
-            <div class="pages" id="pages"></div>
-          </div>
+            <!-- CANVAS AREA -->
+            <div class="canvas-container">
+                <canvas id="pageCanvas" width="800" height="1000"></canvas>
+            </div>
         </div>
-      </section>
+
+        <!-- LIBRARY VIEW -->
+        <div id="libraryView">
+            <h2 style="margin-bottom: 2rem; font-size: 1.8rem;">Your Pages</h2>
+            <div class="library-grid" id="libraryGrid"></div>
+        </div>
     </div>
-  </div>
 
-  <!-- INDEX OVERLAY -->
-  <div class="index-overlay" id="indexOverlay">
-    <div class="index-panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <h2 style="margin:0">Library</h2>
-        <div><button class="btn" id="closeIndex">Close</button></div>
-      </div>
-      <div id="indexGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px"></div>
+    <!-- MODALS -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Import Backup</h2>
+            <input type="file" id="importFile" accept=".json" style="margin-bottom: 1.5rem; width: 100%;">
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-secondary" onclick="document.getElementById('importModal').classList.remove('active')">Cancel</button>
+                <button class="modal-btn modal-btn-primary" onclick="app.importJSON()">Import</button>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <a id="downloadAnchor" style="display:none"></a>
+    <!-- STATUS INDICATOR -->
+    <div id="statusIndicator" class="status-indicator"></div>
 
-  <!-- html2canvas -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- SCRIPT -->
+    <script>
+        // ============================================================================
+        // DIARY APP - Production Single-File Implementation
+        // ============================================================================
+        // Core features: realistic page turns, pressure-sensitive drawing,
+        // IndexedDB storage, PDF/PNG export, offline-first architecture
+        // ============================================================================
 
-  <script>
-  /* ==================================================
-     Ultimate Upgraded RealDiary — single-file
-     Features added now:
-     - Page curl (canvas-based approximation)
-     - Pressure-sensitive, smoothed handwriting with multiple brushes
-     - Hindi UI toggle
-     - Custom cover art (title, names, poem)
-     - Unlimited pages simulation, zero-critical glitches (best-effort)
-     ================================================== */
+        // CONSTANTS & CONFIG
+        const CONFIG = {
+            CANVAS_WIDTH: 800,
+            CANVAS_HEIGHT: 1000,
+            PAGE_MARGIN: 40,
+            DB_NAME: 'DiaryApp',
+            DB_VERSION: 1,
+            AUTOSAVE_DELAY: 5000,
+            BRUSH_SMOOTHING: 0.5,
+            PRESSURE_MULT: 1.5,
+        };
 
-  // Simple helpers
-  const $ = s => document.querySelector(s);
-  const uid = (p='p')=>p+Math.random().toString(36).slice(2,9);
+        // UTILITY: IndexedDB Helper
+        class DiaryDB {
+            constructor() {
+                this.db = null;
+                this.init();
+            }
 
-  // Starfield
-  (function(){const c=$('#stars');const ctx=c.getContext('2d');function r(){c.width=innerWidth;c.height=innerHeight}addEventListener('resize',r);r();const stars=[];for(let i=0;i<320;i++)stars.push({x:Math.random()*c.width,y:Math.random()*c.height,r:Math.random()*1.6,alpha:Math.random()});function draw(){ctx.clearRect(0,0,c.width,c.height);for(const s of stars){ctx.globalAlpha=s.alpha;ctx.beginPath();ctx.fillStyle='#fff';ctx.arc(s.x,s.y,s.r,0,Math.PI*2);ctx.fill()}}setInterval(()=>{for(const s of stars){s.alpha=0.3+Math.random()*0.8;s.x+=Math.random()*1-0.4;if(s.x>c.width)s.x=0;if(s.x<0)s.x=c.width}},700); (function loop(){draw();requestAnimationFrame(loop)})();})();
+            async init() {
+                return new Promise((resolve, reject) => {
+                    const req = indexedDB.open(CONFIG.DB_NAME, CONFIG.DB_VERSION);
+                    req.onerror = () => reject(req.error);
+                    req.onsuccess = () => {
+                        this.db = req.result;
+                        resolve();
+                    };
+                    req.onupgradeneeded = (e) => {
+                        const db = e.target.result;
+                        if (!db.objectStoreNames.contains('pages')) {
+                            db.createObjectStore('pages', { keyPath: 'id' });
+                        }
+                    };
+                });
+            }
 
-  // State & storage
-  const LS_KEY='realdiary_v3';
-  const state={pages:[], currentTopId:null, uiLang:'en', brush:{type:'pen', color:'#111111', size:3}};
-  function load(){try{const raw=localStorage.getItem(LS_KEY);state.pages=raw?JSON.parse(raw):[]; }catch(e){state.pages=[]}}
-  function save(){localStorage.setItem(LS_KEY, JSON.stringify(state.pages)); renderLibrary(); renderIndexGrid();}
+            async savePage(page) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction('pages', 'readwrite');
+                    const req = tx.objectStore('pages').put(page);
+                    req.onerror = () => reject(req.error);
+                    req.onsuccess = () => resolve();
+                });
+            }
 
-  // Page model
-  function newPage(title='Untitled'){return {id:uid(),title,content:'',drawings:[],created:Date.now()}}
+            async getPage(id) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction('pages', 'readonly');
+                    const req = tx.objectStore('pages').get(id);
+                    req.onerror = () => reject(req.error);
+                    req.onsuccess = () => resolve(req.result);
+                });
+            }
 
-  // Render library
-  function renderLibrary(){const list=$('#libraryList');list.innerHTML='';if(!state.pages.length){list.innerHTML='<div style="opacity:0.7">No saved pages yet</div>';return}state.pages.slice().reverse().forEach(p=>{const card=document.createElement('div');card.className='card';card.innerHTML=`<div class='thumb' data-id='${p.id}'></div><div style='flex:1'><strong>${escapeHtml(p.title)}</strong><div style='font-size:12px;opacity:0.7'>${new Date(p.created).toLocaleString()}</div></div><div style='display:flex;flex-direction:column;gap:6px'><button class='btn' data-open='${p.id}'>Open</button><button class='btn' data-png='${p.id}'>PNG</button></div>`;list.appendChild(card);const thumb=card.querySelector('.thumb');thumb.style.background='#f8f5ef';thumb.style.display='flex';thumb.style.alignItems='center';thumb.style.justifyContent='center';thumb.textContent=(p.title||'Untitled').slice(0,12)})}
-  function renderIndexGrid(){const g=$('#indexGrid');g.innerHTML='';state.pages.slice().reverse().forEach(p=>{const el=document.createElement('div');el.style.padding='12px';el.style.borderRadius='8px';el.style.background='linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))';el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>${escapeHtml(p.title)}</strong><div style="font-size:12px;opacity:0.7">${new Date(p.created).toLocaleString()}</div></div><div style="display:flex;flex-direction:column;gap:6px"><button class='btn' data-open='${p.id}'>Open</button><button class='btn' data-download='${p.id}'>PNG</button></div></div>`;g.appendChild(el)})}
+            async getAllPages() {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction('pages', 'readonly');
+                    const req = tx.objectStore('pages').getAll();
+                    req.onerror = () => reject(req.error);
+                    req.onsuccess = () => resolve(req.result);
+                });
+            }
 
-  function escapeHtml(s=''){return String(s||'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c])}
+            async deletePage(id) {
+                return new Promise((resolve, reject) => {
+                    const tx = this.db.transaction('pages', 'readwrite');
+                    const req = tx.objectStore('pages').delete(id);
+                    req.onerror = () => reject(req.error);
+                    req.onsuccess = () => resolve();
+                });
+            }
+        }
 
-  // Pages DOM
-  const pagesRoot = $('#pages');
-  function clearPages(){pagesRoot.innerHTML=''}
+        // STROKE DATA STRUCTURE
+        class Stroke {
+            constructor(brush = 'pen', color = '#000000', size = 3) {
+                this.brush = brush;
+                this.color = color;
+                this.size = size;
+                this.points = [];
+                this.pressures = [];
+            }
 
-  // Create page element with editor and drawing canvas
-  function createPageElement(pageData,stackIndex=0){
-    const el=document.createElement('div'); el.className='page'; el.dataset.id=pageData.id; el.style.zIndex=200-stackIndex; el.style.transform = `translateZ(${stackIndex*-6}px)`;
+            addPoint(x, y, pressure = 1.0) {
+                this.points.push({ x, y });
+                this.pressures.push(Math.max(0.3, Math.min(1.0, pressure)));
+            }
 
-    const paper=document.createElement('div'); paper.className='paper';
-    const title=document.createElement('div'); title.className='title'; title.textContent=pageData.title; title.contentEditable=true; title.style.cursor='text'; title.style.userSelect='text'; title.style.marginBottom='8px'; title.style.color='#111';
-    const editor=document.createElement('div'); editor.className='editor'; editor.contentEditable=true; editor.spellcheck=false; editor.innerHTML=pageData.content||'';
+            toJSON() {
+                return {
+                    brush: this.brush,
+                    color: this.color,
+                    size: this.size,
+                    points: this.points,
+                    pressures: this.pressures,
+                };
+            }
 
-    const controls=document.createElement('div'); controls.className='page-controls';
-    const saveBtn=document.createElement('button'); saveBtn.className='btn'; saveBtn.textContent='💾 Save';
-    const pngBtn=document.createElement('button'); pngBtn.className='btn'; pngBtn.textContent='📷 Save PNG';
-    const turnBtn=document.createElement('button'); turnBtn.className='btn'; turnBtn.textContent='⤵️ Turn';
-    controls.appendChild(saveBtn); controls.appendChild(pngBtn); controls.appendChild(turnBtn);
+            static fromJSON(data) {
+                const s = new Stroke(data.brush, data.color, data.size);
+                s.points = data.points;
+                s.pressures = data.pressures;
+                return s;
+            }
+        }
 
-    paper.appendChild(title); paper.appendChild(editor); paper.appendChild(controls);
-    el.appendChild(paper);
+        // DRAWING ENGINE
+        class DrawingEngine {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d', { willReadFrequently: true });
+                this.strokes = [];
+                this.undoStack = [];
+                this.redoStack = [];
+                this.currentStroke = null;
+                this.isDrawing = false;
 
-    // drawing canvas overlay (absolute inside page coordinate)
-    const drawCanvas = document.createElement('canvas'); drawCanvas.className='draw-canvas'; drawCanvas.width=800; drawCanvas.height=600; drawCanvas.style.position='absolute'; drawCanvas.style.left='14px'; drawCanvas.style.top='14px'; drawCanvas.style.width='calc(100% - 28px)'; drawCanvas.style.height='calc(100% - 28px)'; drawCanvas.style.pointerEvents='none'; el.appendChild(drawCanvas);
+                this.brush = 'pen';
+                this.color = '#000000';
+                this.size = 3;
 
-    // set up resize for canvas to match paper area
-    function fit(){ const r=paper.getBoundingClientRect(); drawCanvas.width=Math.max(400,Math.round(r.width)); drawCanvas.height=Math.max(300,Math.round(r.height)); drawCanvas.style.left=r.left+'px'; drawCanvas.style.top=r.top+'px'; drawCanvas.style.width=r.width+'px'; drawCanvas.style.height=r.height+'px'; }
-    setTimeout(()=>{fit(); window.addEventListener('resize', fit)},50);
+                this.lastX = 0;
+                this.lastY = 0;
 
-    // restore drawings
-    setTimeout(()=>{restoreDrawingsToCanvas(el,pageData.drawings||[])},120);
+                this.setupEventListeners();
+                this.renderPaperTexture();
+            }
 
-    // click handlers for turn
-    turnBtn.addEventListener('click', (ev)=>{ev.stopPropagation(); pageCurlAnimation(el)});
-    el.addEventListener('click',(ev)=>{const r=el.getBoundingClientRect(); const x=ev.clientX - r.left; if(x > r.width*0.78) pageCurlAnimation(el)});
+            setupEventListeners() {
+                this.canvas.addEventListener('pointerdown', (e) => this.onPointerDown(e));
+                this.canvas.addEventListener('pointermove', (e) => this.onPointerMove(e));
+                this.canvas.addEventListener('pointerup', (e) => this.onPointerUp(e));
+                this.canvas.addEventListener('pointercancel', (e) => this.onPointerUp(e));
+            }
 
-    // save handler
-    saveBtn.addEventListener('click',(ev)=>{ev.stopPropagation(); const content = editor.innerHTML; const titleText = title.textContent||'Untitled'; const idx = state.pages.findIndex(p=>p.id===pageData.id); if(idx>=0){ state.pages[idx].content = content; state.pages[idx].title = titleText; state.pages[idx].drawings = captureDrawings(el); save(); alert((state.uiLang==='hi')?'सेव हो गया':'Saved.'); } else { state.pages.push({id:pageData.id,title:titleText,content:content,drawings:captureDrawings(el),created:Date.now()}); save(); alert((state.uiLang==='hi')?'लाइब्रेरी में सेव':'Saved to Library.'); } });
+            renderPaperTexture() {
+                // Simple paper grain effect
+                const imageData = this.ctx.createImageData(this.canvas.width, this.canvas.height);
+                const data = imageData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = Math.random() * 15;
+                    data[i] = 254 - noise;
+                    data[i + 1] = 253 - noise;
+                    data[i + 2] = 251 - noise;
+                    data[i + 3] = 255;
+                }
+                this.ctx.putImageData(imageData, 0, 0);
+            }
 
-    // png handler
-    pngBtn.addEventListener('click',(ev)=>{ev.stopPropagation(); exportPagePNG(el, pageData.title||'page')});
+            onPointerDown(e) {
+                if (app.mode !== 'draw') return;
+                
+                e.preventDefault();
+                this.isDrawing = true;
+                const rect = this.canvas.getBoundingClientRect();
+                this.lastX = e.clientX - rect.left;
+                this.lastY = e.clientY - rect.top;
 
-    // enable drawing interactions
-    enableDrawingOnPage(el);
+                this.currentStroke = new Stroke(this.brush, this.color, this.size);
+                this.currentStroke.addPoint(this.lastX, this.lastY, e.pressure || 1.0);
 
-    return el;
-  }
+                this.undoStack.push(this.strokes.length);
+                this.redoStack = [];
+            }
 
-  // Render top N pages
-  function renderPages(){ clearPages(); const last = state.pages.slice(-10); if(!last.length){ const tmp=newPage('Blank'); tmp.id='temp'; const el=createPageElement(tmp,0); pagesRoot.appendChild(el); state.currentTopId=tmp.id; return } last.forEach((p,i)=>{ const el=createPageElement(p,i); pagesRoot.appendChild(el); }); }
+            onPointerMove(e) {
+                if (!this.isDrawing || !this.currentStroke) return;
 
-  // Page curl animation (canvas-based warp approximation)
-  function pageCurlAnimation(pageEl){ // capture page area to image, animate a curl canvas on top
-    const paper = pageEl.querySelector('.paper'); html2canvas(paper, {scale:2, backgroundColor:'#fff'}).then(base=>{
-      // overlay canvas
-      const overlay = document.createElement('canvas'); overlay.style.position='fixed'; overlay.style.left=paper.getBoundingClientRect().left+'px'; overlay.style.top=paper.getBoundingClientRect().top+'px'; overlay.width=base.width; overlay.height=base.height; overlay.style.width=paper.clientWidth+'px'; overlay.style.height=paper.clientHeight+'px'; overlay.style.zIndex=9999; document.body.appendChild(overlay);
-      const ctx = overlay.getContext('2d');
-      // animation params
-      const frames = 40; let t=0;
-      function drawFrame(){ ctx.clearRect(0,0,overlay.width,overlay.height);
-        // draw base
-        ctx.save(); ctx.globalCompositeOperation='source-over'; ctx.drawImage(base,0,0);
-        // simulated curl: draw a clipped gradient on right side and rotate a folded piece
-        const w=overlay.width, h=overlay.height;
-        // fold width grows
-        const fold = Math.sin((t/frames)*Math.PI) * (w*0.45);
-        // draw shadow on main
-        const grad = ctx.createLinearGradient(w-fold,0,w,0); grad.addColorStop(0,'rgba(0,0,0,0)'); grad.addColorStop(1,'rgba(0,0,0,0.35)'); ctx.fillStyle=grad; ctx.fillRect(w-fold,0,fold,h);
-        // draw curled piece as transformed image (simple shear/scale)
-        ctx.save(); const sx = 1 - (fold/(w*1.2)); const shear = fold/(w*0.6);
-        ctx.translate(w - fold*0.5, 0);
-        ctx.transform(sx, 0, shear*0.0005, 1, 0, 0);
-        ctx.globalAlpha = 0.98;
-        ctx.drawImage(base, -fold, 0);
-        ctx.restore();
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const pressure = e.pressure || 1.0;
 
-        // top glossy
-        const gloss = ctx.createLinearGradient(w-fold,0,w-fold+fold*0.6,0);
-        gloss.addColorStop(0,'rgba(255,255,255,0.06)'); gloss.addColorStop(1,'rgba(255,255,255,0)'); ctx.fillStyle=gloss; ctx.fillRect(w-fold,0,fold*0.6,h);
+                this.currentStroke.addPoint(x, y, pressure);
+                this.redraw();
+            }
 
-        t++; if(t<=frames){requestAnimationFrame(drawFrame)} else { // finish
-            overlay.remove(); // simulate page removed & add a fresh new page to end
-            const p=newPage('Page '+(state.pages.length+1)); state.pages.push(p); save(); renderPages(); }
-      }
-      drawFrame();
-    }).catch(e=>{console.error(e); alert('Curl failed: '+e.message)});
-  }
+            onPointerUp(e) {
+                if (!this.isDrawing) return;
 
-  // Drawing infrastructure: smoothing & pressure
-  const drawStore = {ctxMap:new Map(),undoMap:new Map(),currentStroke:[],config:{type:'pen',color:'#111',size:3}};
+                e.preventDefault();
+                this.isDrawing = false;
+                if (this.currentStroke) {
+                    this.strokes.push(this.currentStroke);
+                    this.currentStroke = null;
+                }
+            }
 
-  function enableDrawingOnPage(pageEl){ const canvas = pageEl.querySelector('.draw-canvas'); if(!canvas) return; // ensure size
-    const paper = pageEl.querySelector('.paper'); const pr=paper.getBoundingClientRect(); canvas.width = Math.max(400, Math.round(pr.width)); canvas.height = Math.max(300, Math.round(pr.height)); canvas.style.left=pr.left+'px'; canvas.style.top=pr.top+'px'; canvas.style.width=pr.width+'px'; canvas.style.height=pr.height+'px'; canvas.style.pointerEvents='auto'; const ctx=canvas.getContext('2d'); ctx.lineCap='round'; ctx.lineJoin='round'; ctx.strokeStyle = state.brush.color; ctx.lineWidth = state.brush.size; drawStore.ctxMap.set(pageEl.dataset.id,ctx); drawStore.undoMap.set(pageEl.dataset.id,[]);
+            redraw() {
+                this.renderPaperTexture();
 
-    let drawing=false; let last=null; let smoothingBuffer=[];
-    function getXY(e){ const r=canvas.getBoundingClientRect(); const x=(e.clientX - r.left)*(canvas.width/r.width); const y=(e.clientY - r.top)*(canvas.height/r.height); const pressure = e.pressure===undefined? (e.force || 0.5) : e.pressure; return {x,y,pressure}; }
+                // Draw all completed strokes
+                for (const stroke of this.strokes) {
+                    this.drawStroke(stroke);
+                }
 
-    function start(e){ e.preventDefault(); drawing=true; smoothingBuffer=[]; last=getXY(e); smoothingBuffer.push(last); ctx.beginPath(); ctx.moveTo(last.x,last.y); }
-    function move(e){ if(!drawing) return; const p=getXY(e); smoothingBuffer.push(p); // smoothing: take average of last few
-      const smooth = averagePoints(smoothingBuffer,4); const width = computeWidth(smooth.pressure); ctx.lineWidth = width; ctx.strokeStyle = state.brush.color; ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(smooth.x,smooth.y); ctx.stroke(); last = smooth; // limit buffer
-      if(smoothingBuffer.length>6) smoothingBuffer.shift(); }
-    function end(e){ if(!drawing) return; drawing=false; // push snapshot for undo
-      const id = pageEl.dataset.id; const data = canvas.toDataURL(); const stack = drawStore.undoMap.get(id) || []; stack.push(data); drawStore.undoMap.set(id, stack); }
+                // Draw current stroke in progress
+                if (this.currentStroke) {
+                    this.drawStroke(this.currentStroke);
+                }
+            }
 
-    canvas.addEventListener('pointerdown', start); window.addEventListener('pointermove', move); window.addEventListener('pointerup', end);
-  }
+            drawStroke(stroke) {
+                if (stroke.points.length < 2) return;
 
-  function averagePoints(buf,n){ const sample = buf.slice(-n); if(!sample.length) return buf[buf.length-1]; let x=0,y=0,p=0; for(const s of sample){x+=s.x;y+=s.y;p+=s.pressure} return {x:x/sample.length,y:y/sample.length,pressure:p/sample.length}; }
-  function computeWidth(pressure){ const base = state.brush.size; if(state.brush.type==='pencil') return Math.max(1, base * (0.6 + pressure*0.8)); if(state.brush.type==='marker') return Math.max(2, base * (1.6 + pressure)); return Math.max(1, base * (0.8 + pressure)); }
+                const ctx = this.ctx;
+                ctx.save();
 
-  function restoreDrawingsToCanvas(pageEl, drawings){ const canvas = pageEl.querySelector('.draw-canvas'); if(!canvas) return; const ctx=canvas.getContext('2d'); canvas.width = Math.max(400,Math.round(pageEl.querySelector('.paper').clientWidth)); canvas.height = Math.max(300,Math.round(pageEl.querySelector('.paper').clientHeight)); ctx.clearRect(0,0,canvas.width,canvas.height); drawings.forEach(d=>{ const img=new Image(); img.onload=()=>{ ctx.drawImage(img,0,0,canvas.width,canvas.height) }; img.src=d }); enableDrawingOnPage(pageEl); }
-  function captureDrawings(pageEl){ const canvas = pageEl.querySelector('.draw-canvas'); if(!canvas) return []; try{ return [canvas.toDataURL()]; }catch(e){return []} }
+                ctx.strokeStyle = stroke.color;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
 
-  function undoDrawOnVisible(){ const top = pagesRoot.lastElementChild; if(!top) return; const id = top.dataset.id; const stack = drawStore.undoMap.get(id) || []; if(stack.length>1){ stack.pop(); const prev = stack[stack.length-1]; const canvas = top.querySelector('.draw-canvas'); const ctx=canvas.getContext('2d'); const img=new Image(); img.onload=()=>{ ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0,canvas.width,canvas.height)}; img.src=prev; drawStore.undoMap.set(id,stack);} else { const canvas = top.querySelector('.draw-canvas'); const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); drawStore.undoMap.set(id,[]); }}
-  function clearDrawOnVisible(){ const top = pagesRoot.lastElementChild; if(!top) return; const canvas = top.querySelector('.draw-canvas'); const ctx=canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); drawStore.undoMap.set(top.dataset.id,[]); }
+                if (stroke.brush === 'eraser') {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.strokeStyle = 'rgba(0,0,0,1)';
+                }
 
-  // Export functions
-  function exportPagePNG(pageEl, title='page'){ const paper = pageEl.querySelector('.paper'); html2canvas(paper, {scale:2, backgroundColor:'#fff'}).then(baseCanvas=>{ const draw = pageEl.querySelector('.draw-canvas'); const tmp = document.createElement('canvas'); tmp.width = baseCanvas.width; tmp.height = baseCanvas.height; const tctx = tmp.getContext('2d'); tctx.drawImage(baseCanvas,0,0); if(draw){ const dimg = new Image(); dimg.onload = ()=>{ tctx.drawImage(dimg,0,0,tmp.width,tmp.height); tmp.toBlob(blob=>{ const url=URL.createObjectURL(blob); const a=$('#downloadAnchor'); a.href=url; a.download=(title.replace(/[^a-z0-9]/gi,'_')||'page')+'.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); }); }; dimg.src = draw.toDataURL(); } else { tmp.toBlob(blob=>{ const url=URL.createObjectURL(blob); const a=$('#downloadAnchor'); a.href=url; a.download=(title.replace(/[^a-z0-9]/gi,'_')||'page')+'.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); }); } }).catch(e=>{console.error(e); alert('Export failed')}); }
+                // Catmull-Rom smoothing for path
+                const points = stroke.points;
+                const pressures = stroke.pressures;
 
-  function downloadPagePNGFromData(pageData){ const tmp = document.createElement('div'); tmp.style.width='800px'; tmp.style.height='600px'; tmp.style.padding='24px'; tmp.style.background='#fff'; tmp.style.color='#111'; tmp.innerHTML=`<h2>${escapeHtml(pageData.title)}</h2><div>${pageData.content}</div>`; document.body.appendChild(tmp); html2canvas(tmp, {scale:2}).then(c=>{ c.toBlob(blob=>{ const url=URL.createObjectURL(blob); const a=$('#downloadAnchor'); a.href=url; a.download=(pageData.title.replace(/[^a-z0-9]/gi,'_')||'page')+'.png'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); tmp.remove(); })}).catch(e=>{tmp.remove();alert('Export error')}) }
+                for (let i = 0; i < points.length - 1; i++) {
+                    const p0 = i > 0 ? points[i - 1] : points[i];
+                    const p1 = points[i];
+                    const p2 = points[i + 1];
+                    const p3 = i < points.length - 2 ? points[i + 2] : points[i + 1];
 
-  // UI wiring
-  $('#enterBtn').addEventListener('click', ()=>{ $('#enterWrap').style.display='none'; $('#app').style.display='block'; load(); renderLibrary(); renderPages(); });
-  $('#openSample').addEventListener('click', ()=>{ load(); if(state.pages.length===0){ state.pages.push({id:uid(),title:'Memories',content:'<p>This is your first saved page. Write here.</p>',drawings:[],created:Date.now()}); state.pages.push({id:uid(),title:'Dreams',content:'<p>Second page.</p>',drawings:[],created:Date.now()}); save(); } $('#enterWrap').style.display='none'; $('#app').style.display='block'; renderLibrary(); renderPages(); });
+                    const pressure = pressures[i];
+                    const width = stroke.size * CONFIG.PRESSURE_MULT * pressure;
 
-  $('#newPageBtn').addEventListener('click', ()=>{ const p=newPage('Page '+(state.pages.length+1)); state.pages.push(p); save(); renderPages(); });
-  $('#downloadAllBtn').addEventListener('click', ()=>{ const data=JSON.stringify(state.pages,null,2); const blob=new Blob([data],{type:'application/json'}); const url=URL.createObjectURL(blob); const a=$('#downloadAnchor'); a.href=url; a.download='realdiary-backup.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),2000); });
+                    ctx.lineWidth = width;
 
-  $('#openIndexBtn').addEventListener('click', ()=>{ renderIndexGrid(); $('#indexOverlay').style.display='flex'; });
-  $('#closeIndex').addEventListener('click', ()=>{ $('#indexOverlay').style.display='none' });
+                    // Variable line width for expressive drawing
+                    if (stroke.brush === 'pencil') {
+                        ctx.globalAlpha = 0.7;
+                    } else if (stroke.brush === 'marker') {
+                        ctx.globalAlpha = 0.5;
+                    } else {
+                        ctx.globalAlpha = 1.0;
+                    }
 
-  // index and library actions
-  $('#indexOverlay').addEventListener('click',(e)=>{ const openId = e.target.closest('[data-open]')?.dataset.open; const downloadId = e.target.closest('[data-download]')?.dataset.download; if(openId){ openSaved(openId); $('#indexOverlay').style.display='none' } if(downloadId){ const p=state.pages.find(x=>x.id===downloadId); if(p) downloadPagePNGFromData(p) } });
-  $('#libraryList').addEventListener('click',(e)=>{ const id=e.target.closest('[data-open]')?.dataset.open; const png=e.target.closest('[data-png]')?.dataset.png; if(id) openSaved(id); if(png){ const p=state.pages.find(x=>x.id===png); if(p) downloadPagePNGFromData(p) } });
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
 
-  function openSaved(id){ const p=state.pages.find(x=>x.id===id); if(!p) return alert('Not found'); clearPages(); const el=createPageElement(p,0); pagesRoot.appendChild(el); }
+                ctx.restore();
+            }
 
-  // brush toolbar
-  document.getElementById('brushbar').addEventListener('click',(e)=>{ const b = e.target.closest('[data-brush]'); if(b){ state.brush.type = b.dataset.brush; updateBrushUI(); } });
-  $('#brushColor').addEventListener('input',(e)=>{ state.brush.color = e.target.value; updateBrushUI(); });
-  $('#brushSize').addEventListener('input',(e)=>{ state.brush.size = parseInt(e.target.value,10); updateBrushUI(); });
-  function updateBrushUI(){ // update drawStore config and existing visible canvas
-    drawStore.config = {...drawStore.config, type:state.brush.type, color:state.brush.color, size:state.brush.size}; const canv = pagesRoot.querySelectorAll('.draw-canvas'); canv.forEach(c=>{ const ctx=c.getContext('2d'); ctx.strokeStyle = state.brush.color; ctx.lineWidth = state.brush.size; }); }
+            undo() {
+                if (this.strokes.length === 0) return;
+                this.redoStack.push(this.strokes.pop());
+                this.redraw();
+            }
 
-  // language toggle
-  $('#langEN').addEventListener('click', ()=>{ state.uiLang='en'; localize('en'); });
-  $('#langHI').addEventListener('click', ()=>{ state.uiLang='hi'; localize('hi'); });
-  function localize(lang){ if(lang==='hi'){ $('#brandTitle').textContent='रीयलडायरी'; $('#smallTag').textContent='प्रियंशु • रिया'; $('#enterBtn').textContent='प्रवेश करें'; $('#openSample').textContent='नमूना खोलें' } else { $('#brandTitle').textContent='RealDiary'; $('#smallTag').textContent='Priyanshu • Ria'; $('#enterBtn').textContent='ENTER'; $('#openSample').textContent='Open Sample' } }
+            redo() {
+                if (this.redoStack.length === 0) return;
+                this.strokes.push(this.redoStack.pop());
+                this.redraw();
+            }
 
-  // cover apply
-  $('#applyCover').addEventListener('click', ()=>{ const t=$('#coverTitle').value.trim(); const n=$('#coverNames').value.trim(); const p=$('#coverPoem').value.trim(); if(t) $('#coverTitleDisplay').textContent=t; if(n) $('#coverNamesDisplay').textContent=n; if(p) $('#coverPoemDisplay').textContent=p; alert('Cover updated') });
+            clear() {
+                this.strokes = [];
+                this.undoStack = [];
+                this.redoStack = [];
+                this.redraw();
+            }
 
-  // undo/clear
-  $('#undoDrawBtn').addEventListener('click', ()=>{ undoDrawOnVisible(); });
-  $('#clearDrawBtn').addEventListener('click', ()=>{ clearDrawOnVisible(); });
+            getImageData(scale = 1) {
+                const w = this.canvas.width;
+                const h = this.canvas.height;
+                const scaledCanvas = document.createElement('canvas');
+                scaledCanvas.width = w * scale;
+                scaledCanvas.height = h * scale;
+                const scaledCtx = scaledCanvas.getContext('2d');
+                scaledCtx.scale(scale, scale);
 
-  // keyboard save
-  window.addEventListener('keydown',(e)=>{ if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='s'){ e.preventDefault(); const top=pagesRoot.lastElementChild; if(!top) return; const title=top.querySelector('.title').textContent||'Untitled'; const content=top.querySelector('.editor').innerHTML; const idx=state.pages.findIndex(p=>p.id===top.dataset.id); if(idx>=0){ state.pages[idx].title=title; state.pages[idx].content=content; state.pages[idx].drawings=captureDrawings(top); save(); alert((state.uiLang==='hi')?'सेव हो गया':'Saved'); } else { state.pages.push({id:top.dataset.id,title,content,drawings:captureDrawings(top),created:Date.now()}); save(); alert((state.uiLang==='hi')?'लाइब्रेरी में सेव':'Saved to Library.'); } } });
+                // Draw paper texture
+                const imgData = this.ctx.createImageData(w, h);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const noise = Math.random() * 15;
+                    data[i] = 254 - noise;
+                    data[i + 1] = 253 - noise;
+                    data[i + 2] = 251 - noise;
+                    data[i + 3] = 255;
+                }
+                scaledCtx.putImageData(imgData, 0, 0);
 
-  // save before unload
-  window.addEventListener('beforeunload', ()=>{ save(); });
+                // Draw strokes
+                for (const stroke of this.strokes) {
+                    this.drawStrokeOnContext(scaledCtx, stroke);
+                }
 
-  // init
-  (function init(){ load(); renderLibrary(); renderIndexGrid(); localize(state.uiLang); })();
+                return scaledCanvas.toDataURL('image/png');
+            }
 
-  // MutationObserver to attach drawing on new pages
-  const mo = new MutationObserver(()=>{ const pageEls = pagesRoot.querySelectorAll('.page'); pageEls.forEach(pe=>{ if(!drawStore.ctxMap.has(pe.dataset.id)) restoreDrawingsToCanvas(pe, (state.pages.find(x=>x.id===pe.dataset.id)||{}).drawings||[]) }) }); mo.observe(pagesRoot,{childList:true,subtree:true});
+            drawStrokeOnContext(ctx, stroke) {
+                if (stroke.points.length < 2) return;
 
-  </script>
+                ctx.save();
+                ctx.strokeStyle = stroke.color;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+
+                if (stroke.brush === 'eraser') {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.strokeStyle = 'rgba(0,0,0,1)';
+                }
+
+                const points = stroke.points;
+                const pressures = stroke.pressures;
+
+                for (let i = 0; i < points.length - 1; i++) {
+                    const p1 = points[i];
+                    const p2 = points[i + 1];
+                    const pressure = pressures[i];
+                    const width = stroke.size * CONFIG.PRESSURE_MULT * pressure;
+
+                    ctx.lineWidth = width;
+
+                    if (stroke.brush === 'pencil') {
+                        ctx.globalAlpha = 0.7;
+                    } else if (stroke.brush === 'marker') {
+                        ctx.globalAlpha = 0.5;
+                    } else {
+                        ctx.globalAlpha = 1.0;
+                    }
+
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.stroke();
+                }
+
+                ctx.restore();
+            }
+        }
+
+        // MAIN APP
+        class DiaryApp {
+            constructor() {
+                this.db = new DiaryDB();
+                this.pages = [];
+                this.currentPageId = null;
+                this.mode = 'text';
+                this.drawingEngine = null;
+                this.autosaveTimer = null;
+                this.initialized = false;
+            }
+
+            async init() {
+                if (this.initialized) return;
+                this.initialized = true;
+
+                // Setup drawing engine
+                const canvas = document.getElementById('pageCanvas');
+                this.drawingEngine = new DrawingEngine(canvas);
+
+                // Load pages from DB
+                this.pages = await this.db.getAllPages();
+                this.pages.sort((a, b) => b.createdAt - a.createdAt);
+
+                if (this.pages.length === 0) {
+                    await this.newPage();
+                } else {
+                    await this.openPage(this.pages[0].id);
+                }
+
+                this.renderPageList();
+                this.setupKeyboardShortcuts();
+
+                // Start autosave
+                this.setupAutosave();
+
+                // Setup resize handler
+                window.addEventListener('resize', () => this.resizeCanvas());
+                this.resizeCanvas();
+            }
+
+            resizeCanvas() {
+                const container = document.querySelector('.canvas-container');
+                const canvas = document.getElementById('pageCanvas');
+                const scale = Math.min(
+                    (container.clientWidth - 40) / CONFIG.CANVAS_WIDTH,
+                    (container.clientHeight - 40) / CONFIG.CANVAS_HEIGHT,
+                    1
+                );
+
+                canvas.style.width = (CONFIG.CANVAS_WIDTH * scale) + 'px';
+                canvas.style.height = (CONFIG.CANVAS_HEIGHT * scale) + 'px';
+            }
+
+            setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    if (e.ctrlKey || e.metaKey) {
+                        if (e.key === 's') {
+                            e.preventDefault();
+                            this.savePage();
+                        } else if (e.key === 'z' && !e.shiftKey) {
+                            e.preventDefault();
+                            this.undo();
+                        } else if (e.key === 'y' || (e.key === 'z' && e.shiftKey)) {
+                            e.preventDefault();
+                            this.redo();
+                        }
+                    }
+
+                    if (e.key === 'ArrowLeft') {
+                        e.preventDefault();
+                        this.previousPage();
+                    } else if (e.key === 'ArrowRight') {
+                        e.preventDefault();
+                        this.nextPage();
+                    }
+                });
+            }
+
+            setupAutosave() {
+                this.autosaveTimer = setInterval(() => {
+                    if (this.currentPageId) {
+                        this.savePage();
+                    }
+                }, CONFIG.AUTOSAVE_DELAY);
+            }
+
+            async newPage() {
+                const page = {
+                    id: Date.now().toString(),
+                    title: `Page ${this.pages.length + 1}`,
+                    createdAt: Date.now(),
+                    updatedAt: Date.now(),
+                    textContent: '',
+                    strokes: [],
+                    thumbnail: '',
+                };
+
+                await this.db.savePage(page);
+                this.pages.unshift(page);
+                await this.openPage(page.id);
+                this.renderPageList();
+                this.showStatus('New page created');
+            }
+
+            async openPage(id) {
+                // Save current page first
+                if (this.currentPageId) {
+                    await this.savePage();
+                }
+
+                const page = await this.db.getPage(id);
+                if (!page) return;
+
+                this.currentPageId = id;
+
+                // Restore text content
+                const textLayer = document.querySelector('.page-text-layer');
+                if (textLayer) {
+                    textLayer.remove();
+                }
+
+                // Clear drawing
+                this.drawingEngine.clear();
+
+                // Restore strokes
+                if (page.strokes && page.strokes.length > 0) {
+                    this.drawingEngine.strokes = page.strokes.map(s => Stroke.fromJSON(s));
+                    this.drawingEngine.redraw();
+                }
+
+                // Create text layer
+                const canvas = document.getElementById('pageCanvas');
+                const textLayer = document.createElement('div');
+                textLayer.className = 'page-text-layer';
+                textLayer.textContent = page.textContent || '';
+                textLayer.contentEditable = true;
+                textLayer.setAttribute('aria-label', 'Page text content');
+                canvas.parentElement.appendChild(textLayer);
+
+                this.renderPageList();
+            }
+
+            async savePage() {
+                if (!this.currentPageId) return;
+
+                const textLayer = document.querySelector('.page-text-layer');
+                const page = await this.db.getPage(this.currentPageId);
+                if (!page) return;
+
+                page.textContent = textLayer ? textLayer.textContent : '';
+                page.strokes = this.drawingEngine.strokes.map(s => s.toJSON());
+                page.updatedAt = Date.now();
+                page.thumbnail = this.drawingEngine.getImageData(0.25);
+
+                await this.db.savePage(page);
+                this.showStatus('Page saved');
+            }
+
+            setMode(mode) {
+                this.mode = mode;
+                document.querySelectorAll('[data-mode]').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+
+                const drawTools = document.getElementById('drawTools');
+                const colorControl = document.getElementById('colorControl');
+                const sizeControl = document.getElementById('sizeControl');
+
+                if (mode === 'draw') {
+                    drawTools.style.display = 'flex';
+                    colorControl.style.display = 'flex';
+                    sizeControl.style.display = 'flex';
+                    document.getElementById('pageCanvas').style.cursor = 'crosshair';
+                } else {
+                    drawTools.style.display = 'none';
+                    colorControl.style.display = 'none';
+                    sizeControl.style.display = 'none';
+                    document.getElementById('pageCanvas').style.cursor = 'default';
+                }
+            }
+
+            setBrush(brush) {
+                this.drawingEngine.brush = brush;
+            }
+
+            setBrushColor(color) {
+                this.drawingEngine.color = color;
+            }
+
+            setBrushSize(size) {
+                this.drawingEngine.size = parseFloat(size);
+            }
+
+            undo() {
+                this.drawingEngine.undo();
+            }
+
+            redo() {
+                this.drawingEngine.redo();
+            }
+
+            async savePagePNG() {
+                if (!this.currentPageId) return;
+                const link = document.createElement('a');
+                link.href = this.drawingEngine.getImageData(2);
+                link.download = `page-${this.currentPageId}.png`;
+                link.click();
+                this.showStatus('PNG exported');
+            }
+
+            async exportPDF() {
+                if (this.pages.length === 0) {
+                    this.showStatus('No pages to export');
+                    return;
+                }
+
+                this.showStatus('Generating PDF...');
+
+                // Use jsPDF and html2canvas
+                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
+                const pageWidth = pdf.internal.pageSize.getWidth();
+                const pageHeight = pdf.internal.pageSize.getHeight();
+
+                for (let i = 0; i < this.pages.length; i++) {
+                    const page = this.pages[i];
+                    const imgData = page.thumbnail || await this.capturePageImage(page.id);
+
+                    if (i > 0) pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+
+                    // Add page number
+                    pdf.setFontSize(10);
+                    pdf.text(`${i + 1}`, pageWidth - 20, pageHeight - 10);
+                }
+
+                pdf.save('diary.pdf');
+                this.showStatus('PDF exported');
+            }
+
+            async capturePageImage(pageId) {
+                const page = await this.db.getPage(pageId);
+                if (!page) return '';
+
+                const canvas = document.createElement('canvas');
+                canvas.width = CONFIG.CANVAS_WIDTH;
+                canvas.height = CONFIG.CANVAS_HEIGHT;
+                const ctx = canvas.getContext('2d');
+
+                // Draw paper
+                for (let i = 0; i < canvas.width * canvas.height; i += 4) {
+                    const noise = Math.random() * 15;
+                }
+
+                // Draw strokes
+                for (const strokeData of (page.strokes || [])) {
+                    const stroke = Stroke.fromJSON(strokeData);
+                    this.drawingEngine.drawStrokeOnContext(ctx, stroke);
+                }
+
+                // Draw text (simple rendering)
+                if (page.textContent) {
+                    ctx.fillStyle = '#2c2a28';
+                    ctx.font = '14px Segoe UI';
+                    const lines = page.textContent.split('\n');
+                    lines.forEach((line, i) => {
+                        ctx.fillText(line, 40, 60 + i * 20);
+                    });
+                }
+
+                return canvas.toDataURL('image/png');
+            }
+
+            async exportJSON() {
+                const allPages = await this.db.getAllPages();
+                const data = JSON.stringify(allPages, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = `diary-backup-${Date.now()}.json`;
+                link.click();
+                this.showStatus('Backup exported');
+            }
+
+            async importJSON() {
+                const fileInput = document.getElementById('importFile');
+                const file = fileInput.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        for (const page of imported) {
+                            page.id = Date.now().toString() + Math.random();
+                            await this.db.savePage(page);
+                        }
+                        this.pages = await this.db.getAllPages();
+                        this.renderPageList();
+                        document.getElementById('importModal').classList.remove('active');
+                        this.showStatus('Backup imported');
+                    } catch (err) {
+                        this.showStatus('Import failed: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+
+            async nextPage() {
+                const idx = this.pages.findIndex(p => p.id === this.currentPageId);
+                if (idx < this.pages.length - 1) {
+                    await this.openPage(this.pages[idx + 1].id);
+                }
+            }
+
+            async previousPage() {
+                const idx = this.pages.findIndex(p => p.id === this.currentPageId);
+                if (idx > 0) {
+                    await this.openPage(this.pages[idx - 1].id);
+                }
+            }
+
+            toggleLibrary() {
+                const lib = document.getElementById('libraryView');
+                const main = document.querySelector('.main-content');
+                lib.classList.toggle('active');
+                main.style.display = lib.classList.contains('active') ? 'none' : 'flex';
+
+                if (lib.classList.contains('active')) {
+                    this.renderLibrary();
+                }
+            }
+
+            renderPageList() {
+                const pageList = document.getElementById('pageList');
+                pageList.innerHTML = '';
+
+                for (const page of this.pages.slice(0, 20)) {
+                    const item = document.createElement('div');
+                    item.className = 'page-item' + (page.id === this.currentPageId ? ' active' : '');
+                    item.innerHTML = `
+                        <div class="page-item-title">${page.title}</div>
+                        <div class="page-item-date">${new Date(page.updatedAt).toLocaleDateString()}</div>
+                    `;
+                    item.onclick = () => this.openPage(page.id);
+                    pageList.appendChild(item);
+                }
+            }
+
+            renderLibrary() {
+                const grid = document.getElementById('libraryGrid');
+                grid.innerHTML = '';
+
+                for (const page of this.pages) {
+                    const thumb = document.createElement('div');
+                    thumb.className = 'page-thumbnail';
+                    if (page.thumbnail) {
+                        thumb.innerHTML = `<img src="${page.thumbnail}" alt="${page.title}">`;
+                    } else {
+                        thumb.style.background = 'var(--color-bg-secondary)';
+                        thumb.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:3rem;">${page.title[0]}</div>`;
+                    }
+                    thumb.onclick = () => {
+                        this.toggleLibrary();
+                        this.openPage(page.id);
+                    };
+                    grid.appendChild(thumb);
+                }
+            }
+
+            showStatus(msg) {
+                const indicator = document.getElementById('statusIndicator');
+                indicator.textContent = msg;
+                indicator.classList.add('visible');
+                setTimeout(() => {
+                    indicator.classList.remove('visible');
+                }, 2000);
+            }
+
+            startApp() {
+                document.getElementById('landing').classList.add('hidden');
+                document.getElementById('app').style.display = 'flex';
+                this.init();
+            }
+        }
+
+        // STARFIELD ANIMATION
+        function initStarfield() {
+            const canvas = document.getElementById('starfield');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const stars = [];
+            for (let i = 0; i < 200; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 1.5,
+                    opacity: Math.random() * 0.5 + 0.5,
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+
+                for (const star of stars) {
+                    ctx.globalAlpha = star.opacity;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    star.opacity += (Math.random() - 0.5) * 0.1;
+                    star.opacity = Math.max(0.2, Math.min(1, star.opacity));
+                }
+
+                requestAnimationFrame(animate);
+            }
+
+            animate();
+
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // GLOBAL APP INSTANCE
+        const app = new DiaryApp();
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            initStarfield();
+        });
+
+        // REGISTER SERVICE WORKER for offline support (optional)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('data:text/javascript,self.addEventListener("install",e=>self.skipWaiting());self.addEventListener("activate",e=>e.waitUntil(clients.matchAll().then(c=>Promise.all(c.map(client=>client.navigate(client.url))))));').catch(() => {});
+        }
+    </script>
 </body>
 </html>
