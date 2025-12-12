@@ -3286,10 +3286,9 @@
                 this.voiceChunks = [];
             }
 
-            async init() {
+            init() {
                 try {
                     this.storage.init();
-                    await new Promise(r => setTimeout(r, 100));
 
                     const canvas = document.getElementById('pageCanvas');
                     if (!canvas) {
@@ -3307,7 +3306,7 @@
                         this.openPage(this.pages[0].id);
                     }
 
-                    // Load ALL customization settings
+                    // Load ALL customization settings (SYNCHRONOUS)
                     const coverSettings = [
                         'coverColor', 'coverPattern', 'coverTrim', 'coverCorner', 'coverFont',
                         'coverSpine', 'coverFinish', 'coverTitleTone', 'coverText', 'coverSubtext',
@@ -3317,7 +3316,7 @@
 
                     for (const setting of coverSettings) {
                         const saved = this.storage.getSettings(setting);
-                        if (saved) {
+                        if (saved !== null && saved !== undefined) {
                             this[setting] = saved;
                         }
                     }
@@ -3325,7 +3324,7 @@
                     const pageSettings = ['pageTemplate', 'pageColor', 'pageMargin', 'pageBorder', 'pageTexture', 'pageNumberStyle'];
                     for (const setting of pageSettings) {
                         const saved = this.storage.getSettings(setting);
-                        if (saved) {
+                        if (saved !== null && saved !== undefined) {
                             this[setting] = saved;
                         }
                     }
@@ -3919,20 +3918,25 @@
                 this.pages.unshift(page);
                 if (this.isCoverOpen) {
                     this.openPage(page.id);
+                    this.renderPageList();
+                    this.showStatus('✨ New page', 1200);
+                    if (window.audio) window.audio.playSave();
                 }
-                this.renderPageList();
-                this.showStatus('✨ New page', 1200);
-                window.audio.playSave();
             }
 
             openPage(id) {
                 try {
+                    if (!id || this.pages.length === 0) return;
+                    
                     if (this.currentPageId) {
                         this.savePage();
                     }
 
                     const page = this.storage.getPage(id);
-                    if (!page) return;
+                    if (!page) {
+                        console.warn('Page not found:', id);
+                        return;
+                    }
 
                     this.currentPageId = id;
                     this.currentPageIndex = this.pages.findIndex(p => p.id === id);
@@ -3974,7 +3978,7 @@
                     this.resizeCanvas();
 
                     const wrapper = document.querySelector('.page-canvas-wrapper');
-                    if (wrapper) {
+                    if (wrapper && window.gsap) {
                         gsap.from(wrapper, { duration: 0.5, opacity: 0, y: 30, ease: 'back.out' });
                     }
                 } catch (err) {
@@ -4157,8 +4161,11 @@
             nextPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx < this.pages.length - 1) {
-                    window.audio.playPageTurn();
-                    gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: -50 });
+                    if (window.audio) window.audio.playPageTurn();
+                    const wrapper = document.querySelector('.page-canvas-wrapper');
+                    if (wrapper && window.gsap) {
+                        gsap.to(wrapper, { duration: 0.3, opacity: 0, x: -50 });
+                    }
                     setTimeout(() => this.openPage(this.pages[idx + 1].id), 300);
                 }
             }
@@ -4166,8 +4173,11 @@
             previousPage() {
                 const idx = this.pages.findIndex(p => p.id === this.currentPageId);
                 if (idx > 0) {
-                    window.audio.playPageTurn();
-                    gsap.to(document.querySelector('.page-canvas-wrapper'), { duration: 0.3, opacity: 0, x: 50 });
+                    if (window.audio) window.audio.playPageTurn();
+                    const wrapper = document.querySelector('.page-canvas-wrapper');
+                    if (wrapper && window.gsap) {
+                        gsap.to(wrapper, { duration: 0.3, opacity: 0, x: 50 });
+                    }
                     setTimeout(() => this.openPage(this.pages[idx - 1].id), 300);
                 }
             }
@@ -4785,23 +4795,38 @@
         window.audio = new AudioEngine();
 
         document.addEventListener('DOMContentLoaded', () => {
-            initStarfield();
-            const enterBtn = document.getElementById('enterBtn');
-            if (enterBtn) {
-                enterBtn.addEventListener('click', () => {
-                    window.audio.playClick();
-                    gsap.to(document.getElementById('landing'), {
-                        duration: 0.8,
-                        opacity: 0,
-                        ease: 'power2.inOut',
-                        onComplete: () => window.app.startApp()
+            try {
+                initStarfield();
+                const enterBtn = document.getElementById('enterBtn');
+                if (enterBtn) {
+                    enterBtn.addEventListener('click', () => {
+                        if (window.audio) window.audio.playClick();
+                        const landing = document.getElementById('landing');
+                        if (landing && window.gsap) {
+                            gsap.to(landing, {
+                                duration: 0.8,
+                                opacity: 0,
+                                ease: 'power2.inOut',
+                                onComplete: () => {
+                                    if (window.app) window.app.startApp();
+                                }
+                            });
+                        } else {
+                            if (window.app) window.app.startApp();
+                        }
                     });
-                });
+                }
+            } catch (err) {
+                console.error('DOMContentLoaded error:', err);
             }
         });
 
-        if (document.readyState !== 'loading') {
-            initStarfield();
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                initStarfield();
+            });
+        } else {
+            setTimeout(() => initStarfield(), 100);
         }
     </script>
 </body>
